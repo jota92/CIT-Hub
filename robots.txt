@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+# Prevent temporary or private files if added in future
+Disallow: /private/
+Disallow: /*.map$
