@@ -468,15 +468,27 @@ ol {
 
   @media (max-width: 640px) {
     .container {
-      width: calc(100% - 28px);
+      width: calc(100% - 32px);
     }
 
     .section {
-      padding: 52px 0;
+      padding: 36px 0;
     }
 
     .hero {
-      padding-top: 64px;
+      padding-top: 52px;
+    }
+
+    .hero-copy {
+      gap: 12px;
+    }
+
+    .hero-copy h1 {
+      font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+    }
+
+    .hero-lead {
+      font-size: clamp(0.95rem, 1.2vw, 1.05rem);
     }
 
     .header-inner {
@@ -492,27 +504,146 @@ ol {
     .header-badge,
     .btn-nav {
       width: 100%;
+      font-size: 13px;
     }
 
     .hero-actions {
       display: grid;
       grid-template-columns: 1fr;
+      gap: 8px;
     }
 
     .btn {
       width: 100%;
+      min-height: 44px;
+      font-size: 14px;
+      padding: 8px 16px;
+    }
+
+    .stat-card {
+      padding: 12px 10px;
+    }
+
+    .stat-card strong {
+      font-size: 0.95rem;
+    }
+
+    .stat-card span {
+      font-size: 12px;
     }
 
     .feature-grid {
       grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .feature-card {
+      padding: 16px;
+    }
+
+    .feature-card h3 {
+      font-size: 18px;
+    }
+
+    .feature-card p {
+      font-size: 14px;
     }
 
     .screens-grid {
       grid-template-columns: 1fr;
-      gap: 20px;
+      gap: 16px;
+    }
+
+    .screen-figure figcaption {
+      font-size: 14px;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.4rem, 2.8vw, 1.8rem);
     }
 
     .cta-card {
-      padding: 18px;
+      padding: 20px;
+      gap: 20px;
+    }
+
+    .cta-card h2 {
+      font-size: clamp(1.3rem, 2.4vw, 1.6rem);
+    }
+
+    .cta-note {
+      font-size: 13px;
+    }
+
+    .kicker {
+      font-size: 10px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .container {
+      width: calc(100% - 24px);
+    }
+
+    .section {
+      padding: 28px 0;
+    }
+
+    .hero {
+      padding-top: 42px;
+    }
+
+    .header-inner {
+      padding: 8px 0;
+    }
+
+    .brand-text {
+      font-size: 18px;
+    }
+
+    .hero-copy h1 {
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+    }
+
+    .hero-lead {
+      font-size: clamp(0.9rem, 1vw, 0.95rem);
+    }
+
+    .feature-card {
+      padding: 14px;
+    }
+
+    .feature-card h3 {
+      font-size: 16px;
+    }
+
+    .feature-card p {
+      font-size: 13px;
+    }
+
+    .stat-card {
+      padding: 10px 8px;
+    }
+
+    .stat-card strong {
+      font-size: 0.9rem;
+    }
+
+    .cta-card {
+      padding: 16px;
+      grid-template-columns: 1fr;
+    }
+
+    .cta-card h2 {
+      font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+    }
+
+    .cta-actions img {
+      width: 60px;
+      height: 60px;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.2rem, 2.5vw, 1.6rem);
     }
   }
