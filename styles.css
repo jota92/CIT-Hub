@@ -19,7 +19,7 @@ body { overflow-x: clip; margin: 0; font-family: 'Outfit', 'Noto Sans JP', sans-
 img { max-width: 100%; display: block; }
 a { text-decoration: none; color: inherit; }
 
-.container { width: min(1040px, 100% - 64px); margin-inline: auto; }
+.container { width: 100%; max-width: 1040px; margin: 0 auto; padding: 0 24px; }
 
 /* Header */
 .site-header { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); width: min(800px, 100% - 48px); z-index: 50; background: rgba(255,255,255,0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,1); border-radius: 999px; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08); transition: all 0.3s ease; }
@@ -37,7 +37,7 @@ h1, h2, h3, p { margin: 0; }
 .hero::before { content: ""; position: absolute; top: -10%; left: -10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(37,99,235,0.12) 0%, transparent 70%); filter: blur(40px); z-index: -1; }
 .hero::after { content: ""; position: absolute; bottom: -10%; right: -10%; width: 600px; height: 600px; background: radial-gradient(circle, rgba(79,70,229,0.08) 0%, transparent 70%); filter: blur(60px); z-index: -1; }
 
-.hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; max-width: 1040px; margin-inline: auto; justify-items: center; text-align: left; }
+.hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; max-width: 1040px; margin: 0 auto; justify-items: center; text-align: left; }
 .hero-copy { display: flex; flex-direction: column; gap: 24px; max-width: 520px; }
 .hero-copy h1 { font-size: clamp(2.8rem, 5.5vw, 4.5rem); line-height: 1.1; font-weight: 800; letter-spacing: -0.04em; text-wrap: balance; }
 .hero-lead { font-size: clamp(1.1rem, 1.5vw, 1.25rem); color: var(--muted); max-width: 500px; text-wrap: pretty; line-height: 1.7; }
@@ -122,7 +122,7 @@ h1, h2, h3, p { margin: 0; }
 
 @media (max-width: 640px) {
   body { font-size: 15px; }
-  .container { width: calc(100% - 32px); }
+  .container { width: 100%; padding: 0 16px; }
   .site-header { width: calc(100% - 32px); padding: 4px; top: 12px; }
   .header-badge { display: none; } /* Keep minimalist on mobile */
   .hero.section { padding-top: 150px; min-height: auto; padding-bottom: 60px; justify-content: flex-start; }
