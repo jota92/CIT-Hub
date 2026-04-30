@@ -182,6 +182,10 @@ ol {
   font-size: clamp(2.3rem, 5vw, 4.4rem);
   line-height: 1.02;
   letter-spacing: -0.04em;
+  background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .hero-lead {
@@ -211,16 +215,25 @@ ol {
 .stat-card {
   border-radius: var(--radius-md);
   padding: 16px 14px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow-soft-small);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(26, 47, 94, 0.08);
   display: grid;
   gap: 4px;
   text-align: center;
+  transition: all 280ms ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+  box-shadow: 0 12px 40px rgba(26, 47, 94, 0.12);
 }
 
 .stat-card strong {
   font-size: 1.1rem;
+  color: var(--accent);
 }
 
 .stat-card span {
@@ -335,51 +348,59 @@ ol {
 }
 
 .feature-card {
-  background: var(--surface);
-  border: 1px solid var(--line);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: var(--radius-md);
-  box-shadow: 0 4px 16px rgba(26, 47, 94, 0.06);
-  padding: 20px;
+  box-shadow: 0 8px 32px rgba(26, 47, 94, 0.06);
+  padding: 24px;
   display: grid;
   gap: 8px;
-  transition: transform 180ms ease, box-shadow 180ms ease;
+  transition: all 240ms ease;
 }
 
 .feature-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(26, 47, 94, 0.12);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 48px rgba(26, 47, 94, 0.14);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+  border-color: rgba(63, 103, 255, 0.2);
 }
 
 .feature-card h3 {
   font-size: 21px;
   line-height: 1.2;
+  color: var(--accent);
+  font-weight: 700;
 }
 
 .feature-card p {
   color: var(--muted);
+  line-height: 1.5;
 }
 
 .cta-card {
-  background: var(--surface);
-  border: 1px solid var(--line);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+  border: none;
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-soft);
-  padding: 32px;
+  box-shadow: 0 20px 60px rgba(63, 103, 255, 0.3);
+  padding: 40px;
   display: grid;
   grid-template-columns: 1.3fr 1fr;
   gap: 32px;
   align-items: center;
+  color: #ffffff;
 }
 
 .cta-card h2 {
   margin-top: 6px;
   font-size: clamp(1.45rem, 2.6vw, 2.05rem);
   line-height: 1.2;
+  color: #ffffff;
 }
 
 .cta-note {
   margin-top: 8px;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.9);
   line-height: 1.6;
 }
 
@@ -487,6 +508,10 @@ ol {
       gap: 12px;
     }
 
+    .hero-visual {
+      display: none;
+    }
+
     .hero-copy h1 {
       font-size: clamp(1.8rem, 4.5vw, 2.8rem);
     }
@@ -573,6 +598,7 @@ ol {
     .cta-card {
       padding: 20px;
       gap: 20px;
+      grid-template-columns: 1fr;
     }
 
     .cta-card h2 {
