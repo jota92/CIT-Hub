@@ -14,7 +14,8 @@
 }
 
 * { box-sizing: border-box; }
-body { margin: 0; font-family: 'Outfit', 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+html, body { overflow-x: hidden; }
+body { margin: 0; font-family: 'Outfit', 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
 img { max-width: 100%; display: block; }
 a { text-decoration: none; color: inherit; }
 

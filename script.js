@@ -33,19 +33,29 @@
 
   if (appDownloadButtons.length) {
     appDownloadButtons.forEach((button) => {
-      button.addEventListener('click', (event) => {
+      button.addEventListener('click', async (event) => {
         event.preventDefault();
+        
         if (isAndroid()) {
-          if (downloadNotice) {
-            downloadNotice.hidden = false;
-            downloadNotice.textContent = 'Android版は間もなくリリース予定です。';
+          try {
+            const response = await fetch('./assets/version.json');
+            const data = await response.json();
+            const latestVersion = data.versions[0];
+            if (latestVersion && latestVersion.downloadUrl) {
+              window.location.href = latestVersion.downloadUrl;
+            } else {
+              throw new Error('Download URL not found');
+            }
+          } catch (e) {
+            if (downloadNotice) {
+              downloadNotice.hidden = false;
+              downloadNotice.textContent = '申し訳ありません。Android版のファイル情報を取得できませんでした。';
+            }
           }
           return;
         }
-        if (isIOS()) {
-          window.location.href = IOS_STORE_URL;
-          return;
-        }
+
+        // isIOS or fallback
         window.location.href = IOS_STORE_URL;
       });
     });
