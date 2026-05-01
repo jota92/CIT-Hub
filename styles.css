@@ -14,8 +14,8 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-padding-top: 120px; scroll-behavior: smooth; }
-body { overflow-x: clip; margin: 0; font-family: 'Outfit', 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+html { scroll-padding-top: 120px; scroll-behavior: smooth; width: 100%; overflow-x: hidden; }
+body { overflow-x: hidden; overflow-x: clip; margin: 0; max-width: 100%; font-family: 'Outfit', 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
 img { max-width: 100%; display: block; }
 a { text-decoration: none; color: inherit; }
 
