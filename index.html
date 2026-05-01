@@ -2,12 +2,13 @@
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>CIT Hub | より良いキャンパスライフを</title>
     <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
     <meta name="author" content="CIT Hub" />
     <meta name="application-name" content="CIT Hub" />
     <meta name="theme-color" content="#edf1f7" />
+    <meta name="format-detection" content="telephone=no" />
     <meta name="apple-itunes-app" content="app-id=6760315556" />
     <meta
       name="keywords"
@@ -17,9 +18,11 @@
       name="description"
       content="CIT Hubは、時間割・課題・学内サービス・板書カメラを一つにまとめた、千葉工業大学向けの非公式サポートアプリです。"
     />
-    <link rel="canonical" href="/" />
+    <link rel="canonical" href="https://cit-hub.vercel.app/" />
+    <link rel="icon" href="https://cit-hub.vercel.app/assets/app-icon.png" />
+    <link rel="apple-touch-icon" href="https://cit-hub.vercel.app/assets/app-icon.png" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="/" />
+    <meta property="og:url" content="https://cit-hub.vercel.app/" />
     <meta property="og:locale" content="ja_JP" />
     <meta property="og:site_name" content="CIT Hub" />
     <meta property="og:title" content="CIT Hub | より良いキャンパスライフを" />
@@ -27,14 +30,16 @@
       property="og:description"
       content="時間割・課題・学内サービス・板書カメラをまとめて使える、千葉工業大学向け非公式アプリCIT Hub。"
     />
-    <meta property="og:image" content="./assets/app-icon.png" />
+    <meta property="og:image" content="https://cit-hub.vercel.app/assets/app-icon.png" />
+    <meta property="og:image:secure_url" content="https://cit-hub.vercel.app/assets/app-icon.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="CIT Hub | より良いキャンパスライフを" />
     <meta
       name="twitter:description"
       content="時間割・課題・学内サービス・板書カメラをまとめて使える、千葉工業大学向け非公式アプリCIT Hub。"
     />
-    <meta name="twitter:image" content="./assets/app-icon.png" />
+    <meta name="twitter:image" content="https://cit-hub.vercel.app/assets/app-icon.png" />
+    <meta name="twitter:image:alt" content="CIT Hubアプリのアイコン" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -48,14 +53,17 @@
         "@type": "SoftwareApplication",
         "name": "CIT Hub",
         "applicationCategory": "EducationApplication",
-        "operatingSystem": "iOS",
+        "operatingSystem": "iOS, Android",
         "inLanguage": "ja-JP",
         "offers": {
           "@type": "Offer",
           "price": "0",
           "priceCurrency": "JPY"
         },
-        "downloadUrl": "https://apps.apple.com/jp/app/cit-hub/id6760315556",
+        "downloadUrl": [
+          "https://apps.apple.com/jp/app/cit-hub/id6760315556",
+          "https://cit-hub.vercel.app/"
+        ],
         "description": "時間割・課題・学内サービス・板書カメラを一つにまとめた、千葉工業大学向けの非公式サポートアプリです。"
       }
     </script>

@@ -4,3 +4,5 @@ Allow: /
 # Prevent temporary or private files if added in future
 Disallow: /private/
 Disallow: /*.map$
+
+Sitemap: https://cit-hub.vercel.app/sitemap.xml
