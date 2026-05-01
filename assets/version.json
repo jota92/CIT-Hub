@@ -1,9 +1,9 @@
 {
   "versions": [
     {
-      "version": "1.0.6",
+      "version": "1.0.5",
       "versionCode": 1,
-      "downloadUrl": "https://cit-hub.vercel.app/android-app/CITHub-release-1.0..apk"
+      "downloadUrl": "https://cit-hub.vercel.app/android-app/CITHub-release-1.0.5.apk"
     }
   ]
 }
