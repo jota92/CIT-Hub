@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "timezone": "Asia/Tokyo",
+  "entries": [
+    { "title": "在学生ガイダンス", "start": "2026-04-01", "end": "2026-04-04", "kind": "regular" },
+    { "title": "入学式", "start": "2026-04-05", "end": "2026-04-05", "kind": "regular" },
+    { "title": "前期授業", "start": "2026-04-11", "end": "2026-07-17", "kind": "regular" },
+    { "title": "祝日授業日", "start": "2026-04-29", "end": "2026-04-29", "kind": "regular" },
+    { "title": "自学自習の日（休講）", "start": "2026-04-30", "end": "2026-04-30", "kind": "class_suspension" },
+    { "title": "開学記念日 休講", "start": "2026-05-01", "end": "2026-05-01", "kind": "class_suspension" },
+    { "title": "自学自習の日（休講）", "start": "2026-05-02", "end": "2026-05-02", "kind": "class_suspension" },
+    { "title": "文化の祭典", "start": "2026-05-10", "end": "2026-05-10", "kind": "regular" },
+    { "title": "開学記念日（授業日）", "start": "2026-05-15", "end": "2026-05-15", "kind": "regular" },
+    { "title": "成田山詣行脚", "start": "2026-05-23", "end": "2026-05-24", "kind": "regular" },
+    { "title": "共通試験日（前期）", "start": "2026-07-18", "end": "2026-07-18", "kind": "regular" },
+    { "title": "後期ガイダンス", "start": "2026-09-17", "end": "2026-09-17", "kind": "regular" },
+    { "title": "後期授業開始", "start": "2026-09-18", "end": "2026-09-18", "kind": "regular" },
+    { "title": "祝日授業日", "start": "2026-09-21", "end": "2026-09-21", "kind": "regular" },
+    { "title": "祝日授業日", "start": "2026-09-22", "end": "2026-09-22", "kind": "regular" },
+    { "title": "祝日授業日", "start": "2026-09-23", "end": "2026-09-23", "kind": "regular" },
+    { "title": "祝日授業日", "start": "2026-10-12", "end": "2026-10-12", "kind": "regular" },
+    { "title": "祝日授業日", "start": "2026-11-03", "end": "2026-11-03", "kind": "regular" },
+    { "title": "津田沼祭準備（休講）", "start": "2026-11-20", "end": "2026-11-20", "kind": "class_suspension" },
+    { "title": "津田沼祭　休講", "start": "2026-11-21", "end": "2026-11-21", "kind": "class_suspension" },
+    { "title": "津田沼祭　休講", "start": "2026-11-22", "end": "2026-11-22", "kind": "class_suspension" },
+    { "title": "津田沼祭後片付け（休講）", "start": "2026-11-23", "end": "2026-11-23", "kind": "class_suspension" },
+    { "title": "後期授業終了", "start": "2026-12-21", "end": "2026-12-21", "kind": "regular" },
+    { "title": "共通試験日（後期）", "start": "2026-12-22", "end": "2026-12-22", "kind": "regular" },
+    { "title": "入学試験", "start": "2027-02-17", "end": "2027-02-18", "kind": "regular" },
+    { "title": "入学試験", "start": "2027-03-04", "end": "2027-03-04", "kind": "regular" },
+    { "title": "学位記授与式（卒業式）", "start": "2027-03-20", "end": "2027-03-31", "kind": "regular" }
+  ],
+  "vacations": [
+    { "title": "夏休み", "start": "2026-07-19", "end": "2026-09-16" },
+    { "title": "冬・春休み", "start": "2026-12-23", "end": "2027-03-31" }
+  ]
+}
