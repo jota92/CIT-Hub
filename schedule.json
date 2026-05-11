@@ -11,7 +11,7 @@
     { "title": "新入生履修訂正期間", "start": "2026-04-22", "end": "2026-04-28", "kind": "regular" },
     { "title": "祝日授業日", "start": "2026-04-29", "end": "2026-04-29", "kind": "regular" },
     { "title": "自学自習の日（休講）", "start": "2026-04-30", "end": "2026-04-30", "kind": "class_suspension" },
-{ "title": "自学自習の日（休講）", "start": "2026-05-11", "end": "2026-05-11", "kind": "class_suspension" },
+
     { "title": "開学記念日（5月15日）の振替（休講）", "start": "2026-05-01", "end": "2026-05-01", "kind": "class_suspension" },
     { "title": "自学自習の日（休講）", "start": "2026-05-02", "end": "2026-05-02", "kind": "class_suspension" },
     { "title": "文化の祭典", "start": "2026-05-10", "end": "2026-05-10", "kind": "class_suspension" },
