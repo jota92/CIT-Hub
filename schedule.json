@@ -17,7 +17,7 @@
     { "title": "文化の祭典", "start": "2026-05-10", "end": "2026-05-10", "kind": "class_suspension" },
     { "title": "開学記念日（授業日）", "start": "2026-05-15", "end": "2026-05-15", "kind": "regular" },
     { "title": "成田山詣行脚", "start": "2026-05-23", "end": "2026-05-24", "kind": "class_suspension" },
-
+ { "title": "台風のため臨時休校", "start": "2026-06-02", "end": "2026-06-03", "kind": "class_suspension" },
     { "title": "共通試験日（前期）", "start": "2026-07-18", "end": "2026-07-18", "kind": "class_suspension" },
     { "title": "追試験・補充授業・再試験等期間", "start": "2026-07-21", "end": "2026-08-07", "kind": "class_suspension" },
     { "title": "夏期集中授業・補充授業・再試験等期間", "start": "2026-08-18", "end": "2026-08-31", "kind": "class_suspension" },
