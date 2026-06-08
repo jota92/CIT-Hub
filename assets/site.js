@@ -2,7 +2,6 @@
   const sections = Array.from(document.querySelectorAll('.reveal'));
   const appDownloadButtons = Array.from(document.querySelectorAll('.js-app-download'));
   const downloadNotice = document.querySelector('#download-notice');
-
   const IOS_STORE_URL = 'https://apps.apple.com/jp/app/cit-hub/id6760315556';
 
   const isIOS = () => {
@@ -12,7 +11,7 @@
 
   const isAndroid = () => /Android/i.test(navigator.userAgent || '');
 
-  if (sections.length) {
+  if (sections.length && 'IntersectionObserver' in window) {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -22,41 +21,41 @@
           }
         });
       },
-      {
-        threshold: 0.1,
-        rootMargin: '0px 0px -8% 0px'
-      }
+      { threshold: 0.08, rootMargin: '0px 0px -6% 0px' }
     );
 
     sections.forEach((section) => observer.observe(section));
+  } else {
+    sections.forEach((section) => section.classList.add('is-visible'));
   }
 
   if (appDownloadButtons.length) {
     appDownloadButtons.forEach((button) => {
       button.addEventListener('click', async (event) => {
         event.preventDefault();
-        
+
         if (isAndroid()) {
           try {
-            const response = await fetch('./assets/version.json');
+            const response = await fetch('./assets/version.json', { cache: 'no-store' });
             const data = await response.json();
-            const latestVersion = data.versions[0];
+            const latestVersion = Array.isArray(data.versions) ? data.versions[0] : null;
             if (latestVersion && latestVersion.downloadUrl) {
               window.location.href = latestVersion.downloadUrl;
-            } else {
-              throw new Error('Download URL not found');
+              return;
             }
-          } catch (e) {
+            throw new Error('download url not found');
+          } catch (error) {
             if (downloadNotice) {
               downloadNotice.hidden = false;
-              downloadNotice.textContent = '申し訳ありません。Android版のファイル情報を取得できませんでした。';
+              downloadNotice.textContent = 'Android版の配布情報を取得できませんでした。時間を置いて再度お試しください。';
             }
+            return;
           }
-          return;
         }
 
-        // isIOS or fallback
-        window.location.href = IOS_STORE_URL;
+        if (isIOS() || !isAndroid()) {
+          window.location.href = IOS_STORE_URL;
+        }
       });
     });
   }

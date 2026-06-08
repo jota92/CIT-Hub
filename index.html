@@ -3,50 +3,42 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>CIT Hub | より良いキャンパスライフを</title>
+    <title>CIT Hub | 学生向けキャンパスサポートアプリ</title>
     <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
     <meta name="author" content="CIT Hub" />
     <meta name="application-name" content="CIT Hub" />
-    <meta name="theme-color" content="#edf1f7" />
+    <meta name="theme-color" content="#f4f7fb" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="apple-itunes-app" content="app-id=6760315556" />
     <meta
       name="keywords"
-      content="CIT Hub,千葉工業大学,時間割アプリ,manaba,課題管理,学内ポータル,学生アプリ,板書カメラ"
+      content="CIT Hub,千葉工業大学,時間割アプリ,manaba,課題管理,学内ポータル,学生アプリ,板書カメラ,ToDo"
     />
     <meta
       name="description"
-      content="CIT Hubは、時間割・課題・学内サービス・板書カメラを一つにまとめた、千葉工業大学向けの非公式サポートアプリです。"
+      content="CIT Hub は、時間割・ToDo・学内サービス・板書カメラをひとつにまとめた、千葉工業大学の学生向けサポートアプリです。"
     />
     <link rel="canonical" href="https://cit-hub.vercel.app/" />
-    <link rel="icon" href="https://cit-hub.vercel.app/assets/app-icon.png" />
-    <link rel="apple-touch-icon" href="https://cit-hub.vercel.app/assets/app-icon.png" />
+    <link rel="icon" href="./assets/app-icon.png" />
+    <link rel="apple-touch-icon" href="./assets/app-icon.png" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://cit-hub.vercel.app/" />
     <meta property="og:locale" content="ja_JP" />
     <meta property="og:site_name" content="CIT Hub" />
-    <meta property="og:title" content="CIT Hub | より良いキャンパスライフを" />
+    <meta property="og:title" content="CIT Hub | 学生向けキャンパスサポートアプリ" />
     <meta
       property="og:description"
-      content="時間割・課題・学内サービス・板書カメラをまとめて使える、千葉工業大学向け非公式アプリCIT Hub。"
+      content="時間割・ToDo・学内サービス・板書カメラをまとめて使える、千葉工業大学の学生向けサポートアプリです。"
     />
     <meta property="og:image" content="https://cit-hub.vercel.app/assets/app-icon.png" />
-    <meta property="og:image:secure_url" content="https://cit-hub.vercel.app/assets/app-icon.png" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="CIT Hub | より良いキャンパスライフを" />
+    <meta name="twitter:title" content="CIT Hub | 学生向けキャンパスサポートアプリ" />
     <meta
       name="twitter:description"
-      content="時間割・課題・学内サービス・板書カメラをまとめて使える、千葉工業大学向け非公式アプリCIT Hub。"
+      content="時間割・ToDo・学内サービス・板書カメラをまとめて使える、千葉工業大学の学生向けサポートアプリです。"
     />
     <meta name="twitter:image" content="https://cit-hub.vercel.app/assets/app-icon.png" />
-    <meta name="twitter:image:alt" content="CIT Hubアプリのアイコン" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Outfit:wght@500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./assets/site.css" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -64,107 +56,57 @@
           "https://apps.apple.com/jp/app/cit-hub/id6760315556",
           "https://cit-hub.vercel.app/"
         ],
-        "description": "時間割・課題・学内サービス・板書カメラを一つにまとめた、千葉工業大学向けの非公式サポートアプリです。"
-      }
-    </script>
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "CIT Hubは何ができますか？",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "時間割、課題、学内サービス、板書カメラを一つのアプリで利用できます。"
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "iOS版はどこからダウンロードできますか？",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "App Storeからダウンロードできます。"
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Android版は利用できますか？",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Android版は間もなくリリース予定です。"
-            }
-          }
-        ]
+        "description": "時間割・ToDo・学内サービス・板書カメラをひとつにまとめた、千葉工業大学の学生向けサポートアプリです。"
       }
     </script>
   </head>
   <body>
     <header class="site-header">
-      <div class="container header-inner">
+      <div class="header-inner">
         <a class="brand" href="#top" aria-label="CIT Hub">
           <img class="brand-icon" src="./assets/app-icon.png" width="40" height="40" alt="CIT Hubアプリアイコン" />
-          <span class="brand-text">CIT Hub</span>
+          <span>CIT Hub</span>
         </a>
-
         <div class="header-actions">
-          <span class="header-badge">学生向け非公式アプリ</span>
+          <span class="header-badge">千葉工業大学 学生向け非公式アプリ</span>
         </div>
       </div>
     </header>
 
     <main id="top">
-      <section class="hero section reveal">
-        <div class="container hero-grid">
-          <div class="hero-copy">
-            <h1>より良いキャンパスライフを。</h1>
-            <p class="hero-lead">
-              <span class="hero-lead-highlight">時間割・課題・学内サービス・板書管理</span> をひとつに。
-              必要な情報へ最短でたどり着ける、学生向けの実用アプリです。
-            </p>
-            <div class="hero-actions">
-              <a class="btn btn-primary js-app-download" href="https://apps.apple.com/jp/app/cit-hub/id6760315556">アプリをダウンロード</a>
-              <a class="btn btn-soft" href="#features">機能を見る</a>
+      <section class="section section-tight reveal">
+        <div class="container hero-card">
+          <div class="hero-grid">
+            <div class="hero-copy">
+              <p class="eyebrow">CIT HUB</p>
+              <h1>時間割も、課題も、学内サービスも、ひとつに。</h1>
+              <p class="hero-lead">
+                CIT Hub は、時間割、ToDo、学内サービス、板書カメラをまとめて使える、
+                千葉工業大学の学生向けサポートアプリです。授業前の確認から提出物の整理まで、日常の流れを崩さず使えます。
+              </p>
+              <div class="hero-actions">
+                <a class="btn btn-primary js-app-download" href="https://apps.apple.com/jp/app/cit-hub/id6760315556">ダウンロード</a>
+                <a class="btn btn-secondary" href="./how.html">取扱説明書を見る</a>
+              </div>
+              <div class="hero-stats" aria-label="アプリの特徴">
+                <article class="stat-card">
+                  <strong>時間割</strong>
+                  <span>授業ごとの情報を一覧で確認</span>
+                </article>
+                <article class="stat-card">
+                  <strong>ToDo</strong>
+                  <span>manaba課題と個人ToDoを一元管理</span>
+                </article>
+                <article class="stat-card">
+                  <strong>学内サービス</strong>
+                  <span>ポータルやmanabaをアプリ内で利用</span>
+                </article>
+              </div>
+              <p class="hero-note">本アプリは個人開発による非公式アプリであり、千葉工業大学とは一切関係ありません。</p>
             </div>
-            <div class="hero-stats" aria-label="アプリの特徴">
-              <article class="stat-card">
-                <strong>iOS</strong>
-                <span>App Storeで配信中</span>
-              </article>
-              <article class="stat-card">
-                <strong>Android</strong>
-                <span>APK配信中</span>
-              </article>
-              <article class="stat-card">
-                <strong>4機能</strong>
-                <span>ひとつのアプリで</span>
-              </article>
+            <div class="hero-visual">
+              <img class="hero-shot" src="./assets/screenshots/iphone15pm/iphone15pm_02_timetable.png" alt="CIT Hub の時間割画面" />
             </div>
-            <p class="hero-note">本アプリは個人開発による非公式アプリであり、千葉工業大学とは一切関係ありません。</p>
-          </div>
-
-          <div class="hero-visual">
-            <img src="./assets/app-screenshot-schedule.png" alt="CIT Hubの時間割画面。今日のスケジュール、課題、通知がひと目で確認できます" class="app-screenshot" />
-          </div>
-        </div>
-      </section>
-
-      <section id="screens" class="section reveal">
-        <div class="container">
-          <div class="section-head">
-            <p class="kicker">実際の画面</p>
-            <h2>アプリでできることを見る</h2>
-          </div>
-          <div class="screens-grid">
-            <figure class="screen-figure">
-              <img src="./assets/app-screenshot-schedule.png" alt="時間割画面：今日のスケジュール、課題、コマ数が一目で確認できます" />
-              <figcaption>時間割・今日のスケジュール</figcaption>
-            </figure>
-            <figure class="screen-figure">
-              <img src="./assets/app-screenshot-tasks.png" alt="課題画面：未提出の課題が一覧表示され、期限順に整理されています" />
-              <figcaption>課題・期限の管理</figcaption>
-            </figure>
           </div>
         </div>
       </section>
@@ -172,88 +114,107 @@
       <section id="features" class="section reveal">
         <div class="container">
           <div class="section-head">
-            <p class="kicker">FEATURES</p>
-            <h2>必要な機能を、シンプルに</h2>
+            <p class="kicker">Features</p>
+            <h2>最新機能</h2>
           </div>
-
           <div class="feature-grid">
             <article class="feature-card">
-              <h3>時間割</h3>
-              <p>前期/後期を自動切替。週グリッドと一覧表示を切り替え可能。</p>
+              <h3>時間割タブ</h3>
+              <p>前期・後期の時間割表示に対応。授業カードから板書や関連導線へ進めます。</p>
             </article>
             <article class="feature-card">
-              <h3>課題</h3>
-              <p>manabaから未提出課題を取得し、期限までの残り時間で整理。</p>
+              <h3>ToDoタブ</h3>
+              <p>manaba課題と個人ToDoを一緒に表示。追加・編集・通知設定・添付ファイル確認に対応します。</p>
             </article>
             <article class="feature-card">
               <h3>学内サービス</h3>
-              <p>manaba・ポータル・食堂メニューを同一導線で利用。</p>
+              <p>manaba、ポータル、食堂メニュー、バスダイヤ、CIT Board、カスタムURLを切り替えて使えます。</p>
             </article>
             <article class="feature-card">
               <h3>板書カメラ</h3>
-              <p>授業ごとに撮影・保存・共有。復習しやすい管理画面。</p>
+              <p>無音カメラで板書を撮影し、授業ごとに保存・閲覧できます。授業カードから直接起動も可能です。</p>
             </article>
             <article class="feature-card">
               <h3>通知</h3>
-              <p>授業前と課題期限前のリマインダー通知に対応。</p>
+              <p>課題通知、授業前通知、個人ToDo通知に対応。個人ToDoは 1回のみ と 毎週通知を選べます。</p>
             </article>
             <article class="feature-card">
-              <h3>ウィジェット</h3>
-              <p>その日の時間割や課題の締切をホーム画面で確認可能。</p>
+              <h3>PDF / 添付確認</h3>
+              <p>学内サービス内の PDF プレビューや、個人ToDo添付ファイルのアプリ内プレビューに対応します。</p>
             </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="screens" class="section reveal">
+        <div class="container">
+          <div class="section-head">
+            <p class="kicker">Screens</p>
+            <h2>アプリ画面</h2>
+          </div>
+          <div class="shot-grid three">
+            <figure class="shot-card">
+              <img src="./assets/screenshots/iphone15pm/iphone15pm_02_timetable.png" alt="時間割画面" />
+              <figcaption>時間割</figcaption>
+            </figure>
+            <figure class="shot-card">
+              <img src="./assets/screenshots/iphone15pm/iphone15pm_03_todo_list.png" alt="ToDo 一覧" />
+              <figcaption>ToDo 一覧</figcaption>
+            </figure>
+            <figure class="shot-card">
+              <img src="./assets/screenshots/iphone15pm/iphone15pm_06_service_manaba.png" alt="学内サービス manaba" />
+              <figcaption>学内サービス</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section id="manual" class="section reveal">
+        <div class="container">
+          <div class="download-card">
+            <div>
+              <p class="kicker">Manual</p>
+              <h3>全機能の取扱説明書</h3>
+              <p>
+                各タブの役割、ToDo の作成方法、通知の違い、学内サービスの使い方、板書カメラの流れを詳しくまとめた説明書ページを用意しています。
+              </p>
+            </div>
+            <div class="download-actions">
+              <img src="./assets/app-icon.png" alt="CIT Hub アイコン" />
+              <a class="btn btn-secondary" href="./how.html">取扱説明書へ</a>
+            </div>
           </div>
         </div>
       </section>
 
       <section id="download" class="section reveal">
-        <div class="container cta-card">
-          <div>
-            <p class="kicker">DOWNLOAD</p>
-            <h2>CIT Hubを今すぐ使う</h2>
-            <p class="cta-note">
-              <strong>iOS版</strong>は App Store で、<strong>Android版</strong>は当サイトからAPKファイルが今すぐダウンロード可能です。
-            </p>
-          </div>
-          <div class="cta-actions">
-            <img src="./assets/app-icon.png" alt="CIT Hubアイコン" />
-            <a class="btn btn-primary js-app-download" href="https://apps.apple.com/jp/app/cit-hub/id6760315556">アプリをダウンロード</a>
-            <p class="download-fallback"><strong>iOS版</strong>は App Store で、<strong>Android版</strong>は当サイト(APK)で配信中です。</p>
-            <p id="download-notice" class="download-notice" hidden></p>
-          </div>
-        </div>
-      </section>
-
-      <section id="faq" class="section reveal">
         <div class="container">
-          <div class="section-head">
-            <p class="kicker">FAQ</p>
-            <h2>よくある質問</h2>
-          </div>
-          <div class="feature-grid">
-            <article class="feature-card">
-              <h3>CIT Hubは何ができますか？</h3>
-              <p>時間割・課題・学内サービス・板書カメラを一つのアプリで使えます。</p>
-            </article>
-            <article class="feature-card">
-              <h3>iOS版の入手先は？</h3>
-              <p>App Storeからダウンロードできます。</p>
-            </article>
-            <article class="feature-card">
-              <h3>Android版は使えますか？</h3>
-              <p>当サイトからAPKファイルを直接ダウンロードしてインストールいただけます。iOSと同じ機能をお使いいただけます。</p>
-            </article>
+          <div class="download-card">
+            <div>
+              <p class="kicker">Download</p>
+              <h3>CIT Hub を使う</h3>
+              <p>
+                iOS は App Store へ移動します。Android は最新配布情報である <code>assets/version.json</code> を参照して APK 配布先へ遷移します。
+              </p>
+            </div>
+            <div class="download-actions">
+              <img src="./assets/app-icon.png" alt="CIT Hub アイコン" />
+              <a class="btn btn-primary js-app-download" href="https://apps.apple.com/jp/app/cit-hub/id6760315556">ダウンロード</a>
+              <p class="download-fallback">Android版の配布先は更新される場合があります。</p>
+              <p id="download-notice" class="download-notice" hidden></p>
+            </div>
           </div>
         </div>
       </section>
     </main>
 
-    <footer class="site-footer">
-      <div class="container footer-inner">
-        <p class="kicker">NON OFFICIAL APPLICATION</p>
-        <p>CIT Hubは個人開発による非公式アプリです。学校公式情報は必ず公式サイトで最終確認してください。</p>
+    <footer class="footer">
+      <div class="container">
+        <p>CIT Hub は個人開発による非公式アプリです。学校公式情報は必ず公式サイトでも確認してください。</p>
+        <p>バスダイヤ、年間スケジュール、配布バージョン情報はこのサイトの管理データをもとに提供しています。</p>
       </div>
     </footer>
 
-    <script src="./script.js" defer></script>
+    <script src="./assets/site.js" defer></script>
   </body>
 </html>
