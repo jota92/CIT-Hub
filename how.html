@@ -1,469 +1,198 @@
 <!doctype html>
 <html lang="ja">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CIT Hub 取扱説明書</title>
-    <meta
-      name="description"
-      content="CIT Hub の全機能をまとめたユーザー向け取扱説明書。時間割、ToDo、学内サービス、板書カメラ、通知、設定の使い方をスクリーンショット付きで確認できます。"
-    />
-    <link rel="stylesheet" href="./assets/site.css" />
-  </head>
-  <body>
-    <header class="site-header">
-      <div class="header-inner">
-        <a class="brand" href="./index.html" aria-label="CIT Hub トップへ移動">
-          <img class="brand-icon" src="./assets/app-icon.png" alt="CIT Hub アイコン" />
-          <span>CIT Hub 取扱説明書</span>
-        </a>
-        <div class="header-meta">
-          <span class="meta-pill">iOS / Android 共通仕様</span>
-          <span class="meta-pill">更新日 2026-06-08</span>
-        </div>
-      </div>
-    </header>
-
-    <div class="page-shell" id="top">
-      <aside class="toc-panel">
-        <div class="toc-card">
-          <p class="toc-kicker">目次</p>
-          <nav>
-            <a href="#overview">1. 概要</a>
-            <a href="#start">2. はじめ方</a>
-            <a href="#tabs">3. タブ構成</a>
-            <a href="#timetable">4. 時間割</a>
-            <a href="#todo">5. ToDo</a>
-            <a href="#services">6. 学内サービス</a>
-            <a href="#board-camera">7. 板書カメラ</a>
-            <a href="#settings">8. 設定</a>
-            <a href="#notifications">9. 通知</a>
-            <a href="#notes">10. 補足</a>
-            <a href="#gallery">11. 画面一覧</a>
-            <a href="#download">12. ダウンロード</a>
-          </nav>
-        </div>
-      </aside>
-
-      <main class="doc-main">
-        <section class="hero-block reveal">
-          <p class="eyebrow">CIT HUB USER MANUAL</p>
-          <h1>全機能を順番に確認できる取扱説明書</h1>
-          <p class="lead">
-            CIT Hub の主な機能と使い方を、タブごとに順番に確認できる取扱説明書です。
-          </p>
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="#start">使い方を読む</a>
-            <a class="btn btn-secondary js-app-download" href="https://apps.apple.com/jp/app/cit-hub/id6760315556">アプリをダウンロード</a>
-          </div>
-        </section>
-
-        <section id="overview" class="doc-section reveal">
-          <div class="doc-head">
-            <p class="section-kicker">Overview</p>
-            <h2>1. アプリ概要</h2>
-          </div>
-          <div class="doc-card">
-            <p>
-              CIT Hub は、千葉工業大学の学生向けに、時間割、課題管理、学内サービス、板書写真管理、通知管理をひとつにまとめたアプリです。
-              基本構成は <strong>時間割 / ToDo / 学内サービス / 板書カメラ / 設定</strong> の5タブです。
-            </p>
-            <ul>
-              <li>授業予定と授業情報の確認</li>
-              <li>manaba課題と個人ToDoの一元管理</li>
-              <li>ポータルや学内Webサービスの利用</li>
-              <li>板書写真の無音撮影と授業別整理</li>
-              <li>課題・授業・個人予定の通知管理</li>
-            </ul>
-          </div>
-        </section>
-
-        <section id="start" class="doc-section reveal">
-          <div class="doc-head">
-            <p class="section-kicker">Quick Start</p>
-            <h2>2. はじめ方</h2>
-          </div>
-          <div class="doc-cards two">
-            <article class="doc-card">
-              <h3>初回起動</h3>
-              <p>ログイン済みでなければ学内アカウントでログインします。保存済み資格情報がある場合は自動で復帰します。</p>
-            </article>
-            <article class="doc-card">
-              <h3>通知の許可</h3>
-              <p>通知を許可すると、課題通知、授業開始前通知、個人ToDo通知を受け取れるようになります。</p>
-            </article>
-            <article class="doc-card">
-              <h3>チュートリアル</h3>
-              <p>初回チュートリアルでは各タブや主要機能の場所を順番に案内します。設定から再表示も可能です。</p>
-            </article>
-            <article class="doc-card">
-              <h3>普段の使い方</h3>
-              <p>時間割で授業確認、ToDoで課題整理、必要に応じて学内サービスや板書カメラを使います。</p>
-            </article>
-          </div>
-          <figure class="doc-shot" style="margin-top:16px;">
-            <img src="./assets/screenshots/iphone15pm/iphone15pm_01_splash.png" alt="起動時の画面" />
-            <figcaption>起動直後の画面</figcaption>
-          </figure>
-        </section>
-
-        <section id="tabs" class="doc-section reveal">
-          <div class="doc-head">
-            <p class="section-kicker">Tabs</p>
-            <h2>3. タブ構成</h2>
-          </div>
-          <div class="feature-table">
-            <div class="feature-row header"><div>タブ</div><div>役割</div></div>
-            <div class="feature-row"><div>時間割</div><div>授業一覧、授業詳細、板書や出席導線への入口</div></div>
-            <div class="feature-row"><div>ToDo</div><div>manaba課題と個人ToDoの一覧、追加、編集、通知設定</div></div>
-            <div class="feature-row"><div>学内サービス</div><div>manaba / ポータル / 食堂メニュー / バスダイヤ / CIT Board / カスタムURL</div></div>
-            <div class="feature-row"><div>板書カメラ</div><div>授業ごとの板書写真管理、無音カメラ起動、閲覧</div></div>
-            <div class="feature-row"><div>設定</div><div>起動設定、表示設定、通知設定、二要素認証、法的情報</div></div>
-          </div>
-        </section>
-
-        <section id="timetable" class="doc-section reveal">
-          <div class="doc-head">
-            <p class="section-kicker">Timetable</p>
-            <h2>4. 時間割タブ</h2>
-          </div>
-          <div class="doc-grid two">
-            <article class="doc-card">
-              <h3>できること</h3>
-              <ul>
-                <li>前期・後期の時間割表示</li>
-                <li>授業カードから授業名、教室、担当情報の確認</li>
-                <li>授業カードから板書タブへ遷移</li>
-                <li>授業ごとに必要な写真へ素早くアクセス</li>
-              </ul>
-            </article>
-            <article class="doc-card">
-              <h3>タップ動作</h3>
-              <ul>
-                <li>授業カードから板書や関連画面へ進めます</li>
-                <li>授業カードからカメラ起動ボタンを表示して撮影開始可能です</li>
-                <li>出席登録導線は設定状態に応じて利用できます</li>
-              </ul>
-            </article>
-          </div>
-          <figure class="doc-shot" style="margin-top:16px;">
-            <img src="./assets/screenshots/iphone15pm/iphone15pm_02_timetable.png" alt="時間割タブ" />
-            <figcaption>時間割タブ</figcaption>
-          </figure>
-        </section>
-
-        <section id="todo" class="doc-section reveal">
-          <div class="doc-head">
-            <p class="section-kicker">ToDo</p>
-            <h2>5. ToDoタブ</h2>
-          </div>
-          <div class="doc-note">
-            <h3>ToDoタブの考え方</h3>
-            <p>manabaから取得した課題と、自分で追加した個人ToDoを同じ一覧で表示します。個人ToDoは標準課題より少し濃い色味で区別します。</p>
-          </div>
-          <div class="doc-grid two" style="margin-top:16px;">
-            <article class="doc-card">
-              <h3>一覧でできること</h3>
-              <ul>
-                <li>課題・ToDoを1画面で確認</li>
-                <li>表示件数、残り日数、対象種別で絞り込み</li>
-                <li>自分で追加したToDoだけに絞り込むフィルタに対応</li>
-                <li>manaba課題は従来順、個人ToDoは期限や通知日時を基準に整理</li>
-              </ul>
-            </article>
-            <article class="doc-card">
-              <h3>個人ToDoの並び順</h3>
-              <ul>
-                <li>期限あり: 期限順</li>
-                <li>期限なし・通知あり: 通知日時を代わりの基準に使用</li>
-                <li>期限なし・通知なし: 個人ToDo内で上部に表示</li>
-                <li>毎週通知: 期限は持たず、次回通知日時に応じて再配置</li>
-              </ul>
-            </article>
-          </div>
-          <div class="doc-grid three" style="margin-top:16px;">
-            <article class="doc-card">
-              <h3>追加できる項目</h3>
-              <ul>
-                <li>タイトル（必須）</li>
-                <li>詳細メモ</li>
-                <li>期限</li>
-                <li>通知方式</li>
-                <li>添付ファイルURL</li>
-                <li>添付ファイル</li>
-              </ul>
-            </article>
-            <article class="doc-card">
-              <h3>通知方式</h3>
-              <ul>
-                <li>なし</li>
-                <li>1回のみ: 日付と時刻を指定</li>
-                <li>毎週: 曜日と時刻を指定</li>
-              </ul>
-            </article>
-            <article class="doc-card">
-              <h3>保存ルール</h3>
-              <ul>
-                <li>1回のみ通知は期限より後に設定不可</li>
-                <li>毎週通知では期限設定不可</li>
-                <li>期限未設定時は期限入力欄を非表示</li>
-                <li>期限到来後、毎週通知でない個人ToDoは自動で消去可</li>
-              </ul>
-            </article>
-          </div>
-          <div class="doc-card" style="margin-top:16px;">
-            <h3>添付ファイルと詳細表示</h3>
-            <ul>
-              <li>個人ToDoをタップすると、タイトル、本文、期限、通知、添付ファイルURL、添付ファイルをプレビュー表示</li>
-              <li>画像やPDFなどはアプリ内プレビューに対応</li>
-              <li>編集ボタンから内容の更新が可能</li>
-            </ul>
-          </div>
-          <div class="doc-shots three" style="margin-top:16px;">
-            <figure class="doc-shot"><img src="./assets/screenshots/iphone15pm/iphone15pm_03_todo_list.png" alt="ToDo一覧" /><figcaption>ToDo一覧</figcaption></figure>
-            <figure class="doc-shot"><img src="./assets/screenshots/iphone15pm/iphone15pm_04_todo_add.png" alt="ToDo追加画面" /><figcaption>ToDo追加</figcaption></figure>
-            <figure class="doc-shot"><img src="./assets/screenshots/iphone15pm/iphone15pm_05_todo_preview.png" alt="ToDo詳細プレビュー" /><figcaption>ToDo詳細プレビュー</figcaption></figure>
-          </div>
-        </section>
-
-        <section id="services" class="doc-section reveal">
-          <div class="doc-head">
-            <p class="section-kicker">Campus Services</p>
-            <h2>6. 学内サービス</h2>
-          </div>
-          <div class="doc-card">
-            <h3>利用できるサービス</h3>
-            <ul>
-              <li>manaba</li>
-              <li>ポータル</li>
-              <li>食堂メニュー</li>
-              <li>バスダイヤ</li>
-              <li>CIT Board</li>
-              <li>カスタムURLタブ</li>
-            </ul>
-          </div>
-          <div class="doc-grid two" style="margin-top:16px;">
-            <article class="doc-card">
-              <h3>ブラウザ操作</h3>
-              <ul>
-                <li>各サービスはアプリ内ブラウザで表示</li>
-                <li>通常のWebサービスでは戻るボタンを常時表示して利用可能</li>
-                <li>ポータル画面だけは、サイト内に専用の戻るがある場合にアプリ側戻るを非表示</li>
-                <li>PDFなどのファイルはアプリ内でプレビューし、右上から共有・保存可能</li>
-              </ul>
-            </article>
-            <article class="doc-card">
-              <h3>ポータル特有の挙動</h3>
-              <ul>
-                <li>多重セッションエラーを検出した場合は再読み込みで復帰を試行</li>
-                <li>ポータル二要素認証の入力補助・設定導線があります</li>
-                <li>登録画面の戻るボタンがある場合はアプリ側戻るを隠します</li>
-              </ul>
-            </article>
-          </div>
-        </section>
-
-        <section id="board-camera" class="doc-section reveal">
-          <div class="doc-head">
-            <p class="section-kicker">Board Camera</p>
-            <h2>7. 板書カメラ</h2>
-          </div>
-          <div class="doc-grid two">
-            <article class="doc-card">
-              <h3>主な機能</h3>
-              <ul>
-                <li>授業ごとの板書写真一覧</li>
-                <li>無音カメラで撮影</li>
-                <li>授業詳細で写真確認、拡大表示、管理</li>
-                <li>時間割や授業カードの導線から直接利用可能</li>
-              </ul>
-            </article>
-            <article class="doc-card">
-              <h3>使い方</h3>
-              <ol>
-                <li>時間割または板書カメラタブから授業を選ぶ</li>
-                <li>カメラボタンを押す</li>
-                <li>無音カメラで撮影する</li>
-                <li>授業詳細で写真を見返す</li>
-              </ol>
-            </article>
-          </div>
-          <div class="doc-shots two" style="margin-top:16px;">
-            <figure class="doc-shot"><img src="./assets/screenshots/iphone15pm/iphone15pm_11_board_camera_courses.png" alt="板書カメラ授業一覧" /><figcaption>授業一覧</figcaption></figure>
-            <figure class="doc-shot"><img src="./assets/screenshots/iphone15pm/iphone15pm_12_board_camera_detail.png" alt="板書カメラ詳細" /><figcaption>授業詳細・写真管理</figcaption></figure>
-          </div>
-        </section>
-
-        <section id="settings" class="doc-section reveal">
-          <div class="doc-head">
-            <p class="section-kicker">Settings</p>
-            <h2>8. 設定タブ</h2>
-          </div>
-          <div class="doc-grid three">
-            <article class="doc-card">
-              <h3>アカウント</h3>
-              <ul>
-                <li>ログイン状態の確認</li>
-                <li>アカウント情報の削除</li>
-              </ul>
-            </article>
-            <article class="doc-card">
-              <h3>通知センター</h3>
-              <ul>
-                <li>管理者からのお知らせ確認</li>
-                <li>アプリ内通知一覧の表示</li>
-              </ul>
-            </article>
-            <article class="doc-card">
-              <h3>起動設定</h3>
-              <ul>
-                <li>起動時に開くタブの選択</li>
-                <li>学内サービスで最初に開くタブの選択</li>
-                <li>スプラッシュ表示のON/OFF</li>
-                <li>チュートリアル再表示</li>
-              </ul>
-            </article>
-            <article class="doc-card">
-              <h3>表示カスタム</h3>
-              <ul>
-                <li>テーマカラー変更</li>
-                <li>学内サービスに表示するタブの選択</li>
-                <li>各画面の表示方針の調整</li>
-              </ul>
-            </article>
-            <article class="doc-card">
-              <h3>通知設定</h3>
-              <ul>
-                <li>課題通知のON/OFF</li>
-                <li>授業開始前通知のON/OFF</li>
-                <li>通知権限状態の確認</li>
-              </ul>
-            </article>
-            <article class="doc-card">
-              <h3>ポータル二要素認証</h3>
-              <ul>
-                <li>Authenticator登録情報の設定</li>
-                <li>QR読み取りやコード管理導線</li>
-                <li>設定済み状態の確認</li>
-              </ul>
-            </article>
-          </div>
-          <div class="doc-policy" style="margin-top:16px;">
-            <h3>設定画面について</h3>
-            <p>設定画面は利用状況に応じて表示項目が変わるため、この説明書では機能を文章中心で紹介しています。</p>
-          </div>
-        </section>
-
-        <section id="notifications" class="doc-section reveal">
-          <div class="doc-head">
-            <p class="section-kicker">Notifications</p>
-            <h2>9. 通知機能</h2>
-          </div>
-          <div class="doc-grid three">
-            <article class="doc-card">
-              <h3>課題通知</h3>
-              <ul>
-                <li>課題公開時</li>
-                <li>締切1週間前</li>
-                <li>締切3日前</li>
-                <li>締切24時間前</li>
-              </ul>
-            </article>
-            <article class="doc-card">
-              <h3>授業前通知</h3>
-              <ul>
-                <li>授業開始前に通知</li>
-                <li>授業リマインダーとして利用可能</li>
-              </ul>
-            </article>
-            <article class="doc-card">
-              <h3>個人ToDo通知</h3>
-              <ul>
-                <li>通知なし</li>
-                <li>1回のみ</li>
-                <li>毎週</li>
-              </ul>
-            </article>
-          </div>
-        </section>
-
-        <section id="notes" class="doc-section reveal">
-          <div class="doc-head">
-            <p class="section-kicker">Notes</p>
-            <h2>10. 補足情報</h2>
-          </div>
-          <div class="doc-grid two">
-            <article class="doc-card">
-              <h3>保存されるデータ</h3>
-              <ul>
-                <li>個人ToDo</li>
-                <li>添付ファイル情報</li>
-                <li>板書写真</li>
-                <li>各種設定値</li>
-                <li>ログイン情報はOSの安全な保存領域を使用</li>
-              </ul>
-            </article>
-            <article class="doc-card">
-              <h3>必要な権限</h3>
-              <ul>
-                <li>通知</li>
-                <li>カメラ</li>
-                <li>写真 / ファイル</li>
-              </ul>
-            </article>
-            <article class="doc-card">
-              <h3>既知の注意点</h3>
-              <ul>
-                <li>学内Webサービス側の仕様変更で一部表示が変わる場合があります</li>
-                <li>ポータル側のセッション制限により、再読み込みが発生する場合があります</li>
-                <li>Webコンテンツの一部は提供元の都合で読み込み待ちが長くなる場合があります</li>
-              </ul>
-            </article>
-          </div>
-        </section>
-
-        <section id="gallery" class="doc-section reveal">
-          <div class="doc-head">
-            <p class="section-kicker">Gallery</p>
-            <h2>11. 画面スクリーンショット一覧</h2>
-          </div>
-          <div class="gallery-grid">
-            <figure class="gallery-card"><img src="./assets/screenshots/iphone15pm/iphone15pm_01_splash.png" alt="01 起動時画面" /><figcaption>01 起動時画面</figcaption></figure>
-            <figure class="gallery-card"><img src="./assets/screenshots/iphone15pm/iphone15pm_02_timetable.png" alt="02 時間割" /><figcaption>02 時間割</figcaption></figure>
-            <figure class="gallery-card"><img src="./assets/screenshots/iphone15pm/iphone15pm_03_todo_list.png" alt="03 ToDo一覧" /><figcaption>03 ToDo一覧</figcaption></figure>
-            <figure class="gallery-card"><img src="./assets/screenshots/iphone15pm/iphone15pm_04_todo_add.png" alt="04 ToDo追加" /><figcaption>04 ToDo追加</figcaption></figure>
-            <figure class="gallery-card"><img src="./assets/screenshots/iphone15pm/iphone15pm_05_todo_preview.png" alt="05 ToDo詳細" /><figcaption>05 ToDo詳細</figcaption></figure>
-            <figure class="gallery-card"><img src="./assets/screenshots/iphone15pm/iphone15pm_11_board_camera_courses.png" alt="11 板書カメラ 授業一覧" /><figcaption>11 板書カメラ 授業一覧</figcaption></figure>
-            <figure class="gallery-card"><img src="./assets/screenshots/iphone15pm/iphone15pm_12_board_camera_detail.png" alt="12 板書カメラ 詳細" /><figcaption>12 板書カメラ 詳細</figcaption></figure>
-          </div>
-        </section>
-
-        <section id="download" class="doc-section reveal">
-          <div class="doc-head">
-            <p class="section-kicker">Download</p>
-            <h2>12. ダウンロード</h2>
-          </div>
-          <div class="download-card">
-            <div>
-              <h3>CIT Hub をインストール</h3>
-              <p>iOS は App Store に遷移します。Android は配布中の最新 APK 取得先に遷移します。</p>
-            </div>
-            <div class="download-actions">
-              <img src="./assets/app-icon.png" alt="CIT Hubアイコン" />
-              <a class="btn btn-primary js-app-download" href="https://apps.apple.com/jp/app/cit-hub/id6760315556">ダウンロード</a>
-              <p id="download-notice" class="download-notice" hidden></p>
-            </div>
-          </div>
-        </section>
-      </main>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>CIT Hub 使い方ガイド</title>
+  <meta name="description" content="CIT Hubの時間割、ToDo、学内サービス、板書カメラ、通知、設定、サポートの操作をまとめたガイドです。" />
+  <meta name="theme-color" content="#f5f5f7" />
+  <link rel="icon" href="./assets/app-icon.png" />
+  <link rel="stylesheet" href="./assets/site.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main-content">本文へ移動</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="./index.html" aria-label="CIT Hubトップへ"><img class="brand-icon" src="./assets/app-icon.png" width="34" height="34" alt="" /><span>CIT Hub</span></a>
+      <button class="nav-toggle" type="button" aria-label="メニューを開く" aria-expanded="false">メニュー</button>
+      <nav class="site-nav" aria-label="サイト内ナビゲーション"><a href="./index.html">トップ</a><a href="#start">はじめ方</a><a href="#timetable">時間割</a><a href="#todo">ToDo</a><a href="#settings">設定</a></nav>
     </div>
+  </header>
 
-    <footer class="footer">
-      <div class="container">
-        <p>CIT Hub ユーザー向け取扱説明書</p>
+  <main id="main-content">
+    <section class="manual-hero">
+      <div class="container reveal">
+        <p class="eyebrow">使い方ガイド</p>
+        <h1>必要な操作を、<br />ここで確認する。</h1>
+        <p class="hero-lead">CIT Hubの機能を、実際の画面と操作順に沿って説明します。端末によって配置や名称がわずかに異なる場合があります。</p>
+        <div class="hero-actions"><a class="btn btn-primary" href="#start">はじめ方から読む</a><a class="btn btn-secondary js-app-download" href="https://apps.apple.com/jp/app/cit-hub/id6760315556">ダウンロード</a></div>
       </div>
-    </footer>
+    </section>
 
-    <script src="./assets/site.js" defer></script>
-  </body>
+    <div class="manual-layout">
+      <aside class="toc"><p class="toc-title">目次</p><nav aria-label="取扱説明書の目次"><a href="#start">はじめ方</a><a href="#timetable">時間割</a><a href="#course">授業の詳細</a><a href="#todo">ToDo・課題</a><a href="#services">学内サービス</a><a href="#board">板書カメラ</a><a href="#notifications">通知</a><a href="#settings">設定</a><a href="#authenticator">二要素認証</a><a href="#support">サポート</a><a href="#sync">引き継ぎ</a><a href="#devices">対応端末</a><a href="#privacy">データの扱い</a></nav></aside>
+
+      <article class="manual-content">
+        <section id="start" class="manual-section reveal">
+          <p class="section-label">はじめ方</p><h2>最初にすること</h2>
+          <div class="manual-grid">
+            <div class="manual-block"><h3>1. ログイン</h3><p>MARINE User IDとパスワードを入力します。保存した情報を使って、次回以降の学内サービスへのログインを補助します。</p></div>
+            <div class="manual-block"><h3>2. 時間割を取得</h3><p>最初に時間割を取得すると、時間割、授業詳細、板書カメラで授業名と教室情報を利用できます。取得に失敗したときは、前回の保存データを表示します。</p></div>
+            <div class="manual-block"><h3>3. 通知を許可</h3><p>課題、授業開始前、個人ToDo、サポート返信を通知で受け取る場合は、端末の通知を許可します。後から設定画面でも確認できます。</p></div>
+            <div class="manual-block"><h3>4. チュートリアル</h3><p>初回チュートリアルでは、時間割、ToDo、学内サービス、板書カメラ、食堂、バス、通知、設定を案内します。設定の「使い方チュートリアルを再表示」からいつでも見直せます。</p></div>
+          </div>
+        </section>
+
+        <section id="timetable" class="manual-section reveal">
+          <p class="section-label">時間割</p><h2>今日の授業を確認する</h2>
+          <p>時間割では日別表示と週表示を切り替え、曜日ごとの授業、教室、担当情報を確認できます。右上の年間予定から学年暦PDFも開けます。</p>
+          <div class="manual-grid">
+            <div class="manual-block"><h3>日別・週表示</h3><p>上部の「日別」「週表示」で見方を切り替えます。曜日は曜日表示のどこを押しても選択できます。更新ボタンでは時間割を再取得します。</p></div>
+            <div class="manual-block"><h3>学期の表示</h3><p>通常は日付から前期・後期を自動判定します。設定では前期または後期に固定できます。設定した学期は板書カメラの授業一覧にも反映されます。</p></div>
+            <div class="manual-block"><h3>授業カードを変更</h3><p>授業カードを長押しすると、授業名とカード色を変更できます。変更した授業名は、授業詳細と板書カメラでも同じ名称で表示されます。</p></div>
+            <div class="manual-block"><h3>更新できないとき</h3><p>通信や学内サービス側の都合で再取得できない場合でも、保存済みの時間割を先に表示します。更新操作の近くに表示される状態を確認して、時間を置いて再試行してください。</p></div>
+          </div>
+          <figure class="manual-shot"><img src="./assets/screenshots/iphone15pm/iphone15pm_02_timetable.png" alt="時間割画面" /><figcaption>授業、時限、担当、教室を日別表示で確認します。</figcaption></figure>
+        </section>
+
+        <section id="course" class="manual-section reveal">
+          <p class="section-label">授業の詳細</p><h2>授業ごとの情報をまとめて開く</h2>
+          <p>時間割の授業をタップすると、その授業に関連する情報を確認できます。時間割とmanabaで授業名の表記に差がある場合は、曜日・時限・名称を使って関連づけます。</p>
+          <div class="manual-grid">
+            <div class="manual-block"><h3>課題</h3><p>関連するmanaba課題を確認できます。課題名をタップすると、学内サービス内のmanabaで該当課題ページを開きます。</p></div>
+            <div class="manual-block"><h3>板書写真</h3><p>授業詳細から、その授業の板書写真一覧を開けます。写真がない場合も、ここから撮影または端末内の写真を追加できます。</p></div>
+          </div>
+        </section>
+
+        <section id="todo" class="manual-section reveal">
+          <p class="section-label">ToDo・課題</p><h2>課題と自分の予定を、同じ一覧で管理する</h2>
+          <p>manabaから取得した課題と、自分で追加したToDoを同じ一覧に表示します。個人ToDoは色の濃淡で区別し、編集・削除できます。</p>
+          <div class="manual-grid">
+            <div class="manual-block"><h3>一覧を絞り込む</h3><p>「すべて」「ToDoのみ」「課題のみ」で表示対象を切り替えます。manaba課題は取得した並びを保ち、個人ToDoだけが期限・通知日時を使って整理されます。</p></div>
+            <div class="manual-block"><h3>個人ToDoを追加</h3><p>右上の追加ボタンから作成します。タイトルは必須です。詳細、期限、通知、URL、写真、ファイルを追加できます。URLと添付ファイルは同じ添付欄で扱います。</p></div>
+            <div class="manual-block"><h3>期限と通知</h3><p>期限なしでは期限日時の入力欄を表示しません。通知は「なし」「1回のみ」「毎週」から選択します。1回のみでは通知を期限より後に設定できません。毎週では期限を設定できません。</p></div>
+            <div class="manual-block"><h3>期限を過ぎた後</h3><p>1回のみの個人ToDoは期限を過ぎると一覧から自動で整理されます。毎週通知のToDoは、次回の通知日時へ更新して残ります。期限なしでも通知日時があるものは、一覧ではその通知日時を基準に並びます。</p></div>
+            <div class="manual-block"><h3>添付とURL</h3><p>詳細画面からURL、PDF、画像などを開けます。添付ファイルはアプリ内プレビューで確認し、対応する共有操作を利用できます。</p></div>
+            <div class="manual-block"><h3>manaba課題</h3><p>manaba課題をタップすると、実際の課題ページを開きます。課題の更新や削除を再取得した場合は、古い課題通知を整理します。</p></div>
+          </div>
+          <div class="manual-shot-grid">
+            <figure><img src="./assets/screenshots/iphone15pm/iphone15pm_03_todo_list.png" alt="ToDo一覧" /><figcaption>課題と個人ToDoを一覧で確認</figcaption></figure>
+            <figure><img src="./assets/screenshots/iphone15pm/iphone15pm_04_todo_add.png" alt="ToDo追加画面" /><figcaption>期限、通知、添付を設定して追加</figcaption></figure>
+            <figure><img src="./assets/screenshots/iphone15pm/iphone15pm_05_todo_preview.png" alt="ToDo詳細画面" /><figcaption>詳細、期限、通知、URL、添付を確認</figcaption></figure>
+          </div>
+        </section>
+
+        <section id="services" class="manual-section reveal">
+          <p class="section-label">学内サービス</p><h2>よく使うWebサービスを切り替える</h2>
+          <p>学内サービスにはmanaba、CITポータル、食堂メニュー、バスダイヤを表示します。設定で表示・非表示、並び順、カスタムWebページを変更できます。</p>
+          <div class="manual-grid">
+            <div class="manual-block"><h3>manaba</h3><p>スマホ表示と通常表示を設定から選べます。課題一覧や時間割から開いた課題は、manaba内の該当ページへ直接移動します。</p></div>
+            <div class="manual-block"><h3>CITポータル</h3><p>保存済みのアカウント情報でログインを補助します。ログイン画面への自動送信は同じ画面で1回に制限します。パスワードが入らない、二要素認証が必要、複数画面エラーなどは状態と手動操作を表示します。</p></div>
+            <div class="manual-block"><h3>読み込み・再読み込み</h3><p>読み込み中、ログイン処理中、エラーを区別して表示します。白い画面のまま待たせず、状態と再読み込み操作を示します。学内サービスのタブと戻る操作は読み込み中も表示されます。</p></div>
+            <div class="manual-block"><h3>戻る</h3><p>学内サービスでは通常の履歴に戻れます。ポータルだけは、サイト内に戻るボタンがある画面でアプリ側の戻る操作を無効にし、ほかのWebサービスとは切り離して扱います。</p></div>
+            <div class="manual-block"><h3>PDF・ファイル</h3><p>学内サービスでPDFを開くと、通常のブラウザに近い閲覧画面を表示します。右上から共有・ダウンロードできます。</p></div>
+            <div class="manual-block"><h3>食堂メニュー</h3><p>前回取得した食堂メニューを最初に表示し、バックグラウンドで更新を確認します。更新が見つかった場合だけ新しい内容に切り替えます。</p></div>
+            <div class="manual-block"><h3>バスダイヤ</h3><p>バスダイヤは標準で表示します。利用キャンパスを設定すると該当する時刻表を優先し、現在時刻に近い便を確認できます。曜日や経路も切り替えられます。</p></div>
+            <div class="manual-block"><h3>カスタムWebページ</h3><p>よく使うWebページを追加し、表示名・URL・並び順・表示状態を管理できます。</p></div>
+          </div>
+        </section>
+
+        <section id="board" class="manual-section reveal">
+          <p class="section-label">板書カメラ</p><h2>授業ごとに、写真を整理する</h2>
+          <p>時間割の授業名をもとに、板書写真を授業単位で保存します。写真が多い授業でも、授業一覧から目的の写真へ進めます。</p>
+          <div class="manual-grid">
+            <div class="manual-block"><h3>写真を追加</h3><p>授業を開き、「撮影」または「取り込む」を選びます。撮影時にシャッター音を出さないカメラを表示し、端末の向きに合わせて保存します。</p></div>
+            <div class="manual-block"><h3>写真を確認</h3><p>写真一覧で選んだ写真を開きます。ピンチ操作で拡大・縮小でき、横向きの写真は横向きのまま確認できます。</p></div>
+            <div class="manual-block"><h3>写真を管理</h3><p>写真の共有、写真アプリへの保存、削除ができます。既存の端末写真も授業へ追加できます。</p></div>
+            <div class="manual-block"><h3>時間割との関係</h3><p>時間割で変更した授業名は、板書カメラの授業名にも反映されます。時間割または授業詳細から板書カメラを開くこともできます。</p></div>
+          </div>
+          <div class="manual-shot-grid"><figure><img src="./assets/screenshots/iphone15pm/iphone15pm_11_board_camera_courses.png" alt="板書カメラの授業一覧" /><figcaption>時間割をもとにした授業一覧</figcaption></figure><figure><img src="./assets/screenshots/iphone15pm/iphone15pm_12_board_camera_detail.png" alt="板書カメラの授業詳細" /><figcaption>授業ごとの写真一覧と撮影操作</figcaption></figure></div>
+        </section>
+
+        <section id="notifications" class="manual-section reveal">
+          <p class="section-label">通知</p><h2>必要な通知だけを受け取る</h2>
+          <div class="manual-grid">
+            <div class="manual-block"><h3>課題リマインダー</h3><p>課題公開時、締切1週間前、3日前、24時間前を個別にオン・オフできます。通知には授業名、課題名、期限を表示し、タップすると該当課題を開きます。</p></div>
+            <div class="manual-block"><h3>授業開始前</h3><p>授業開始前の通知は課題通知と別に設定します。授業開始30分前と開始時刻に通知します。</p></div>
+            <div class="manual-block"><h3>個人ToDo</h3><p>個人ToDoの通知は、追加時に設定した単発または毎週の日時に届きます。課題リマインダーの設定とは独立しています。</p></div>
+            <div class="manual-block"><h3>通知センター</h3><p>アプリからのお知らせを一覧で確認できます。新しい端末にログインしても、過去のお知らせを自動で追加しません。</p></div>
+            <div class="manual-block"><h3>通知が届かない場合</h3><p>設定の「通知権限」で状態を確認してください。無効な場合は、端末の通知設定を開けます。</p></div>
+          </div>
+        </section>
+
+        <section id="settings" class="manual-section reveal">
+          <p class="section-label">設定</p><h2>使い方を自分に合わせる</h2>
+          <p>設定は、アカウント、サポート、通知センター、起動、表示カスタム、学内サービス、課題リマインダー、ポータル二要素認証、法務情報で構成されています。</p>
+          <div class="manual-grid">
+            <div class="manual-block"><h3>アカウント</h3><p>ログイン中のMARINE User IDを確認し、アカウント情報を削除または再入力できます。アカウント情報を削除しても、ポータル側の二要素認証設定は解除されません。</p></div>
+            <div class="manual-block"><h3>起動</h3><p>起動時に開くタブと、学内サービスで最初に開くタブを選べます。スプラッシュ表示のオン・オフ、チュートリアルの再表示もここで行います。</p></div>
+            <div class="manual-block"><h3>表示カスタム</h3><p>テーマカラーを選択またはカラーコードで指定できます。時間割は自動・前期・後期を選べます。文字の読みやすさを保つため、配色は自動で補正されます。</p></div>
+            <div class="manual-block"><h3>学内サービス</h3><p>manabaとポータルのスマホ表示を切り替え、表示タブの順番や表示状態、カスタムWebページを編集できます。</p></div>
+            <div class="manual-block"><h3>課題リマインダー</h3><p>課題と授業開始前通知を個別にオン・オフし、課題通知のタイミングを選べます。通知権限の状態もここで確認します。</p></div>
+            <div class="manual-block"><h3>通知センター</h3><p>管理者から配信されたお知らせの件数と未読数を確認できます。タップして全文を読み、URLが含まれる場合は外部ブラウザで開けます。</p></div>
+            <div class="manual-block"><h3>法務情報</h3><p>利用規約とプライバシーポリシーをアプリ内で確認できます。</p></div>
+          </div>
+          <div class="settings-shot-grid">
+            <figure><img src="./assets/screenshots/settings/support.png" alt="サポート設定" /><figcaption>サポートを開く</figcaption></figure>
+            <figure><img src="./assets/screenshots/settings/notification-center.png" alt="通知センター設定" /><figcaption>通知センターを開く</figcaption></figure>
+            <figure><img src="./assets/screenshots/settings/startup.png" alt="起動設定" /><figcaption>起動時に開く場所を選択</figcaption></figure>
+            <figure><img src="./assets/screenshots/settings/appearance.png" alt="表示カスタム設定" /><figcaption>テーマカラーと学期を設定</figcaption></figure>
+            <figure><img src="./assets/screenshots/settings/services.png" alt="学内サービス設定" /><figcaption>表示方式とサービスのタブを編集</figcaption></figure>
+            <figure><img src="./assets/screenshots/settings/reminders.png" alt="課題リマインダー設定" /><figcaption>通知タイミングを個別に選択</figcaption></figure>
+          </div>
+        </section>
+
+        <section id="authenticator" class="manual-section reveal">
+          <p class="section-label">ポータル二要素認証</p><h2>ワンタイムコードを設定する</h2>
+          <p>設定の「ポータル二要素認証」から追加します。ポータル側の登録では、デバイス名を <strong>cithub</strong>（小文字・スペースなし）にしてください。</p>
+          <div class="manual-grid">
+            <div class="manual-block"><h3>自動登録</h3><p>「ワンタップで自動登録」を選ぶと、ポータルの登録手順を案内します。処理中に繰り返し送信せず、状態を表示します。</p></div>
+            <div class="manual-block"><h3>QRコードで登録</h3><p>「QRコードで登録」では、最初に設定手順を確認してからQRコードを読み取ります。手動登録にも対応します。</p></div>
+            <div class="manual-block"><h3>コードが通らない場合</h3><p>端末の「日付と時刻」を自動設定にしてください。OTPが失敗した場合、アプリは何度も自動送信しません。画面に表示される状態を確認して手動で操作できます。</p></div>
+            <div class="manual-block"><h3>削除する前に</h3><p>アプリからAuthenticator設定を削除しても、ポータル側の二要素認証は解除されません。先にポータル側でcithubの設定を解除してください。解除せずに削除すると、ログインできなくなるおそれがあります。</p></div>
+          </div>
+        </section>
+
+        <section id="support" class="manual-section reveal">
+          <p class="section-label">サポート</p><h2>開発者へ直接問い合わせる</h2>
+          <p>設定の「サポートに問い合わせる」から、開発者とのメッセージ画面を開きます。問い合わせはログイン中のアカウントに紐付きます。</p>
+          <div class="manual-grid">
+            <div class="manual-block"><h3>会話を続ける</h3><p>同じアカウントでログインすれば、iPhone、iPad、Mac、Android間で会話を引き継げます。画面を開いたままでも、新しい返信を一定間隔で確認します。</p></div>
+            <div class="manual-block"><h3>返信の通知</h3><p>開発者から返信が届くと通知します。通知をタップすると、該当するサポート会話を直接開きます。</p></div>
+            <div class="manual-block"><h3>URLを受け取った場合</h3><p>サポートや通知センター内のURLは、タップすると端末の外部ブラウザで開きます。</p></div>
+          </div>
+        </section>
+
+        <section id="sync" class="manual-section reveal">
+          <p class="section-label">引き継ぎ</p><h2>端末を変えても、設定を続ける</h2>
+          <div class="manual-grid">
+            <div class="manual-block"><h3>同期する設定</h3><p>テーマカラー、時間割の授業名・色、学内サービスの表示と並び、起動先、通知設定、サポート会話などをアカウントに紐付けて反映します。</p></div>
+            <div class="manual-block"><h3>二要素認証</h3><p>ポータルのAuthenticator設定は端末側で暗号化して同期します。別端末には、時刻が新しい登録情報を反映します。</p></div>
+            <div class="manual-block"><h3>端末内に残るもの</h3><p>板書写真、添付ファイル、ログイン情報などは主に端末内で扱います。写真やファイルの内容を利用状況の分析目的で収集することはありません。</p></div>
+          </div>
+        </section>
+
+        <section id="devices" class="manual-section reveal">
+          <p class="section-label">対応端末</p><h2>端末に合わせた表示</h2>
+          <table class="availability"><thead><tr><th>機能</th><th>iPhone / iPad</th><th>Android</th><th>Mac</th></tr></thead><tbody>
+            <tr><td>時間割・授業詳細・ToDo</td><td class="yes">対応</td><td class="yes">対応</td><td class="yes">対応</td></tr>
+            <tr><td>学内サービス・PDF・バス</td><td class="yes">対応</td><td class="yes">対応</td><td class="yes">対応</td></tr>
+            <tr><td>通知・通知センター・サポート</td><td class="yes">対応</td><td class="yes">対応</td><td class="yes">対応</td></tr>
+            <tr><td>板書写真の閲覧・整理</td><td class="yes">対応</td><td class="yes">対応</td><td class="yes">対応</td></tr>
+            <tr><td>板書カメラでの撮影</td><td class="yes">対応</td><td class="yes">対応</td><td class="partial">非表示</td></tr>
+          </tbody></table>
+        </section>
+
+        <section id="privacy" class="manual-section reveal">
+          <p class="section-label">データの扱い</p><h2>必要な情報だけを扱う</h2>
+          <p>ログイン情報、時間割、課題、ToDo、板書写真、添付ファイルは、原則として端末内または利用者が接続する公式サービスとの通信で扱います。通知、設定同期、サポートのために、アカウントID、端末・アプリ情報、通知用トークン、利用設定・利用状況を送信する場合があります。</p>
+          <p class="manual-note"><strong>二要素認証の秘密鍵は平文で送信しません。</strong> 詳細は<a href="./privacy.html">プライバシーポリシー</a>を確認してください。</p>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container footer-inner"><div><p>CIT Hub は個人開発による千葉工業大学向け非公式アプリです。</p><p>学校公式の案内・期限・時刻は、必ず公式情報も確認してください。</p></div><a href="./index.html">CIT Hubトップ</a></div></footer>
+  <script src="./assets/site.js" defer></script>
+</body>
 </html>

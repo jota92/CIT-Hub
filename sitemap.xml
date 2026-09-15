@@ -6,22 +6,12 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://cit-hub.vercel.app/#features</loc>
+    <loc>https://cit-hub.vercel.app/how.html</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://cit-hub.vercel.app/#screens</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://cit-hub.vercel.app/#download</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://cit-hub.vercel.app/#faq</loc>
+    <loc>https://cit-hub.vercel.app/privacy.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
