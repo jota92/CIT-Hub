@@ -24,7 +24,7 @@
 
     { "title": "後期ガイダンス", "start": "2026-09-17", "end": "2026-09-17", "kind": "class_suspension" },
     { "title": "後期授業", "start": "2026-09-18", "end": "2026-12-21", "kind": "regular" },
-    { "title": "祝日授業日", "start": "2026-09-21", "end": "2026-09-21", "kind": "regular" },
+    { "title": "台風のため臨時休校", "start": "2026-09-21", "end": "2026-09-21", "kind": "class_suspension" },
     { "title": "祝日授業日", "start": "2026-09-22", "end": "2026-09-22", "kind": "regular" },
     { "title": "祝日授業日", "start": "2026-09-23", "end": "2026-09-23", "kind": "regular" },
     { "title": "祝日授業日", "start": "2026-10-12", "end": "2026-10-12", "kind": "regular" },
