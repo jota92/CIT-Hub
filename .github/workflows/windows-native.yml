@@ -38,5 +38,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: CIT-Hub-Windows-build-log-${{ matrix.architecture }}
-          path: windows-build-${{ matrix.architecture }}.log
+          path: |
+            windows-build-${{ matrix.architecture }}.log
+            windows/windows-build-*.binlog
+            windows/CITHub.Windows/obj/**/input.json
+            windows/CITHub.Windows/obj/**/output.json
           if-no-files-found: ignore

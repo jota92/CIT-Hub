@@ -7,6 +7,7 @@ $ErrorActionPreference = "Stop"
 $project = Join-Path $PSScriptRoot "CITHub.Windows\CITHub.Windows.csproj"
 $runtimeArchitecture = $Architecture.ToLowerInvariant()
 dotnet publish $project -c Release -r "win-$runtimeArchitecture" --self-contained true `
-    /p:Platform=$Architecture /p:AppxBundle=Never /p:GenerateAppxPackageOnBuild=true
+    /p:Platform=$Architecture /p:AppxBundle=Never /p:GenerateAppxPackageOnBuild=true `
+    "/bl:$PSScriptRoot\windows-build-$runtimeArchitecture.binlog"
 
 Write-Host "Published Windows $Architecture package."
