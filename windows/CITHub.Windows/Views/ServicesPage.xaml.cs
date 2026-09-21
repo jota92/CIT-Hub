@@ -60,7 +60,7 @@ public sealed partial class ServicesPage : Page
             BrowserLoading.IsActive = false;
             ServiceStatus.Text = args.IsSuccess ? "表示中" : "読み込みに失敗しました。再読み込みしてください。";
         };
-        Browser.CoreWebView2.DOMContentLoaded += async (_, args) => await TryPortalSignInAsync(args.Uri);
+        Browser.CoreWebView2.DOMContentLoaded += async (_, _) => await TryPortalSignInAsync(Browser.CoreWebView2.Source);
         Browser.CoreWebView2.NewWindowRequested += (_, args) =>
         {
             args.Handled = true;

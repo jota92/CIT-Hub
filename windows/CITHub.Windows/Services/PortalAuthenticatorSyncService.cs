@@ -56,6 +56,7 @@ public static class PortalAuthenticatorSyncService
 
     public static bool TryLoad(out PortalAuthenticatorConfig config)
     {
+        config = new PortalAuthenticatorConfig();
         var raw = WindowsCredentialStore.Load(ConfigKey);
         return !string.IsNullOrWhiteSpace(raw) && TryParse(raw, out config);
     }
@@ -121,7 +122,7 @@ public static class PortalAuthenticatorSyncService
     private static bool Validate(PortalAuthenticatorConfig config) =>
         config.secretBase32.Length >= 4 && config.digits is >= 4 and <= 10 && config.period is >= 5 and <= 120 &&
         config.algorithm is "SHA1" or "SHA256" or "SHA512" && config.secretBase32.All(c => "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".Contains(c));
-    private static string NormalizeSecret(string raw) => new(raw.ToUpperInvariant().Where(c => char.IsLetterOrDigit(c)).ToArray()).Replace("=", "");
+    private static string NormalizeSecret(string raw) => new string(raw.ToUpperInvariant().Where(char.IsLetterOrDigit).ToArray()).Replace("=", "");
     private static Dictionary<string, string> ParseQuery(string query) => query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries)
         .Select(pair => pair.Split('=', 2)).Where(pair => pair.Length == 2)
         .ToDictionary(pair => Uri.UnescapeDataString(pair[0]), pair => Uri.UnescapeDataString(pair[1]), StringComparer.OrdinalIgnoreCase);
