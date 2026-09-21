@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml;
+using CITHub.Windows.Services;
 
 namespace CITHub.Windows;
 
@@ -15,5 +16,6 @@ public partial class App : Application
     {
         MainWindow = new MainWindow();
         MainWindow.Activate();
+        ForegroundNoticePoller.Start(MainWindow.DispatcherQueue);
     }
 }
