@@ -52,9 +52,31 @@ public sealed partial class TimetablePage : Page
         var note = new TextBox { Text = course.Note, AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 120, PlaceholderText = "授業メモ" };
         var panel = new StackPanel { Spacing = 12 };
         panel.Children.Add(new TextBlock { Text = course.Subtitle, Opacity = 0.72 }); panel.Children.Add(note);
+        var assignments = await AssignmentStore.LoadAsync();
+        var matchedAssignments = assignments.Where(assignment => IsSameCourse(course.Title, assignment.Course)).ToList();
+        if (matchedAssignments.Count > 0)
+        {
+            panel.Children.Add(new TextBlock { Text = "この授業の課題", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
+            foreach (var assignment in matchedAssignments)
+            {
+                if (Uri.TryCreate(assignment.Url, UriKind.Absolute, out var assignmentUrl))
+                {
+                    var assignmentButton = new Button { Content = string.IsNullOrWhiteSpace(assignment.DeadlineText) ? assignment.Title : $"{assignment.Title}  {assignment.DeadlineText}", HorizontalAlignment = HorizontalAlignment.Left };
+                    assignmentButton.Click += (_, _) => App.MainWindow.Navigate(typeof(ServicesPage), new ServiceNavigationRequest("manaba", assignmentUrl));
+                    panel.Children.Add(assignmentButton);
+                }
+            }
+        }
         var dialog = new ContentDialog { Title = course.DisplayName, Content = panel, PrimaryButtonText = "メモを保存", SecondaryButtonText = "板書", CloseButtonText = "閉じる", XamlRoot = XamlRoot };
         var result = await dialog.ShowAsync();
         if (result == ContentDialogResult.Primary) { course.Note = note.Text.Trim(); await TimetableStore.SaveAsync(_courses); }
         if (result == ContentDialogResult.Secondary) App.MainWindow.Navigate(typeof(BoardPage), course);
+    }
+
+    private static bool IsSameCourse(string timetableName, string assignmentName)
+    {
+        static string Normalize(string value) => new string(value.Where(char.IsLetterOrDigit).Select(char.ToLowerInvariant).ToArray());
+        var left = Normalize(timetableName); var right = Normalize(assignmentName);
+        return left.Length >= 3 && right.Length >= 3 && (left.Contains(right, StringComparison.Ordinal) || right.Contains(left, StringComparison.Ordinal));
     }
 }
