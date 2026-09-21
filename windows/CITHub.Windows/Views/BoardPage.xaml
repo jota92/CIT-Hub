@@ -12,7 +12,7 @@
         <GridView Grid.Row="3" x:Name="Photos" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="OnPhotoSelected">
             <GridView.ItemTemplate>
                 <DataTemplate>
-                    <Image Source="{Binding}" Width="210" Height="150" Stretch="UniformToFill" />
+                    <Image Source="{Binding Image}" Width="210" Height="150" Stretch="UniformToFill" />
                 </DataTemplate>
             </GridView.ItemTemplate>
         </GridView>

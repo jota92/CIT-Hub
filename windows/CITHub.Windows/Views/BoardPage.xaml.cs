@@ -39,12 +39,12 @@ public sealed partial class BoardPage : Page
     private async Task RefreshAsync()
     {
         var files = await (await GetFolderAsync()).GetFilesAsync();
-        var images = new List<BitmapImage>();
+        var images = new List<BoardPhotoItem>();
         foreach (var file in files.Where(file => new[] { ".jpg", ".jpeg", ".png", ".heic" }.Contains(Path.GetExtension(file.Name).ToLowerInvariant())))
         {
             var image = new BitmapImage();
             await image.SetSourceAsync(await file.OpenAsync(FileAccessMode.Read));
-            images.Add(image);
+            images.Add(new BoardPhotoItem(file, image));
         }
         Photos.ItemsSource = images;
     }
@@ -64,7 +64,27 @@ public sealed partial class BoardPage : Page
 
     private async void OnPhotoSelected(object sender, ItemClickEventArgs e)
     {
-        var dialog = new ContentDialog { Title = "板書写真", Content = new Image { Source = (BitmapImage)e.ClickedItem, MaxHeight = 620, Stretch = Microsoft.UI.Xaml.Media.Stretch.Uniform }, CloseButtonText = "閉じる", XamlRoot = XamlRoot };
-        await dialog.ShowAsync();
+        if (e.ClickedItem is not BoardPhotoItem item) return;
+        var dialog = new ContentDialog
+        {
+            Title = "板書写真",
+            Content = new Image { Source = item.Image, MaxHeight = 620, Stretch = Microsoft.UI.Xaml.Media.Stretch.Uniform },
+            PrimaryButtonText = "削除",
+            SecondaryButtonText = "外部アプリで開く",
+            CloseButtonText = "閉じる",
+            XamlRoot = XamlRoot,
+        };
+        var result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Primary)
+        {
+            await item.File.DeleteAsync();
+            await RefreshAsync();
+        }
+        else if (result == ContentDialogResult.Secondary)
+        {
+            await Launcher.LaunchFileAsync(item.File);
+        }
     }
+
+    private sealed record BoardPhotoItem(StorageFile File, BitmapImage Image);
 }
