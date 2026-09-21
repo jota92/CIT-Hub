@@ -107,17 +107,18 @@ public sealed partial class ServicesPage : Page
             ServiceStatus.Text = "アカウント情報を設定すると、ポータルへ自動入力できます。";
             return;
         }
-        var script = $"""
-            (() => {{
+        var script = """
+            (() => {
               const fields = Array.from(document.querySelectorAll('input'));
               const password = fields.find(x => (x.type || '').toLowerCase() === 'password');
-              const user = fields.find(x => x !== password && /user|id|login|account|username/i.test(`${{x.name}} ${{x.id}} ${{x.autocomplete}}`)) || fields.find(x => x !== password && ['text','email'].includes((x.type || '').toLowerCase()));
+              const user = fields.find(x => x !== password && /user|id|login|account|username/i.test(`${x.name} ${x.id} ${x.autocomplete}`)) || fields.find(x => x !== password && ['text','email'].includes((x.type || '').toLowerCase()));
               if (!user || !password || !document.querySelector('button[type=submit], input[type=submit]')) return false;
-              const set = (element, value) => {{ const descriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value'); descriptor.set.call(element, value); element.dispatchEvent(new Event('input', {{ bubbles:true }})); element.dispatchEvent(new Event('change', {{ bubbles:true }})); }};
-              set(user, {JsonSerializer.Serialize(userId)}); set(password, {JsonSerializer.Serialize(password)});
+              const set = (element, value) => { const descriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value'); descriptor.set.call(element, value); element.dispatchEvent(new Event('input', { bubbles:true })); element.dispatchEvent(new Event('change', { bubbles:true })); };
+              set(user, __USER_ID__); set(password, __PASSWORD__);
               const submit = document.querySelector('button[type=submit], input[type=submit]'); submit.click(); return true;
-            }})()
-            """;
+            })()
+            """.Replace("__USER_ID__", JsonSerializer.Serialize(userId), StringComparison.Ordinal)
+                 .Replace("__PASSWORD__", JsonSerializer.Serialize(password), StringComparison.Ordinal);
         try
         {
             var result = await Browser.CoreWebView2.ExecuteScriptAsync(script);
