@@ -33,7 +33,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: CIT-Hub-Windows-${{ matrix.architecture }}
-          path: windows/CITHub.Windows/bin/Release/**/AppPackages/**/*
+          path: windows/CITHub.Windows/bin/**/AppPackages/**/*
           if-no-files-found: error
       - name: Upload build diagnostics
         if: always()
