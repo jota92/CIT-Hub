@@ -42,7 +42,7 @@ public sealed partial class ServicesPage : Page
         BrowserLoading.IsActive = true;
         ServiceStatus.Text = "ブラウザを準備しています";
         var userDataFolder = Path.Combine(ApplicationData.Current.LocalFolder.Path, "webview-profile");
-        var environment = await CoreWebView2Environment.CreateWithOptionsAsync(null, userDataFolder);
+        var environment = await CoreWebView2Environment.CreateWithOptionsAsync(null, userDataFolder, null);
         await Browser.EnsureCoreWebView2Async(environment);
         Browser.CoreWebView2.Settings.AreDefaultContextMenusEnabled = true;
         Browser.CoreWebView2.Settings.AreDevToolsEnabled = false;

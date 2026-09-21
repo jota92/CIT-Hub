@@ -27,4 +27,12 @@ public sealed partial class MainWindow : Window
         };
         if (ContentFrame.CurrentSourcePageType != page) ContentFrame.Navigate(page);
     }
+
+    public void Navigate(Type page, object? parameter = null)
+    {
+        if (ContentFrame.CurrentSourcePageType != page || parameter is not null)
+        {
+            ContentFrame.Navigate(page, parameter);
+        }
+    }
 }

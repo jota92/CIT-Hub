@@ -16,7 +16,7 @@ public sealed partial class TimetablePage : Page
     {
         try
         {
-            var file = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync("Assets\\schedule.json");
+            var file = await global::Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync("Assets\\schedule.json");
             using var stream = await file.OpenStreamForReadAsync();
             using var json = await JsonDocument.ParseAsync(stream);
             var rows = json.RootElement.GetProperty("entries").EnumerateArray().Take(8)
@@ -31,8 +31,8 @@ public sealed partial class TimetablePage : Page
     }
 
     private void OnOpenCalendar(object sender, RoutedEventArgs e) =>
-        ((MainWindow)App.MainWindow).ContentFrame.Navigate(typeof(ServicesPage), "calendar");
+        App.MainWindow.Navigate(typeof(ServicesPage), "calendar");
 
     private void OnOpenPortal(object sender, RoutedEventArgs e) =>
-        ((MainWindow)App.MainWindow).ContentFrame.Navigate(typeof(ServicesPage), "portal");
+        App.MainWindow.Navigate(typeof(ServicesPage), "portal");
 }
