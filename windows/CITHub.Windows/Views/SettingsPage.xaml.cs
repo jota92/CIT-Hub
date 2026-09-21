@@ -89,7 +89,9 @@ public sealed partial class SettingsPage : Page
 
     private void OnThemeChanged(object sender, RoutedEventArgs e)
     {
+        if (_isLoading) return;
         LocalStore.SetString("dark-mode", DarkMode.IsOn ? "true" : "false");
+        App.ApplyUserTheme();
         _ = UserPreferencesSyncService.UploadAsync();
     }
 

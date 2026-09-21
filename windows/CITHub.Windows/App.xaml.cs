@@ -15,7 +15,13 @@ public partial class App : Application
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         MainWindow = new MainWindow();
+        ApplyUserTheme();
         MainWindow.Activate();
         ForegroundNoticePoller.Start(MainWindow.DispatcherQueue);
+    }
+
+    public static void ApplyUserTheme()
+    {
+        if (MainWindow is not null) MainWindow.ApplyTheme(LocalStore.GetString("dark-mode") == "true");
     }
 }
