@@ -11,6 +11,7 @@ public sealed partial class SettingsPage : Page
 {
     private readonly DispatcherQueueTimer _supportRefreshTimer;
     private bool _supportRefreshInProgress;
+    private bool _isLoading;
 
     public SettingsPage()
     {
@@ -32,17 +33,32 @@ public sealed partial class SettingsPage : Page
 
     private void Load()
     {
+        _isLoading = true;
         UserId.Text = LocalStore.GetString("marin-user-id");
         DarkMode.IsOn = LocalStore.GetString("dark-mode") == "true";
         ManabaMobile.IsOn = LocalStore.GetString("manaba-smartphone", "true") == "true";
         PortalMobile.IsOn = LocalStore.GetString("portal-smartphone", "true") == "true";
+        LoadServiceTabs();
         PairingStatus.Text = WindowsDeviceSessionService.IsLinked
             ? $"{WindowsDeviceSessionService.UserId} と連携済みです。"
             : "この端末はまだ連携されていません。";
         _ = RestoreAuthenticatorAsync();
         _ = RefreshSupportAsync();
         _ = RefreshNoticesAsync();
+        _isLoading = false;
     }
+
+    private void LoadServiceTabs()
+    {
+        var tabs = ServiceTabPreferences.Load();
+        ServiceManaba.IsOn = IsVisible(tabs, "manaba");
+        ServicePortal.IsOn = IsVisible(tabs, "portal");
+        ServiceCafeteria.IsOn = IsVisible(tabs, "cafeteriaMenu");
+        ServiceBus.IsOn = IsVisible(tabs, "busSchedule");
+        CustomServiceList.ItemsSource = tabs.Where(tab => tab.kind == "custom").ToList();
+    }
+
+    private static bool IsVisible(IReadOnlyList<ServiceTabPreference> tabs, string kind) => tabs.FirstOrDefault(tab => tab.kind == kind)?.isVisible ?? true;
 
     private void OnSaveCredentials(object sender, RoutedEventArgs e)
     {
@@ -79,9 +95,53 @@ public sealed partial class SettingsPage : Page
 
     private void OnServiceDisplayChanged(object sender, RoutedEventArgs e)
     {
+        if (_isLoading) return;
         LocalStore.SetString("manaba-smartphone", ManabaMobile.IsOn ? "true" : "false");
         LocalStore.SetString("portal-smartphone", PortalMobile.IsOn ? "true" : "false");
         _ = UserPreferencesSyncService.UploadAsync();
+    }
+
+    private void OnServiceTabsChanged(object sender, RoutedEventArgs e)
+    {
+        if (_isLoading) return;
+        var tabs = ServiceTabPreferences.Load().ToList();
+        SetVisibility(tabs, "manaba", ServiceManaba.IsOn);
+        SetVisibility(tabs, "portal", ServicePortal.IsOn);
+        SetVisibility(tabs, "cafeteriaMenu", ServiceCafeteria.IsOn);
+        SetVisibility(tabs, "busSchedule", ServiceBus.IsOn);
+        ServiceTabPreferences.Save(tabs);
+        ServiceTabsStatus.Text = "学内サービスの表示設定を保存しました。";
+    }
+
+    private static void SetVisibility(List<ServiceTabPreference> tabs, string kind, bool visible)
+    {
+        var index = tabs.FindIndex(tab => tab.kind == kind);
+        if (index >= 0) tabs[index] = tabs[index] with { isVisible = visible };
+        else tabs.Add(new ServiceTabPreference($"builtin.{kind}", kind, ServiceTabPreferences.DefaultTitle(kind), null, visible));
+    }
+
+    private void OnAddCustomService(object sender, RoutedEventArgs e)
+    {
+        var title = CustomServiceTitle.Text.Trim();
+        var url = CustomServiceUrl.Text.Trim();
+        if (string.IsNullOrWhiteSpace(title) || !Uri.TryCreate(url, UriKind.Absolute, out _))
+        {
+            ServiceTabsStatus.Text = "表示名と http:// または https:// で始まるURLを入力してください。";
+            return;
+        }
+        var tabs = ServiceTabPreferences.Load().ToList();
+        tabs.Add(new ServiceTabPreference($"custom.{Guid.NewGuid():N}", "custom", title, url, true));
+        ServiceTabPreferences.Save(tabs);
+        CustomServiceTitle.Text = ""; CustomServiceUrl.Text = ""; LoadServiceTabs();
+        ServiceTabsStatus.Text = "Webページを追加しました。";
+    }
+
+    private void OnRemoveCustomService(object sender, RoutedEventArgs e)
+    {
+        if (CustomServiceList.SelectedItem is not ServiceTabPreference selected) return;
+        ServiceTabPreferences.Save(ServiceTabPreferences.Load().Where(tab => tab.id != selected.id));
+        LoadServiceTabs();
+        ServiceTabsStatus.Text = "Webページを削除しました。";
     }
 
     private async void OnClaimWindowsDevice(object sender, RoutedEventArgs e)

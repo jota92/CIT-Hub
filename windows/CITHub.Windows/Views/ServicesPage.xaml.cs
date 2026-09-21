@@ -79,8 +79,34 @@ public sealed partial class ServicesPage : Page
             args.Handled = true;
             Browser.CoreWebView2.Navigate(args.Uri);
         };
+        BuildServiceTabs();
         _isBrowserReady = true;
         if (_pendingUri is { } uri) OpenUri(uri); else Navigate(_requestedService);
+    }
+
+    private void BuildServiceTabs()
+    {
+        ServiceTabs.Children.Clear();
+        foreach (var tab in ServiceTabPreferences.Load().Where(value => value.isVisible))
+        {
+            var service = tab.kind switch
+            {
+                "cafeteriaMenu" => "cafeteria",
+                "busSchedule" => "bus",
+                "custom" => tab.id,
+                _ => tab.kind
+            };
+            if (tab.kind == "custom" && Uri.TryCreate(tab.urlString, UriKind.Absolute, out var customUrl)) ServiceUrls[service] = customUrl;
+            if (!ServiceUrls.ContainsKey(service)) continue;
+            var button = new Button { Content = tab.title, Tag = service, MinWidth = 96, Padding = new Thickness(14, 8, 14, 8) };
+            button.Click += OnServiceSelected;
+            ServiceTabs.Children.Add(button);
+        }
+
+        if (ServiceTabs.Children.Count == 0)
+        {
+            ServiceTabs.Children.Add(new TextBlock { Text = "設定から表示する学内サービスを選択してください。", Opacity = 0.72, VerticalAlignment = VerticalAlignment.Center });
+        }
     }
 
     private void Navigate(string tab)

@@ -30,7 +30,20 @@
                 <TextBlock Text="学内サービス" Style="{StaticResource SubtitleTextBlockStyle}" />
                 <ToggleSwitch x:Name="ManabaMobile" Header="manabaをスマホ表示で開く" Toggled="OnServiceDisplayChanged" />
                 <ToggleSwitch x:Name="PortalMobile" Header="ポータルをスマホ表示で開く" Toggled="OnServiceDisplayChanged" />
-                <TextBlock Text="この設定は連携済みの端末間で共有されます。" Opacity="0.72" />
+                <TextBlock Text="表示する学内サービス" FontWeight="SemiBold" Margin="0,8,0,0" />
+                <ToggleSwitch x:Name="ServiceManaba" Header="manaba" Toggled="OnServiceTabsChanged" />
+                <ToggleSwitch x:Name="ServicePortal" Header="ポータル" Toggled="OnServiceTabsChanged" />
+                <ToggleSwitch x:Name="ServiceCafeteria" Header="食堂メニュー" Toggled="OnServiceTabsChanged" />
+                <ToggleSwitch x:Name="ServiceBus" Header="バスダイヤ" Toggled="OnServiceTabsChanged" />
+                <TextBlock Text="Webページを追加" FontWeight="SemiBold" Margin="0,8,0,0" />
+                <TextBox x:Name="CustomServiceTitle" Header="表示名" />
+                <TextBox x:Name="CustomServiceUrl" Header="URL" PlaceholderText="https://..." />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Content="追加" Click="OnAddCustomService" />
+                    <Button Content="選択したページを削除" Click="OnRemoveCustomService" />
+                </StackPanel>
+                <ListView x:Name="CustomServiceList" DisplayMemberPath="title" SelectionMode="Single" MaxHeight="144" />
+                <TextBlock x:Name="ServiceTabsStatus" TextWrapping="Wrap" Opacity="0.72" />
             </StackPanel>
             <StackPanel Spacing="10">
                 <TextBlock Text="Windows端末の連携" Style="{StaticResource SubtitleTextBlockStyle}" />
