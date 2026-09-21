@@ -76,6 +76,7 @@ public sealed partial class SettingsPage : Page
         {
             PairingCode.Text = "";
             await UserPreferencesSyncService.SynchronizeAsync();
+            Load();
             await RestoreAuthenticatorAsync();
         }
     }
