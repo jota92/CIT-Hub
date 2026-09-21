@@ -7,4 +7,6 @@ public sealed record PersonalTodo(
     DateTimeOffset? Deadline,
     DateTimeOffset? NotifyAt,
     bool Weekly,
-    bool IsCompleted = false);
+    bool IsCompleted = false,
+    string Url = "",
+    string AttachmentPath = "");
