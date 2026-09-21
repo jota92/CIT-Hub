@@ -25,6 +25,13 @@ public sealed partial class TodoPage : Page
     private async Task RefreshAsync()
     {
         _todos = await LocalStore.LoadTodosAsync();
+        var expired = _todos.Where(todo => !todo.Weekly && todo.Deadline is { } deadline && deadline < DateTimeOffset.Now).ToList();
+        if (expired.Count > 0)
+        {
+            _todos.RemoveAll(todo => expired.Contains(todo));
+            await LocalStore.SaveTodosAsync(_todos);
+        }
+        WindowsTodoNotificationService.Reschedule(_todos);
         var assignments = await AssignmentStore.LoadAsync();
         _items.Clear();
         foreach (var todo in _todos.Where(item => !item.IsCompleted).OrderBy(item => item.Deadline ?? item.NotifyAt ?? DateTimeOffset.MinValue))
@@ -39,6 +46,9 @@ public sealed partial class TodoPage : Page
         var title = new TextBox { PlaceholderText = "タイトル（必須）" };
         var detail = new TextBox { PlaceholderText = "詳細", AcceptsReturn = true, MinHeight = 90, TextWrapping = TextWrapping.Wrap };
         var deadline = new CalendarDatePicker { PlaceholderText = "期限（任意）" };
+        var notificationDate = new CalendarDatePicker { PlaceholderText = "通知日（任意）" };
+        var notificationTime = new TimePicker { Time = new TimeSpan(9, 0, 0) };
+        var weekly = new ToggleSwitch { Header = "毎週同じ時刻に通知" };
         var url = new TextBox { PlaceholderText = "URL（任意）" };
         StorageFile? attachment = null;
         var attachmentName = new TextBlock { Text = "添付なし", Opacity = 0.68, VerticalAlignment = VerticalAlignment.Center };
@@ -51,12 +61,22 @@ public sealed partial class TodoPage : Page
         };
         var panel = new StackPanel { Spacing = 12 };
         panel.Children.Add(title); panel.Children.Add(detail); panel.Children.Add(deadline); panel.Children.Add(url);
+        panel.Children.Add(notificationDate); panel.Children.Add(notificationTime); panel.Children.Add(weekly);
         var attachmentPanel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 }; attachmentPanel.Children.Add(chooseAttachment); attachmentPanel.Children.Add(attachmentName); panel.Children.Add(attachmentPanel);
         var dialog = new ContentDialog { Title = "ToDoを追加", Content = panel, PrimaryButtonText = "追加", CloseButtonText = "キャンセル", XamlRoot = XamlRoot };
         if (await dialog.ShowAsync() != ContentDialogResult.Primary || string.IsNullOrWhiteSpace(title.Text)) return;
+        DateTimeOffset? notifyAt = notificationDate.Date is { } date
+            ? new DateTimeOffset(date.Year, date.Month, date.Day, notificationTime.Time.Hours, notificationTime.Time.Minutes, 0, TimeZoneInfo.Local.GetUtcOffset(date))
+            : null;
+        if (!weekly.IsOn && deadline.Date is { } due && notifyAt is { } notification && notification > due)
+        {
+            await new ContentDialog { Title = "通知日時を確認してください", Content = "1回のみの通知は、期限以前に設定してください。", CloseButtonText = "閉じる", XamlRoot = XamlRoot }.ShowAsync();
+            return;
+        }
+        if (weekly.IsOn) deadline.Date = null;
         var id = Guid.NewGuid().ToString("N");
         var attachmentPath = attachment is null ? "" : await SaveAttachmentAsync(attachment, id);
-        _todos.Add(new PersonalTodo(id, title.Text.Trim(), detail.Text.Trim(), deadline.Date, null, false, false, url.Text.Trim(), attachmentPath));
+        _todos.Add(new PersonalTodo(id, title.Text.Trim(), detail.Text.Trim(), deadline.Date, notifyAt, weekly.IsOn, false, url.Text.Trim(), attachmentPath));
         await LocalStore.SaveTodosAsync(_todos);
         await RefreshAsync();
     }
