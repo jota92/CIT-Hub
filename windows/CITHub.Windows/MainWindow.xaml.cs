@@ -41,10 +41,10 @@ public sealed partial class MainWindow : Window
     public void ApplyTheme(bool dark)
     {
         RootNavigation.RequestedTheme = dark ? ElementTheme.Dark : ElementTheme.Light;
-        SetBrush("CITHubAccentBrush", dark ? ColorHelper.FromArgb(255, 10, 132, 255) : ColorHelper.FromArgb(255, 0, 95, 175));
-        SetBrush("CITHubSurfaceBrush", dark ? ColorHelper.FromArgb(255, 28, 28, 30) : ColorHelper.FromArgb(255, 255, 255, 255));
-        SetBrush("CITHubBackgroundBrush", dark ? ColorHelper.FromArgb(255, 0, 0, 0) : ColorHelper.FromArgb(255, 245, 245, 247));
-        SetBrush("CITHubSecondaryTextBrush", dark ? ColorHelper.FromArgb(255, 174, 174, 178) : ColorHelper.FromArgb(255, 97, 97, 102));
+        SetBrush("CITHubAccentBrush", dark ? Color.FromArgb(255, 10, 132, 255) : Color.FromArgb(255, 0, 95, 175));
+        SetBrush("CITHubSurfaceBrush", dark ? Color.FromArgb(255, 28, 28, 30) : Color.FromArgb(255, 255, 255, 255));
+        SetBrush("CITHubBackgroundBrush", dark ? Color.FromArgb(255, 0, 0, 0) : Color.FromArgb(255, 245, 245, 247));
+        SetBrush("CITHubSecondaryTextBrush", dark ? Color.FromArgb(255, 174, 174, 178) : Color.FromArgb(255, 97, 97, 102));
     }
 
     private static void SetBrush(string key, Color color)
