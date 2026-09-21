@@ -11,6 +11,7 @@
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
                 <Button Content="時間割を取得" Click="OnCaptureTimetable" />
+                <Button Content="課題を取得" Click="OnCaptureAssignments" />
                 <Button Content="戻る" Click="OnBack" />
                 <Button Content="再読み込み" Click="OnRefresh" />
                 <Button Content="外部で開く" Click="OnOpenExternal" />

@@ -12,6 +12,7 @@ namespace CITHub.Windows.Views;
 public sealed partial class TodoPage : Page
 {
     private readonly ObservableCollection<TodoRow> _items = [];
+    private readonly ObservableCollection<AssignmentRow> _assignments = [];
     private List<PersonalTodo> _todos = [];
 
     public TodoPage()
@@ -24,9 +25,13 @@ public sealed partial class TodoPage : Page
     private async Task RefreshAsync()
     {
         _todos = await LocalStore.LoadTodosAsync();
+        var assignments = await AssignmentStore.LoadAsync();
         _items.Clear();
         foreach (var todo in _todos.Where(item => !item.IsCompleted).OrderBy(item => item.Deadline ?? item.NotifyAt ?? DateTimeOffset.MinValue))
             _items.Add(new TodoRow(todo));
+        _assignments.Clear();
+        foreach (var assignment in assignments) _assignments.Add(new AssignmentRow(assignment));
+        TodoList.ItemsSource = _items.Cast<object>().Concat(_assignments).ToList();
     }
 
     private async void OnAdd(object sender, RoutedEventArgs e)
@@ -56,11 +61,12 @@ public sealed partial class TodoPage : Page
         await RefreshAsync();
     }
 
-    private void OnShowAll(object sender, RoutedEventArgs e) => _ = RefreshAsync();
-    private void OnShowPersonal(object sender, RoutedEventArgs e) => _ = RefreshAsync();
+    private async void OnShowAll(object sender, RoutedEventArgs e) => await RefreshAsync();
+    private void OnShowPersonal(object sender, RoutedEventArgs e) { TodoList.ItemsSource = _items; }
 
     private async void OnTodoSelected(object sender, ItemClickEventArgs e)
     {
+        if (e.ClickedItem is AssignmentRow assignment) { if (Uri.TryCreate(assignment.Url, UriKind.Absolute, out var assignmentUrl)) App.MainWindow.Navigate(typeof(ServicesPage), new ServiceNavigationRequest("manaba", assignmentUrl)); return; }
         if (e.ClickedItem is not TodoRow row) return;
         var panel = new StackPanel { Spacing = 12 };
         panel.Children.Add(new TextBlock { Text = string.IsNullOrWhiteSpace(row.Details) ? "詳細はありません。" : row.Details, TextWrapping = TextWrapping.Wrap });
@@ -88,5 +94,12 @@ public sealed partial class TodoPage : Page
         public string DeadlineDisplay => todo.Deadline?.ToString("yyyy/MM/dd") ?? "期限なし";
         public string Url => todo.Url;
         public string AttachmentPath => todo.AttachmentPath;
+    }
+    public sealed class AssignmentRow(ManabaAssignment assignment)
+    {
+        public string Title => assignment.DisplayTitle;
+        public string Details => assignment.Details;
+        public string DeadlineDisplay => assignment.DeadlineText;
+        public string Url => assignment.Url;
     }
 }

@@ -21,6 +21,7 @@ public sealed partial class ServicesPage : Page
     };
     private string _requestedService = "manaba";
     private Uri? _currentUri;
+    private Uri? _pendingUri;
     private bool _isBrowserReady;
     private bool _portalSubmissionAttempted;
 
@@ -33,7 +34,13 @@ public sealed partial class ServicesPage : Page
     protected override void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        if (e.Parameter is string tab && tab == "portal-timetable")
+        if (e.Parameter is ServiceNavigationRequest request)
+        {
+            _requestedService = request.Service;
+            _pendingUri = request.Url;
+            if (_isBrowserReady) OpenUri(request.Url);
+        }
+        else if (e.Parameter is string tab && tab == "portal-timetable")
         {
             _requestedService = "portal";
             if (_isBrowserReady) Navigate("portal");
@@ -73,7 +80,7 @@ public sealed partial class ServicesPage : Page
             Browser.CoreWebView2.Navigate(args.Uri);
         };
         _isBrowserReady = true;
-        Navigate(_requestedService);
+        if (_pendingUri is { } uri) OpenUri(uri); else Navigate(_requestedService);
     }
 
     private void Navigate(string tab)
@@ -85,6 +92,11 @@ public sealed partial class ServicesPage : Page
         ServiceStatus.Text = "ページを読み込んでいます";
         _currentUri = url;
         Browser.Source = url;
+    }
+    private void OpenUri(Uri uri)
+    {
+        if (!_isBrowserReady || Browser.CoreWebView2 is null) return;
+        _currentUri = uri; BrowserLoading.IsActive = true; ServiceStatus.Text = "ページを読み込んでいます"; Browser.Source = uri;
     }
     private void OnServiceSelected(object sender, RoutedEventArgs e) => Navigate((sender as FrameworkElement)?.Tag as string ?? "manaba");
     private void OnBack(object sender, RoutedEventArgs e)
@@ -151,6 +163,45 @@ public sealed partial class ServicesPage : Page
         catch { ServiceStatus.Text = "時間割の取得に失敗しました。ポータルの時間割表を表示して再試行してください。"; }
     }
 
+    private async void OnCaptureAssignments(object sender, RoutedEventArgs e)
+    {
+        if (!_isBrowserReady || _requestedService != "manaba" || Browser.CoreWebView2 is null)
+        {
+            ServiceStatus.Text = "manabaの課題一覧を開いてから実行してください。";
+            return;
+        }
+        const string script = """
+            (() => {
+              const clean = value => (value || '').replace(/\s+/g, ' ').trim();
+              const seen = new Set(); const assignments = [];
+              [...document.querySelectorAll('a[href]')].forEach(link => {
+                const row = link.closest('tr, li, article, .course, .content') || link.parentElement;
+                const title = clean(link.innerText); const text = clean((row || link).innerText);
+                const href = new URL(link.getAttribute('href'), location.href).href;
+                if (!title || seen.has(href) || !/report|assignment|task|課題|レポート/i.test(`${href} ${text}`)) return;
+                seen.add(href);
+                const lines = text.split(/\s{2,}|\n/).map(clean).filter(Boolean);
+                assignments.push({ title, course: lines.find(line => line !== title && !/期限|締切|\d{4}[\/.-]\d/.test(line)) || '', deadlineText: lines.find(line => /期限|締切|\d{4}[\/.-]\d/.test(line)) || '', url: href });
+              });
+              return JSON.stringify({ assignments });
+            })()
+            """;
+        try
+        {
+            var raw = await Browser.CoreWebView2.ExecuteScriptAsync(script); var json = JsonSerializer.Deserialize<string>(raw);
+            if (string.IsNullOrWhiteSpace(json)) throw new InvalidOperationException();
+            using var document = JsonDocument.Parse(json);
+            var assignments = document.RootElement.GetProperty("assignments").EnumerateArray().Select(item =>
+            {
+                var url = item.GetProperty("url").GetString() ?? "";
+                return new ManabaAssignment { Id = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(url))).ToLowerInvariant()[..24], Title = item.GetProperty("title").GetString() ?? "", Course = item.GetProperty("course").GetString() ?? "", DeadlineText = item.GetProperty("deadlineText").GetString() ?? "", Url = url };
+            }).ToList();
+            await AssignmentStore.SaveAsync(assignments);
+            ServiceStatus.Text = assignments.Count == 0 ? "課題を見つけられませんでした。manabaの課題一覧で再試行してください。" : $"{assignments.Count}件の課題を保存しました。ToDoで確認できます。";
+        }
+        catch { ServiceStatus.Text = "課題の取得に失敗しました。manabaの課題一覧を開いて再試行してください。"; }
+    }
+
     // The portal receives only one automatic submission for a rendered sign-in page.
     // If its markup changes or the sign-in fails, the page remains usable for manual entry.
     private async Task TryPortalSignInAsync(string rawUri)
@@ -189,3 +240,5 @@ public sealed partial class ServicesPage : Page
         catch { ServiceStatus.Text = "統合認証画面を確認できませんでした。手動でログインしてください。"; }
     }
 }
+
+public sealed record ServiceNavigationRequest(string Service, Uri Url);
