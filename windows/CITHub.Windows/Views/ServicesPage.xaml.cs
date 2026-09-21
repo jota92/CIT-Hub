@@ -3,6 +3,8 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
 using Windows.Storage;
 using Windows.System;
+using CITHub.Windows.Services;
+using System.Text.Json;
 
 namespace CITHub.Windows.Views;
 
@@ -19,6 +21,7 @@ public sealed partial class ServicesPage : Page
     private string _requestedService = "manaba";
     private Uri? _currentUri;
     private bool _isBrowserReady;
+    private bool _portalSubmissionAttempted;
 
     public ServicesPage()
     {
@@ -57,6 +60,7 @@ public sealed partial class ServicesPage : Page
             BrowserLoading.IsActive = false;
             ServiceStatus.Text = args.IsSuccess ? "表示中" : "読み込みに失敗しました。再読み込みしてください。";
         };
+        Browser.CoreWebView2.DOMContentLoaded += async (_, args) => await TryPortalSignInAsync(args.Uri);
         Browser.CoreWebView2.NewWindowRequested += (_, args) =>
         {
             args.Handled = true;
@@ -69,6 +73,7 @@ public sealed partial class ServicesPage : Page
     private void Navigate(string tab)
     {
         _requestedService = tab;
+        if (tab == "portal") _portalSubmissionAttempted = false;
         if (!_isBrowserReady || Browser.CoreWebView2 is null || !ServiceUrls.TryGetValue(tab, out var url)) return;
         BrowserLoading.IsActive = true;
         ServiceStatus.Text = "ページを読み込んでいます";
@@ -87,5 +92,42 @@ public sealed partial class ServicesPage : Page
     private async void OnOpenExternal(object sender, RoutedEventArgs e)
     {
         if (_currentUri is not null) await Launcher.LaunchUriAsync(_currentUri);
+    }
+
+    // The portal receives only one automatic submission for a rendered sign-in page.
+    // If its markup changes or the sign-in fails, the page remains usable for manual entry.
+    private async Task TryPortalSignInAsync(string rawUri)
+    {
+        if (_requestedService != "portal" || _portalSubmissionAttempted || !Uri.TryCreate(rawUri, UriKind.Absolute, out var uri) ||
+            !uri.Host.EndsWith("chibatech.ac.jp", StringComparison.OrdinalIgnoreCase)) return;
+        var userId = LocalStore.GetString("marin-user-id");
+        var password = WindowsCredentialStore.Load("marin-password");
+        if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(password))
+        {
+            ServiceStatus.Text = "アカウント情報を設定すると、ポータルへ自動入力できます。";
+            return;
+        }
+        var script = $"""
+            (() => {{
+              const fields = Array.from(document.querySelectorAll('input'));
+              const password = fields.find(x => (x.type || '').toLowerCase() === 'password');
+              const user = fields.find(x => x !== password && /user|id|login|account|username/i.test(`${{x.name}} ${{x.id}} ${{x.autocomplete}}`)) || fields.find(x => x !== password && ['text','email'].includes((x.type || '').toLowerCase()));
+              if (!user || !password || !document.querySelector('button[type=submit], input[type=submit]')) return false;
+              const set = (element, value) => {{ const descriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value'); descriptor.set.call(element, value); element.dispatchEvent(new Event('input', {{ bubbles:true }})); element.dispatchEvent(new Event('change', {{ bubbles:true }})); }};
+              set(user, {JsonSerializer.Serialize(userId)}); set(password, {JsonSerializer.Serialize(password)});
+              const submit = document.querySelector('button[type=submit], input[type=submit]'); submit.click(); return true;
+            }})()
+            """;
+        try
+        {
+            var result = await Browser.CoreWebView2.ExecuteScriptAsync(script);
+            if (string.Equals(result, "true", StringComparison.OrdinalIgnoreCase))
+            {
+                _portalSubmissionAttempted = true;
+                ServiceStatus.Text = "ポータルへログインしています";
+            }
+            else ServiceStatus.Text = "統合認証画面です。必要に応じて手動でログインしてください。";
+        }
+        catch { ServiceStatus.Text = "統合認証画面を確認できませんでした。手動でログインしてください。"; }
     }
 }

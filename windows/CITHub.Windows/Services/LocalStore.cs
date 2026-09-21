@@ -1,6 +1,7 @@
 using System.Text.Json;
 using CITHub.Windows.Models;
 using Windows.Storage;
+using Windows.Security.Credentials;
 
 namespace CITHub.Windows.Services;
 
@@ -29,4 +30,22 @@ public static class LocalStore
 
     public static void SetString(string key, string value) =>
         ApplicationData.Current.LocalSettings.Values[key] = value;
+}
+
+public static class WindowsCredentialStore
+{
+    private const string Resource = "CITHub.Windows";
+
+    public static void Save(string key, string value)
+    {
+        var vault = new PasswordVault();
+        try { vault.Remove(vault.Retrieve(Resource, key)); } catch { }
+        vault.Add(new PasswordCredential(Resource, key, value));
+    }
+
+    public static string? Load(string key)
+    {
+        try { var credential = new PasswordVault().Retrieve(Resource, key); credential.RetrievePassword(); return credential.Password; }
+        catch { return null; }
+    }
 }
