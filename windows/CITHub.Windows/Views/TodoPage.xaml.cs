@@ -3,6 +3,7 @@ using CITHub.Windows.Models;
 using CITHub.Windows.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.System;
@@ -83,6 +84,7 @@ public sealed partial class TodoPage : Page
 
     private async void OnShowAll(object sender, RoutedEventArgs e) => await RefreshAsync();
     private void OnShowPersonal(object sender, RoutedEventArgs e) { TodoList.ItemsSource = _items; }
+    private void OnShowAssignments(object sender, RoutedEventArgs e) { TodoList.ItemsSource = _assignments; }
 
     private async void OnTodoSelected(object sender, ItemClickEventArgs e)
     {
@@ -148,6 +150,8 @@ public sealed partial class TodoPage : Page
         public string DeadlineDisplay => todo.Deadline?.ToString("yyyy/MM/dd") ?? "期限なし";
         public string Url => todo.Url;
         public string AttachmentPath => todo.AttachmentPath;
+        public string TypeLabel => "ToDo";
+        public Brush AccentBrush => new SolidColorBrush(Windows.UI.Color.FromArgb(255, 52, 120, 184));
     }
     public sealed class AssignmentRow(ManabaAssignment assignment)
     {
@@ -155,5 +159,7 @@ public sealed partial class TodoPage : Page
         public string Details => assignment.Details;
         public string DeadlineDisplay => assignment.DeadlineText;
         public string Url => assignment.Url;
+        public string TypeLabel => "課題";
+        public Brush AccentBrush => new SolidColorBrush(Windows.UI.Color.FromArgb(255, 99, 99, 102));
     }
 }

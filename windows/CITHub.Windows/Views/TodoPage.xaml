@@ -8,16 +8,21 @@
             <Button Content="追加" Click="OnAdd" />
             <Button Content="すべて" Click="OnShowAll" />
             <Button Content="ToDoのみ" Click="OnShowPersonal" />
+            <Button Content="課題のみ" Click="OnShowAssignments" />
         </StackPanel>
         <ListView Grid.Row="2" x:Name="TodoList" IsItemClickEnabled="True" ItemClick="OnTodoSelected">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="8" ColumnDefinitions="*,Auto">
-                        <StackPanel Spacing="3">
-                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                    <Grid Margin="8" ColumnDefinitions="4,12,*,Auto">
+                        <Border Background="{Binding AccentBrush}" CornerRadius="2" />
+                        <StackPanel Grid.Column="2" Spacing="3">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                                <TextBlock Text="{Binding TypeLabel}" Opacity="0.68" />
+                            </StackPanel>
                             <TextBlock Text="{Binding Details}" TextWrapping="Wrap" Opacity="0.68" />
                         </StackPanel>
-                        <TextBlock Grid.Column="1" Text="{Binding DeadlineDisplay}" VerticalAlignment="Center" Opacity="0.7" />
+                        <TextBlock Grid.Column="3" Text="{Binding DeadlineDisplay}" VerticalAlignment="Center" Opacity="0.7" />
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
