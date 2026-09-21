@@ -45,10 +45,10 @@ public sealed partial class ServicesPage : Page
             _requestedService = "portal";
             if (_isBrowserReady) Navigate("portal");
         }
-        else if (e.Parameter is string tab && ServiceUrls.ContainsKey(tab))
+        else if (e.Parameter is string serviceTab && ServiceUrls.ContainsKey(serviceTab))
         {
-            _requestedService = tab;
-            if (_isBrowserReady) Navigate(tab);
+            _requestedService = serviceTab;
+            if (_isBrowserReady) Navigate(serviceTab);
         }
     }
 
