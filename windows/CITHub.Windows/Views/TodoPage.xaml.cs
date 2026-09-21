@@ -91,12 +91,45 @@ public sealed partial class TodoPage : Page
         var panel = new StackPanel { Spacing = 12 };
         panel.Children.Add(new TextBlock { Text = string.IsNullOrWhiteSpace(row.Details) ? "詳細はありません。" : row.Details, TextWrapping = TextWrapping.Wrap });
         if (!string.IsNullOrWhiteSpace(row.DeadlineDisplay)) panel.Children.Add(new TextBlock { Text = $"期限: {row.DeadlineDisplay}", Opacity = 0.72 });
-        var dialog = new ContentDialog { Title = row.Title, Content = panel, CloseButtonText = "閉じる", XamlRoot = XamlRoot };
-        if (Uri.TryCreate(row.Url, UriKind.Absolute, out _)) dialog.PrimaryButtonText = "URLを開く";
-        if (!string.IsNullOrWhiteSpace(row.AttachmentPath) && File.Exists(row.AttachmentPath)) dialog.SecondaryButtonText = "添付を開く";
+        if (!string.IsNullOrWhiteSpace(row.AttachmentPath) && File.Exists(row.AttachmentPath))
+        {
+            var attachmentButton = new Button { Content = "添付ファイルを開く", HorizontalAlignment = HorizontalAlignment.Left };
+            attachmentButton.Click += async (_, _) => await Launcher.LaunchFileAsync(await StorageFile.GetFileFromPathAsync(row.AttachmentPath));
+            panel.Children.Add(attachmentButton);
+        }
+        var dialog = new ContentDialog { Title = row.Title, Content = panel, PrimaryButtonText = "編集", CloseButtonText = "閉じる", XamlRoot = XamlRoot };
+        if (Uri.TryCreate(row.Url, UriKind.Absolute, out _)) dialog.SecondaryButtonText = "URLを開く";
         var result = await dialog.ShowAsync();
-        if (result == ContentDialogResult.Primary && Uri.TryCreate(row.Url, UriKind.Absolute, out var uri)) await Launcher.LaunchUriAsync(uri);
-        if (result == ContentDialogResult.Secondary && File.Exists(row.AttachmentPath)) await Launcher.LaunchFileAsync(await StorageFile.GetFileFromPathAsync(row.AttachmentPath));
+        if (result == ContentDialogResult.Primary) await EditTodoAsync(row.Item);
+        if (result == ContentDialogResult.Secondary && Uri.TryCreate(row.Url, UriKind.Absolute, out var uri)) await Launcher.LaunchUriAsync(uri);
+    }
+
+    private async Task EditTodoAsync(PersonalTodo todo)
+    {
+        var title = new TextBox { Text = todo.Title, Header = "タイトル" };
+        var detail = new TextBox { Text = todo.Details, Header = "詳細", AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 90 };
+        var deadline = new CalendarDatePicker { Header = "期限", Date = todo.Deadline };
+        var notificationDate = new CalendarDatePicker { Header = "通知日", Date = todo.NotifyAt };
+        var notificationTime = new TimePicker { Time = todo.NotifyAt?.TimeOfDay ?? new TimeSpan(9, 0, 0) };
+        var weekly = new ToggleSwitch { Header = "毎週同じ時刻に通知", IsOn = todo.Weekly };
+        var url = new TextBox { Text = todo.Url, Header = "URL" };
+        var panel = new StackPanel { Spacing = 12 };
+        panel.Children.Add(title); panel.Children.Add(detail); panel.Children.Add(deadline); panel.Children.Add(url); panel.Children.Add(notificationDate); panel.Children.Add(notificationTime); panel.Children.Add(weekly);
+        var dialog = new ContentDialog { Title = "ToDoを編集", Content = panel, PrimaryButtonText = "保存", CloseButtonText = "キャンセル", XamlRoot = XamlRoot };
+        if (await dialog.ShowAsync() != ContentDialogResult.Primary || string.IsNullOrWhiteSpace(title.Text)) return;
+        DateTimeOffset? notifyAt = notificationDate.Date is { } date
+            ? new DateTimeOffset(date.Year, date.Month, date.Day, notificationTime.Time.Hours, notificationTime.Time.Minutes, 0, TimeZoneInfo.Local.GetUtcOffset(date))
+            : null;
+        if (!weekly.IsOn && deadline.Date is { } due && notifyAt is { } notification && notification > due)
+        {
+            await new ContentDialog { Title = "通知日時を確認してください", Content = "1回のみの通知は、期限以前に設定してください。", CloseButtonText = "閉じる", XamlRoot = XamlRoot }.ShowAsync();
+            return;
+        }
+        var updated = todo with { Title = title.Text.Trim(), Details = detail.Text.Trim(), Deadline = weekly.IsOn ? null : deadline.Date, NotifyAt = notifyAt, Weekly = weekly.IsOn, Url = url.Text.Trim() };
+        var index = _todos.FindIndex(item => item.Id == todo.Id);
+        if (index >= 0) _todos[index] = updated;
+        await LocalStore.SaveTodosAsync(_todos);
+        await RefreshAsync();
     }
 
     private static async Task<string> SaveAttachmentAsync(StorageFile source, string todoId)
@@ -109,6 +142,7 @@ public sealed partial class TodoPage : Page
 
     public sealed class TodoRow(PersonalTodo todo)
     {
+        public PersonalTodo Item => todo;
         public string Title => todo.Title;
         public string Details => todo.Details;
         public string DeadlineDisplay => todo.Deadline?.ToString("yyyy/MM/dd") ?? "期限なし";
