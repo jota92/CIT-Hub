@@ -21,6 +21,7 @@ public sealed partial class SettingsPage : Page
             ? $"{WindowsDeviceSessionService.UserId} と連携済みです。"
             : "この端末はまだ連携されていません。";
         _ = RestoreAuthenticatorAsync();
+        _ = RefreshSupportAsync();
     }
 
     private void OnSaveCredentials(object sender, RoutedEventArgs e)
@@ -68,6 +69,24 @@ public sealed partial class SettingsPage : Page
         if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(password)) return;
         var result = await PortalAuthenticatorSyncService.SynchronizeAsync(userId, password);
         if (result == SyncResult.Restored) OtpCode.Text = "Authenticator設定を同期しました";
+    }
+
+    private async Task RefreshSupportAsync()
+    {
+        if (!WindowsDeviceSessionService.IsLinked) { SupportStatus.Text = "端末連携後に利用できます。"; return; }
+        var messages = await SupportChatService.LoadAsync();
+        SupportMessages.ItemsSource = messages.Select(message => message.Display).ToList();
+        SupportStatus.Text = messages.Count == 0 ? "メッセージはありません。" : "最新の会話を表示しています。";
+    }
+
+    private async void OnRefreshSupport(object sender, RoutedEventArgs e) => await RefreshSupportAsync();
+
+    private async void OnSendSupport(object sender, RoutedEventArgs e)
+    {
+        var sent = await SupportChatService.SendAsync(SupportDraft.Text);
+        if (sent is null) { SupportStatus.Text = "送信できませんでした。端末連携と通信を確認してください。"; return; }
+        SupportDraft.Text = "";
+        await RefreshSupportAsync();
     }
 }
 
