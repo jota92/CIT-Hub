@@ -44,6 +44,7 @@ public sealed class SupportChatMessage
     public string created_at { get; set; } = "";
     public bool is_read { get; set; }
     public string Display => $"{(sender == "admin" ? "運営" : "あなた")}  {body}";
+    public string SenderDisplay => sender == "admin" ? "運営" : "あなた";
 }
 
 public sealed class SupportChatResponse { public bool success { get; set; } public List<SupportChatMessage>? messages { get; set; } public SupportChatMessage? message { get; set; } }

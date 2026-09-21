@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using CITHub.Windows.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -179,7 +180,7 @@ public sealed partial class SettingsPage : Page
         try
         {
             var messages = await SupportChatService.LoadAsync();
-            SupportMessages.ItemsSource = messages.Select(message => message.Display).ToList();
+            SupportMessages.ItemsSource = messages;
             SupportStatus.Text = messages.Count == 0 ? "メッセージはありません。" : "最新の会話を表示しています。";
         }
         finally
@@ -189,6 +190,16 @@ public sealed partial class SettingsPage : Page
     }
 
     private async void OnRefreshSupport(object sender, RoutedEventArgs e) => await RefreshSupportAsync();
+
+    private async void OnSupportMessageSelected(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is not SupportChatMessage message) return;
+        var match = Regex.Match(message.body, @"https?://[^\s<>]+", RegexOptions.IgnoreCase);
+        if (match.Success && Uri.TryCreate(match.Value.TrimEnd('.', ',', ')', ']', '。', '、'), UriKind.Absolute, out var url))
+        {
+            await Launcher.LaunchUriAsync(url);
+        }
+    }
 
     private async void OnSendSupport(object sender, RoutedEventArgs e)
     {
