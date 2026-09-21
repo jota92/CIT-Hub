@@ -23,7 +23,7 @@ public sealed partial class ServicesPage : Page
     private Uri? _currentUri;
     private Uri? _pendingUri;
     private bool _isBrowserReady;
-    private bool _portalSubmissionAttempted;
+    private readonly HashSet<string> _automaticSubmissionAttempted = [];
 
     public ServicesPage()
     {
@@ -73,7 +73,7 @@ public sealed partial class ServicesPage : Page
             BrowserLoading.IsActive = false;
             ServiceStatus.Text = args.IsSuccess ? "表示中" : "読み込みに失敗しました。再読み込みしてください。";
         };
-        Browser.CoreWebView2.DOMContentLoaded += async (_, _) => await TryPortalSignInAsync(Browser.CoreWebView2.Source);
+        Browser.CoreWebView2.DOMContentLoaded += async (_, _) => await TryServiceSignInAsync(Browser.CoreWebView2.Source);
         Browser.CoreWebView2.NewWindowRequested += (_, args) =>
         {
             args.Handled = true;
@@ -86,7 +86,7 @@ public sealed partial class ServicesPage : Page
     private void Navigate(string tab)
     {
         _requestedService = tab;
-        if (tab == "portal") _portalSubmissionAttempted = false;
+        if (tab is "portal" or "manaba") _automaticSubmissionAttempted.Remove(tab);
         if (!_isBrowserReady || Browser.CoreWebView2 is null || !ServiceUrls.TryGetValue(tab, out var url)) return;
         BrowserLoading.IsActive = true;
         ServiceStatus.Text = "ページを読み込んでいます";
@@ -215,10 +215,12 @@ public sealed partial class ServicesPage : Page
 
     // The portal receives only one automatic submission for a rendered sign-in page.
     // If its markup changes or the sign-in fails, the page remains usable for manual entry.
-    private async Task TryPortalSignInAsync(string rawUri)
+    private async Task TryServiceSignInAsync(string rawUri)
     {
-        if (_requestedService != "portal" || _portalSubmissionAttempted || !Uri.TryCreate(rawUri, UriKind.Absolute, out var uri) ||
-            !uri.Host.EndsWith("chibatech.ac.jp", StringComparison.OrdinalIgnoreCase)) return;
+        if (_requestedService is not ("portal" or "manaba") || _automaticSubmissionAttempted.Contains(_requestedService) ||
+            !Uri.TryCreate(rawUri, UriKind.Absolute, out var uri)) return;
+        var expectedHost = _requestedService == "portal" ? "chibatech.ac.jp" : "manaba.jp";
+        if (!uri.Host.EndsWith(expectedHost, StringComparison.OrdinalIgnoreCase)) return;
         var userId = LocalStore.GetString("marin-user-id");
         var password = WindowsCredentialStore.Load("marin-password");
         if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(password))
@@ -243,12 +245,12 @@ public sealed partial class ServicesPage : Page
             var result = await Browser.CoreWebView2.ExecuteScriptAsync(script);
             if (string.Equals(result, "true", StringComparison.OrdinalIgnoreCase))
             {
-                _portalSubmissionAttempted = true;
-                ServiceStatus.Text = "ポータルへログインしています";
+                _automaticSubmissionAttempted.Add(_requestedService);
+                ServiceStatus.Text = $"{(_requestedService == "portal" ? "ポータル" : "manaba")}へログインしています";
             }
-            else ServiceStatus.Text = "統合認証画面です。必要に応じて手動でログインしてください。";
+            else ServiceStatus.Text = "ログイン画面を確認しました。必要に応じて手動でログインしてください。";
         }
-        catch { ServiceStatus.Text = "統合認証画面を確認できませんでした。手動でログインしてください。"; }
+        catch { ServiceStatus.Text = "ログイン画面を確認できませんでした。手動でログインしてください。"; }
     }
 }
 
