@@ -1,15 +1,15 @@
 using System.Security.Cryptography;
 using CITHub.Windows.Services;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Windows.System;
+using DispatcherTimer = Microsoft.UI.Dispatching.DispatcherQueueTimer;
 
 namespace CITHub.Windows.Views;
 
 public sealed partial class SettingsPage : Page
 {
-    private readonly DispatcherQueueTimer _supportRefreshTimer;
+    private readonly DispatcherTimer _supportRefreshTimer;
     private bool _supportRefreshInProgress;
     private bool _isLoading;
 
