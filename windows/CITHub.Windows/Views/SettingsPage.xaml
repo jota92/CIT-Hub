@@ -52,6 +52,11 @@
                 <TextBlock x:Name="ServiceTabsStatus" TextWrapping="Wrap" Opacity="0.72" />
             </StackPanel>
             <StackPanel Spacing="10">
+                <TextBlock Text="通知" Style="{StaticResource SubtitleTextBlockStyle}" />
+                <ToggleSwitch x:Name="PersonalTodoReminders" Header="自分で追加したToDoの通知" Toggled="OnTodoReminderChanged" />
+                <TextBlock Text="Windowsの通知設定でCIT Hubの通知が許可されている必要があります。" TextWrapping="Wrap" Opacity="0.72" />
+            </StackPanel>
+            <StackPanel Spacing="10">
                 <TextBlock Text="Windows端末の連携" Style="{StaticResource SubtitleTextBlockStyle}" />
                 <TextBlock Text="モバイル版で発行した連携コードを入力すると、アカウントに紐付けて同期します。" TextWrapping="Wrap" Opacity="0.72" />
                 <TextBox x:Name="PairingCode" PlaceholderText="連携コード" />

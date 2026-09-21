@@ -40,6 +40,7 @@ public sealed partial class SettingsPage : Page
         SelectTermPreference(LocalStore.GetString("term-preference", "automatic"));
         ManabaMobile.IsOn = LocalStore.GetString("manaba-smartphone", "true") == "true";
         PortalMobile.IsOn = LocalStore.GetString("portal-smartphone", "true") == "true";
+        PersonalTodoReminders.IsOn = LocalStore.GetString("personal-todo-reminders", "true") == "true";
         LoadServiceTabs();
         PairingStatus.Text = WindowsDeviceSessionService.IsLinked
             ? $"{WindowsDeviceSessionService.UserId} と連携済みです。"
@@ -135,6 +136,13 @@ public sealed partial class SettingsPage : Page
         SetVisibility(tabs, "busSchedule", ServiceBus.IsOn);
         ServiceTabPreferences.Save(tabs);
         ServiceTabsStatus.Text = "学内サービスの表示設定を保存しました。";
+    }
+
+    private async void OnTodoReminderChanged(object sender, RoutedEventArgs e)
+    {
+        if (_isLoading) return;
+        LocalStore.SetString("personal-todo-reminders", PersonalTodoReminders.IsOn ? "true" : "false");
+        WindowsTodoNotificationService.Reschedule(await LocalStore.LoadTodosAsync());
     }
 
     private static void SetVisibility(List<ServiceTabPreference> tabs, string kind, bool visible)

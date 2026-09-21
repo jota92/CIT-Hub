@@ -14,6 +14,7 @@ public static class WindowsTodoNotificationService
         {
             var notifier = ToastNotificationManager.CreateToastNotifier();
             foreach (var scheduled in notifier.GetScheduledToastNotifications()) notifier.RemoveFromSchedule(scheduled);
+            if (LocalStore.GetString("personal-todo-reminders", "true") != "true") return;
             var now = DateTimeOffset.Now;
             foreach (var todo in todos.Where(todo => !todo.IsCompleted && todo.NotifyAt is not null))
             {
