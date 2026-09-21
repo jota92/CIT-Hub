@@ -25,6 +25,12 @@
                 <TextBlock Text="表示" Style="{StaticResource SubtitleTextBlockStyle}" />
                 <ToggleSwitch x:Name="DarkMode" Header="ダークモード" Toggled="OnThemeChanged" />
                 <TextBlock Text="テーマカラーはWindowsのアクセントカラーを使用します。" Opacity="0.72" />
+                <TextBlock Text="時間割の学期" FontWeight="SemiBold" Margin="0,8,0,0" />
+                <ComboBox x:Name="TermPreference" SelectionChanged="OnTermPreferenceChanged" HorizontalAlignment="Left" MinWidth="180">
+                    <ComboBoxItem Content="自動" Tag="automatic" />
+                    <ComboBoxItem Content="前期" Tag="zenki" />
+                    <ComboBoxItem Content="後期" Tag="koki" />
+                </ComboBox>
             </StackPanel>
             <StackPanel Spacing="10">
                 <TextBlock Text="学内サービス" Style="{StaticResource SubtitleTextBlockStyle}" />

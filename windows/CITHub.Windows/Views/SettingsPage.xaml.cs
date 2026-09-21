@@ -37,6 +37,7 @@ public sealed partial class SettingsPage : Page
         _isLoading = true;
         UserId.Text = LocalStore.GetString("marin-user-id");
         DarkMode.IsOn = LocalStore.GetString("dark-mode") == "true";
+        SelectTermPreference(LocalStore.GetString("term-preference", "automatic"));
         ManabaMobile.IsOn = LocalStore.GetString("manaba-smartphone", "true") == "true";
         PortalMobile.IsOn = LocalStore.GetString("portal-smartphone", "true") == "true";
         LoadServiceTabs();
@@ -93,6 +94,26 @@ public sealed partial class SettingsPage : Page
         if (_isLoading) return;
         LocalStore.SetString("dark-mode", DarkMode.IsOn ? "true" : "false");
         App.ApplyUserTheme();
+        _ = UserPreferencesSyncService.UploadAsync();
+    }
+
+    private void SelectTermPreference(string preference)
+    {
+        foreach (var item in TermPreference.Items.OfType<ComboBoxItem>())
+        {
+            if (string.Equals(item.Tag as string, preference, StringComparison.Ordinal))
+            {
+                TermPreference.SelectedItem = item;
+                return;
+            }
+        }
+        TermPreference.SelectedIndex = 0;
+    }
+
+    private void OnTermPreferenceChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isLoading || TermPreference.SelectedItem is not ComboBoxItem item || item.Tag is not string preference) return;
+        LocalStore.SetString("term-preference", preference);
         _ = UserPreferencesSyncService.UploadAsync();
     }
 
