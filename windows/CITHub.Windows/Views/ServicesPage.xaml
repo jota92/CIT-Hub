@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Microsoft.UI.Xaml.Controls">
     <Grid RowDefinitions="Auto,Auto,*" Background="{StaticResource CITHubBackgroundBrush}">
-        <Grid Padding="28,24,28,12" ColumnDefinitions="*,Auto">
+        <Grid Margin="28,24,28,12" ColumnDefinitions="*,Auto">
             <StackPanel Spacing="3">
                 <TextBlock Text="学内サービス" Style="{StaticResource TitleTextBlockStyle}" />
                 <TextBlock x:Name="ServiceStatus" Text="読み込み準備中" Foreground="{StaticResource CITHubSecondaryTextBrush}" />
