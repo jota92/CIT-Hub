@@ -26,7 +26,7 @@
         </ScrollViewer>
         <Grid Grid.Row="2" Margin="28,0,28,28" Background="{StaticResource CITHubSurfaceBrush}">
             <controls:WebView2 x:Name="Browser" />
-            <ProgressRing x:Name="Loading" Width="32" Height="32" IsActive="True" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <ProgressRing x:Name="BrowserLoading" Width="32" Height="32" IsActive="True" HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Grid>
     </Grid>
 </Page>

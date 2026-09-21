@@ -39,7 +39,7 @@ public sealed partial class ServicesPage : Page
     private async Task InitializeBrowserAsync()
     {
         if (_isBrowserReady) return;
-        Loading.IsActive = true;
+        BrowserLoading.IsActive = true;
         ServiceStatus.Text = "ブラウザを準備しています";
         var userDataFolder = Path.Combine(ApplicationData.Current.LocalFolder.Path, "webview-profile");
         var environment = await CoreWebView2Environment.CreateWithOptionsAsync(null, userDataFolder);
@@ -48,13 +48,13 @@ public sealed partial class ServicesPage : Page
         Browser.CoreWebView2.Settings.AreDevToolsEnabled = false;
         Browser.CoreWebView2.NavigationStarting += (_, args) =>
         {
-            Loading.IsActive = true;
+            BrowserLoading.IsActive = true;
             ServiceStatus.Text = "ページを読み込んでいます";
             _currentUri = new Uri(args.Uri);
         };
         Browser.CoreWebView2.NavigationCompleted += (_, args) =>
         {
-            Loading.IsActive = false;
+            BrowserLoading.IsActive = false;
             ServiceStatus.Text = args.IsSuccess ? "表示中" : "読み込みに失敗しました。再読み込みしてください。";
         };
         Browser.CoreWebView2.NewWindowRequested += (_, args) =>
@@ -70,7 +70,7 @@ public sealed partial class ServicesPage : Page
     {
         _requestedService = tab;
         if (!_isBrowserReady || Browser.CoreWebView2 is null || !ServiceUrls.TryGetValue(tab, out var url)) return;
-        Loading.IsActive = true;
+        BrowserLoading.IsActive = true;
         ServiceStatus.Text = "ページを読み込んでいます";
         _currentUri = url;
         Browser.Source = url;
