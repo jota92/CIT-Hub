@@ -4,6 +4,7 @@ using Microsoft.Web.WebView2.Core;
 using Windows.Storage;
 using Windows.System;
 using CITHub.Windows.Services;
+using CITHub.Windows.Models;
 using System.Text.Json;
 
 namespace CITHub.Windows.Views;
@@ -32,7 +33,12 @@ public sealed partial class ServicesPage : Page
     protected override void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        if (e.Parameter is string tab && ServiceUrls.ContainsKey(tab))
+        if (e.Parameter is string tab && tab == "portal-timetable")
+        {
+            _requestedService = "portal";
+            if (_isBrowserReady) Navigate("portal");
+        }
+        else if (e.Parameter is string tab && ServiceUrls.ContainsKey(tab))
         {
             _requestedService = tab;
             if (_isBrowserReady) Navigate(tab);
@@ -92,6 +98,57 @@ public sealed partial class ServicesPage : Page
     private async void OnOpenExternal(object sender, RoutedEventArgs e)
     {
         if (_currentUri is not null) await Launcher.LaunchUriAsync(_currentUri);
+    }
+
+    private async void OnCaptureTimetable(object sender, RoutedEventArgs e)
+    {
+        if (!_isBrowserReady || _requestedService != "portal" || Browser.CoreWebView2 is null)
+        {
+            ServiceStatus.Text = "ポータルを開いてから時間割を取得してください。";
+            return;
+        }
+        // Portal markup differs between terms. This extraction preserves each table cell's
+        // text and link rather than depending on a fixed page identifier.
+        const string script = """
+            (() => {
+              const clean = value => (value || '').replace(/\s+/g, ' ').trim();
+              const candidates = [...document.querySelectorAll('table')].map(table => ({ table, score: table.querySelectorAll('td').length }));
+              const target = candidates.sort((a,b) => b.score - a.score)[0];
+              if (!target || target.score < 4) return JSON.stringify({ ok:false, reason:'timetable_table_not_found' });
+              const rows = [...target.table.querySelectorAll('tr')];
+              const days = [...target.table.querySelectorAll('th')].map(cell => clean(cell.innerText)).filter(text => /^[月火水木金土日](曜)?$/.test(text)).map(text => text[0]);
+              const courses = [];
+              rows.forEach((row, rowIndex) => {
+                const cells = [...row.querySelectorAll(':scope > td')];
+                if (!cells.length) return;
+                const period = clean((row.querySelector('th') || {}).innerText) || String(rowIndex);
+                cells.forEach((cell, index) => {
+                  const title = clean(cell.innerText);
+                  if (!title || /^(\-|\u2014|\u00a0)$/.test(title)) return;
+                  const link = cell.querySelector('a[href]');
+                  courses.push({ day: days[index] || String(index + 1), period, title, detailUrl: link ? new URL(link.getAttribute('href'), location.href).href : '' });
+                });
+              });
+              return JSON.stringify({ ok:courses.length > 0, courses });
+            })()
+            """;
+        try
+        {
+            var raw = await Browser.CoreWebView2.ExecuteScriptAsync(script);
+            var json = JsonSerializer.Deserialize<string>(raw);
+            if (string.IsNullOrWhiteSpace(json)) throw new InvalidOperationException();
+            using var document = JsonDocument.Parse(json);
+            var root = document.RootElement;
+            if (!root.TryGetProperty("ok", out var ok) || !ok.GetBoolean()) { ServiceStatus.Text = "時間割表を見つけられませんでした。ポータルで時間割ページを開いてから実行してください。"; return; }
+            var courses = root.GetProperty("courses").EnumerateArray().Select(item =>
+            {
+                var day = item.GetProperty("day").GetString() ?? ""; var period = item.GetProperty("period").GetString() ?? ""; var title = item.GetProperty("title").GetString() ?? "";
+                return new TimetableCourse { Id = TimetableStore.CourseId(day, period, title, "", ""), Day = day, Period = period, Title = title, DetailUrl = item.TryGetProperty("detailUrl", out var link) ? link.GetString() ?? "" : "" };
+            }).ToList();
+            await TimetableStore.SaveAsync(courses);
+            ServiceStatus.Text = $"{courses.Count}件の授業を保存しました。時間割タブで確認できます。";
+        }
+        catch { ServiceStatus.Text = "時間割の取得に失敗しました。ポータルの時間割表を表示して再試行してください。"; }
     }
 
     // The portal receives only one automatic submission for a rendered sign-in page.

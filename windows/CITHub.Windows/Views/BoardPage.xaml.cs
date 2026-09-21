@@ -4,12 +4,14 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.System;
+using CITHub.Windows.Models;
 
 namespace CITHub.Windows.Views;
 
 public sealed partial class BoardPage : Page
 {
     private StorageFolder? _folder;
+    private TimetableCourse? _course;
 
     public BoardPage()
     {
@@ -17,9 +19,20 @@ public sealed partial class BoardPage : Page
         Loaded += async (_, _) => await RefreshAsync();
     }
 
+    protected override void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+        _course = e.Parameter as TimetableCourse;
+        PageTitle.Text = _course is null ? "板書" : _course.DisplayName;
+        CourseSubtitle.Text = _course is null ? "時間割の授業を選ぶと、授業ごとに写真を整理できます。" : $"{_course.Day} { _course.Period }限  {_course.Subtitle}";
+        _folder = null;
+        _ = RefreshAsync();
+    }
+
     private async Task<StorageFolder> GetFolderAsync()
     {
-        _folder ??= await ApplicationData.Current.LocalFolder.CreateFolderAsync("board-photos", CreationCollisionOption.OpenIfExists);
+        var root = await ApplicationData.Current.LocalFolder.CreateFolderAsync("board-photos", CreationCollisionOption.OpenIfExists);
+        _folder ??= await root.CreateFolderAsync(_course?.Id ?? "unfiled", CreationCollisionOption.OpenIfExists);
         return _folder;
     }
 
