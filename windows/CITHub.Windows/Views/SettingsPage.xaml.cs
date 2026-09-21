@@ -51,13 +51,22 @@ public sealed partial class SettingsPage : Page
         if (code is null) await new ContentDialog { Title = "コードを生成できません", Content = "Authenticator設定の形式を確認してください。", CloseButtonText = "閉じる", XamlRoot = XamlRoot }.ShowAsync();
     }
 
-    private void OnThemeChanged(object sender, RoutedEventArgs e) => LocalStore.SetString("dark-mode", DarkMode.IsOn ? "true" : "false");
+    private void OnThemeChanged(object sender, RoutedEventArgs e)
+    {
+        LocalStore.SetString("dark-mode", DarkMode.IsOn ? "true" : "false");
+        _ = UserPreferencesSyncService.UploadAsync();
+    }
 
     private async void OnClaimWindowsDevice(object sender, RoutedEventArgs e)
     {
         var result = await WindowsDeviceSessionService.ClaimAsync(PairingCode.Text ?? "");
         PairingStatus.Text = result.Message;
-        if (result.Success) { PairingCode.Text = ""; await RestoreAuthenticatorAsync(); }
+        if (result.Success)
+        {
+            PairingCode.Text = "";
+            await UserPreferencesSyncService.SynchronizeAsync();
+            await RestoreAuthenticatorAsync();
+        }
     }
 
     private async Task RestoreAuthenticatorAsync()
