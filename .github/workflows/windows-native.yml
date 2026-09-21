@@ -22,6 +22,8 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
+      - name: Set up Visual Studio MSBuild
+        uses: microsoft/setup-msbuild@v2
       - name: Restore
         run: dotnet restore windows/CITHub.Windows/CITHub.Windows.csproj
       - name: Build native package
