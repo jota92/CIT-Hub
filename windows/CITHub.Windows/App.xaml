@@ -5,7 +5,7 @@
     xmlns:controls="using:Microsoft.UI.Xaml.Controls">
     <Application.Resources>
         <ResourceDictionary>
-            <controls:XamlControlsResources />
+            <controls:XamlControlsResources x:Key="XamlControlsResources" />
             <SolidColorBrush x:Key="CITHubAccentBrush" Color="#4A90D9" />
             <SolidColorBrush x:Key="CITHubSurfaceBrush" Color="#303030" />
             <SolidColorBrush x:Key="CITHubBackgroundBrush" Color="#1D1D1D" />
