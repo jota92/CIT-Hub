@@ -4,10 +4,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Microsoft.UI.Xaml.Controls">
     <Application.Resources>
-        <controls:XamlControlsResources />
-        <SolidColorBrush x:Key="CITHubAccentBrush" Color="#4A90D9" />
-        <SolidColorBrush x:Key="CITHubSurfaceBrush" Color="#303030" />
-        <SolidColorBrush x:Key="CITHubBackgroundBrush" Color="#1D1D1D" />
-        <SolidColorBrush x:Key="CITHubSecondaryTextBrush" Color="#AEAEAF" />
+        <ResourceDictionary>
+            <controls:XamlControlsResources />
+            <SolidColorBrush x:Key="CITHubAccentBrush" Color="#4A90D9" />
+            <SolidColorBrush x:Key="CITHubSurfaceBrush" Color="#303030" />
+            <SolidColorBrush x:Key="CITHubBackgroundBrush" Color="#1D1D1D" />
+            <SolidColorBrush x:Key="CITHubSecondaryTextBrush" Color="#AEAEAF" />
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
