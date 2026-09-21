@@ -17,6 +17,8 @@ public sealed partial class SettingsPage : Page
     {
         UserId.Text = LocalStore.GetString("marin-user-id");
         DarkMode.IsOn = LocalStore.GetString("dark-mode") == "true";
+        ManabaMobile.IsOn = LocalStore.GetString("manaba-smartphone", "true") == "true";
+        PortalMobile.IsOn = LocalStore.GetString("portal-smartphone", "true") == "true";
         PairingStatus.Text = WindowsDeviceSessionService.IsLinked
             ? $"{WindowsDeviceSessionService.UserId} と連携済みです。"
             : "この端末はまだ連携されていません。";
@@ -54,6 +56,13 @@ public sealed partial class SettingsPage : Page
     private void OnThemeChanged(object sender, RoutedEventArgs e)
     {
         LocalStore.SetString("dark-mode", DarkMode.IsOn ? "true" : "false");
+        _ = UserPreferencesSyncService.UploadAsync();
+    }
+
+    private void OnServiceDisplayChanged(object sender, RoutedEventArgs e)
+    {
+        LocalStore.SetString("manaba-smartphone", ManabaMobile.IsOn ? "true" : "false");
+        LocalStore.SetString("portal-smartphone", PortalMobile.IsOn ? "true" : "false");
         _ = UserPreferencesSyncService.UploadAsync();
     }
 

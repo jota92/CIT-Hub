@@ -27,6 +27,12 @@
                 <TextBlock Text="テーマカラーはWindowsのアクセントカラーを使用します。" Opacity="0.72" />
             </StackPanel>
             <StackPanel Spacing="10">
+                <TextBlock Text="学内サービス" Style="{StaticResource SubtitleTextBlockStyle}" />
+                <ToggleSwitch x:Name="ManabaMobile" Header="manabaをスマホ表示で開く" Toggled="OnServiceDisplayChanged" />
+                <ToggleSwitch x:Name="PortalMobile" Header="ポータルをスマホ表示で開く" Toggled="OnServiceDisplayChanged" />
+                <TextBlock Text="この設定は連携済みの端末間で共有されます。" Opacity="0.72" />
+            </StackPanel>
+            <StackPanel Spacing="10">
                 <TextBlock Text="Windows端末の連携" Style="{StaticResource SubtitleTextBlockStyle}" />
                 <TextBlock Text="モバイル版で発行した連携コードを入力すると、アカウントに紐付けて同期します。" TextWrapping="Wrap" Opacity="0.72" />
                 <TextBox x:Name="PairingCode" PlaceholderText="連携コード" />

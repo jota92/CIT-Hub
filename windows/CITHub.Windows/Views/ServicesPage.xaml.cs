@@ -91,12 +91,23 @@ public sealed partial class ServicesPage : Page
         BrowserLoading.IsActive = true;
         ServiceStatus.Text = "ページを読み込んでいます";
         _currentUri = url;
+        ApplyUserAgent(tab);
         Browser.Source = url;
     }
     private void OpenUri(Uri uri)
     {
         if (!_isBrowserReady || Browser.CoreWebView2 is null) return;
         _currentUri = uri; BrowserLoading.IsActive = true; ServiceStatus.Text = "ページを読み込んでいます"; Browser.Source = uri;
+    }
+
+    private void ApplyUserAgent(string service)
+    {
+        if (Browser.CoreWebView2 is null) return;
+        var mobile = service == "manaba" ? LocalStore.GetString("manaba-smartphone", "true") == "true" :
+            service == "portal" && LocalStore.GetString("portal-smartphone", "true") == "true";
+        Browser.CoreWebView2.Settings.UserAgent = mobile
+            ? "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Mobile Safari/537.36"
+            : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36";
     }
     private void OnServiceSelected(object sender, RoutedEventArgs e) => Navigate((sender as FrameworkElement)?.Tag as string ?? "manaba");
     private void OnBack(object sender, RoutedEventArgs e)
