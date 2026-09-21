@@ -254,26 +254,62 @@ public sealed partial class ServicesPage : Page
             ServiceStatus.Text = "アカウント情報を設定すると、ポータルへ自動入力できます。";
             return;
         }
+        var otpCode = PortalAuthenticatorSyncService.TryLoad(out var authenticator)
+            ? Totp.Generate(authenticator, DateTimeOffset.UtcNow) ?? ""
+            : "";
         var script = """
             (() => {
-              const fields = Array.from(document.querySelectorAll('input'));
-              const password = fields.find(x => (x.type || '').toLowerCase() === 'password');
-              const user = fields.find(x => x !== password && /user|id|login|account|username/i.test(`${x.name} ${x.id} ${x.autocomplete}`)) || fields.find(x => x !== password && ['text','email'].includes((x.type || '').toLowerCase()));
-              if (!user || !password || !document.querySelector('button[type=submit], input[type=submit]')) return false;
-              const set = (element, value) => { const descriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value'); descriptor.set.call(element, value); element.dispatchEvent(new Event('input', { bubbles:true })); element.dispatchEvent(new Event('change', { bubbles:true })); };
-              set(user, __USER_ID__); set(password, __PASSWORD__);
-              const submit = document.querySelector('button[type=submit], input[type=submit]'); submit.click(); return true;
+              const set = (field, value) => {
+                if (!field) return false;
+                const text = String(value || ''); let proto = field, descriptor;
+                while ((proto = Object.getPrototypeOf(proto)) && !descriptor) descriptor = Object.getOwnPropertyDescriptor(proto, 'value');
+                try { descriptor && descriptor.set ? descriptor.set.call(field, text) : field.value = text; } catch (_) { field.value = text; }
+                field.setAttribute('value', text); field.dispatchEvent(new Event('input', { bubbles:true })); field.dispatchEvent(new Event('change', { bubbles:true }));
+                // Keycloak can replace a visual input after its change handler runs.
+                if (String(field.value || '') !== text) try { field.value = text; } catch (_) {}
+                return String(field.value || '') === text;
+              };
+              const submit = (form, button) => {
+                try { if (form && form.requestSubmit) { form.requestSubmit(button || undefined); return true; } } catch (_) {}
+                try { if (form && form.submit) { form.submit(); return true; } } catch (_) {}
+                try { button && button.click(); return !!button; } catch (_) { return false; }
+              };
+              const once = key => { if (sessionStorage.getItem(key)) return false; sessionStorage.setItem(key, String(Date.now())); return true; };
+              const path = location.pathname || '';
+              const body = (document.body?.innerText || '').replace(/\s+/g, ' ');
+              if (__IS_PORTAL__ && (body.includes('別の画面で操作されたため') || body.includes('複数の画面でご利用になれません'))) return 'multi-screen';
+              const otpForm = document.querySelector('form#kc-otp-login-form');
+              const otpField = document.querySelector('input#otp, input[name="otp"]');
+              if (otpForm && otpField) {
+                if (!__OTP__) return 'otp-required';
+                if (!once('cit-hub-otp:' + path)) return 'already-attempted';
+                set(otpField, __OTP__); return submit(otpForm, otpForm.querySelector('#kc-login, button[type=submit], input[type=submit]')) ? 'otp-submitted' : 'manual-required';
+              }
+              const form = document.querySelector('form#kc-form-login, form[action*="login-actions/authenticate"]') || document.querySelector('form');
+              const pass = document.querySelector('#password, input[name="password"], input[type="password"]');
+              const user = document.querySelector('#username, input[name="username"], input[name="loginForm:userId"], #loginForm\\:userId') || [...(form?.querySelectorAll('input') || [])].find(x => x !== pass && !['hidden','checkbox','radio','submit','button'].includes((x.type || '').toLowerCase()));
+              if (!user || !pass) return 'no-login-form';
+              if (!once('cit-hub-credentials:' + path)) return 'already-attempted';
+              const userOk = set(user, __USER_ID__), passwordOk = set(pass, __PASSWORD__);
+              if (!userOk || !passwordOk) return 'credentials-not-applied';
+              const button = form?.querySelector('#kc-login, button[type=submit], input[type=submit]') || document.querySelector('#kc-login, button[type=submit], input[type=submit]');
+              return submit(form, button) ? 'credentials-submitted' : 'manual-required';
             })()
             """.Replace("__USER_ID__", JsonSerializer.Serialize(userId), StringComparison.Ordinal)
-                 .Replace("__PASSWORD__", JsonSerializer.Serialize(password), StringComparison.Ordinal);
+                 .Replace("__PASSWORD__", JsonSerializer.Serialize(password), StringComparison.Ordinal)
+                 .Replace("__OTP__", JsonSerializer.Serialize(otpCode), StringComparison.Ordinal)
+                 .Replace("__IS_PORTAL__", _requestedService == "portal" ? "true" : "false", StringComparison.Ordinal);
         try
         {
-            var result = await Browser.CoreWebView2.ExecuteScriptAsync(script);
-            if (string.Equals(result, "true", StringComparison.OrdinalIgnoreCase))
+            var result = JsonSerializer.Deserialize<string>(await Browser.CoreWebView2.ExecuteScriptAsync(script)) ?? "";
+            if (result is "credentials-submitted" or "otp-submitted")
             {
                 _automaticSubmissionAttempted.Add(_requestedService);
                 ServiceStatus.Text = $"{(_requestedService == "portal" ? "ポータル" : "manaba")}へログインしています";
             }
+            else if (result == "otp-required") ServiceStatus.Text = "ポータル二要素認証の設定が必要です。設定からAuthenticator設定を登録してください。";
+            else if (result == "multi-screen") { ServiceStatus.Text = "ポータルの画面が無効になりました。入口から再読み込みしてください。"; Navigate("portal"); }
+            else if (result is "credentials-not-applied" or "manual-required") ServiceStatus.Text = "自動入力を完了できませんでした。入力欄を確認して手動でログインしてください。";
             else ServiceStatus.Text = "ログイン画面を確認しました。必要に応じて手動でログインしてください。";
         }
         catch { ServiceStatus.Text = "ログイン画面を確認できませんでした。手動でログインしてください。"; }
