@@ -26,10 +26,17 @@ jobs:
         run: dotnet restore windows/CITHub.Windows/CITHub.Windows.csproj
       - name: Build native package
         shell: pwsh
-        run: ./windows/build-release.ps1 -Architecture ${{ matrix.architecture }}
+        run: ./windows/build-release.ps1 -Architecture ${{ matrix.architecture }} *>&1 | Tee-Object -FilePath windows-build-${{ matrix.architecture }}.log; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Upload package
         uses: actions/upload-artifact@v4
         with:
           name: CIT-Hub-Windows-${{ matrix.architecture }}
           path: windows/CITHub.Windows/bin/Release/**/AppPackages/**/*
           if-no-files-found: error
+      - name: Upload build diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CIT-Hub-Windows-build-log-${{ matrix.architecture }}
+          path: windows-build-${{ matrix.architecture }}.log
+          if-no-files-found: ignore
