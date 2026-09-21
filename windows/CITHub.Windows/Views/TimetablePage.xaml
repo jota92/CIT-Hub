@@ -16,10 +16,13 @@
             <ListView x:Name="ScheduleList" IsItemClickEnabled="True" ItemClick="OnCourseSelected">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Margin="0,10" Spacing="3">
-                            <TextBlock Text="{Binding DisplayName}" FontSize="18" FontWeight="SemiBold" />
-                            <TextBlock Text="{Binding Subtitle}" Opacity="0.72" />
-                        </StackPanel>
+                        <Grid Margin="0,10" ColumnDefinitions="4,12,*">
+                            <Border Background="{Binding AccentBrush}" CornerRadius="2" />
+                            <StackPanel Grid.Column="2" Spacing="3">
+                                <TextBlock Text="{Binding DisplayName}" FontSize="18" FontWeight="SemiBold" />
+                                <TextBlock Text="{Binding Subtitle}" Opacity="0.72" />
+                            </StackPanel>
+                        </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
