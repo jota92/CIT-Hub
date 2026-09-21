@@ -50,6 +50,21 @@
                 </StackPanel>
                 <TextBlock x:Name="SupportStatus" TextWrapping="Wrap" Opacity="0.72" />
             </StackPanel>
+            <StackPanel Spacing="10">
+                <TextBlock Text="通知センター" Style="{StaticResource SubtitleTextBlockStyle}" />
+                <Button Content="お知らせを更新" HorizontalAlignment="Left" Click="OnRefreshNotices" />
+                <ListView x:Name="NoticeList" IsItemClickEnabled="True" ItemClick="OnNoticeSelected" MaxHeight="280">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,8" Spacing="3">
+                                <TextBlock Text="{Binding title}" FontWeight="SemiBold" />
+                                <TextBlock Text="{Binding message}" TextWrapping="Wrap" Opacity="0.72" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <TextBlock x:Name="NoticeStatus" TextWrapping="Wrap" Opacity="0.72" />
+            </StackPanel>
         </StackPanel>
     </ScrollViewer>
 </Page>

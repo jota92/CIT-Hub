@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using CITHub.Windows.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Windows.System;
 
 namespace CITHub.Windows.Views;
 
@@ -24,6 +25,7 @@ public sealed partial class SettingsPage : Page
             : "この端末はまだ連携されていません。";
         _ = RestoreAuthenticatorAsync();
         _ = RefreshSupportAsync();
+        _ = RefreshNoticesAsync();
     }
 
     private void OnSaveCredentials(object sender, RoutedEventArgs e)
@@ -105,6 +107,21 @@ public sealed partial class SettingsPage : Page
         if (sent is null) { SupportStatus.Text = "送信できませんでした。端末連携と通信を確認してください。"; return; }
         SupportDraft.Text = "";
         await RefreshSupportAsync();
+    }
+
+    private async Task RefreshNoticesAsync()
+    {
+        if (!WindowsDeviceSessionService.IsLinked) { NoticeStatus.Text = "端末連携後にお知らせを取得できます。"; return; }
+        var notices = await AdminNotificationService.LoadAsync();
+        NoticeList.ItemsSource = notices;
+        NoticeStatus.Text = notices.Count == 0 ? "現在のお知らせはありません。" : $"{notices.Count}件のお知らせがあります。";
+    }
+
+    private async void OnRefreshNotices(object sender, RoutedEventArgs e) => await RefreshNoticesAsync();
+
+    private async void OnNoticeSelected(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is AdminNotice notice && Uri.TryCreate(notice.url, UriKind.Absolute, out var url)) await Launcher.LaunchUriAsync(url);
     }
 }
 
