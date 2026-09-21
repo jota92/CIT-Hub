@@ -1,0 +1,57 @@
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Imaging;
+using Windows.Storage;
+using Windows.Storage.Pickers;
+using Windows.System;
+
+namespace CITHub.Windows.Views;
+
+public sealed partial class BoardPage : Page
+{
+    private StorageFolder? _folder;
+
+    public BoardPage()
+    {
+        InitializeComponent();
+        Loaded += async (_, _) => await RefreshAsync();
+    }
+
+    private async Task<StorageFolder> GetFolderAsync()
+    {
+        _folder ??= await ApplicationData.Current.LocalFolder.CreateFolderAsync("board-photos", CreationCollisionOption.OpenIfExists);
+        return _folder;
+    }
+
+    private async Task RefreshAsync()
+    {
+        var files = await (await GetFolderAsync()).GetFilesAsync();
+        var images = new List<BitmapImage>();
+        foreach (var file in files.Where(file => new[] { ".jpg", ".jpeg", ".png", ".heic" }.Contains(Path.GetExtension(file.Name).ToLowerInvariant())))
+        {
+            var image = new BitmapImage();
+            await image.SetSourceAsync(await file.OpenAsync(FileAccessMode.Read));
+            images.Add(image);
+        }
+        Photos.ItemsSource = images;
+    }
+
+    private async void OnAddPhoto(object sender, RoutedEventArgs e)
+    {
+        var picker = new FileOpenPicker();
+        picker.FileTypeFilter.Add(".jpg"); picker.FileTypeFilter.Add(".jpeg"); picker.FileTypeFilter.Add(".png"); picker.FileTypeFilter.Add(".heic");
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow));
+        var file = await picker.PickSingleFileAsync();
+        if (file is null) return;
+        await file.CopyAsync(await GetFolderAsync(), $"{DateTimeOffset.Now:yyyyMMdd-HHmmss}-{file.Name}", NameCollisionOption.GenerateUniqueName);
+        await RefreshAsync();
+    }
+
+    private async void OnOpenFolder(object sender, RoutedEventArgs e) => await Launcher.LaunchFolderAsync(await GetFolderAsync());
+
+    private async void OnPhotoSelected(object sender, ItemClickEventArgs e)
+    {
+        var dialog = new ContentDialog { Title = "板書写真", Content = new Image { Source = (BitmapImage)e.ClickedItem, MaxHeight = 620, Stretch = Microsoft.UI.Xaml.Media.Stretch.Uniform }, CloseButtonText = "閉じる", XamlRoot = XamlRoot };
+        await dialog.ShowAsync();
+    }
+}

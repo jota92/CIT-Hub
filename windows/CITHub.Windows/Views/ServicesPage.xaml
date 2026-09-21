@@ -1,0 +1,32 @@
+<Page
+    x:Class="CITHub.Windows.Views.ServicesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls">
+    <Grid RowDefinitions="Auto,Auto,*" Background="{StaticResource CITHubBackgroundBrush}">
+        <Grid Padding="28,24,28,12" ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="3">
+                <TextBlock Text="学内サービス" Style="{StaticResource TitleTextBlockStyle}" />
+                <TextBlock x:Name="ServiceStatus" Text="読み込み準備中" Foreground="{StaticResource CITHubSecondaryTextBrush}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                <Button Content="戻る" Click="OnBack" />
+                <Button Content="再読み込み" Click="OnRefresh" />
+                <Button Content="外部で開く" Click="OnOpenExternal" />
+            </StackPanel>
+        </Grid>
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Padding="28,0,28,14">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Content="manaba" Tag="manaba" Click="OnServiceSelected" />
+                <Button Content="ポータル" Tag="portal" Click="OnServiceSelected" />
+                <Button Content="食堂メニュー" Tag="cafeteria" Click="OnServiceSelected" />
+                <Button Content="バスダイヤ" Tag="bus" Click="OnServiceSelected" />
+                <Button Content="年間スケジュール" Tag="calendar" Click="OnServiceSelected" />
+            </StackPanel>
+        </ScrollViewer>
+        <Grid Grid.Row="2" Margin="28,0,28,28" Background="{StaticResource CITHubSurfaceBrush}">
+            <controls:WebView2 x:Name="Browser" />
+            <ProgressRing x:Name="Loading" Width="32" Height="32" IsActive="True" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Grid>
+    </Grid>
+</Page>

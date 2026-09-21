@@ -1,0 +1,26 @@
+<Page
+    x:Class="CITHub.Windows.Views.TodoPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Padding="36,28" RowDefinitions="Auto,Auto,*" RowSpacing="20">
+        <TextBlock Text="ToDo" Style="{StaticResource TitleTextBlockStyle}" />
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+            <Button Content="追加" Click="OnAdd" />
+            <Button Content="すべて" Click="OnShowAll" />
+            <Button Content="ToDoのみ" Click="OnShowPersonal" />
+        </StackPanel>
+        <ListView Grid.Row="2" x:Name="TodoList" IsItemClickEnabled="True" ItemClick="OnTodoSelected">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="8" ColumnDefinitions="*,Auto">
+                        <StackPanel Spacing="3">
+                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding Details}" TextWrapping="Wrap" Opacity="0.68" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="{Binding DeadlineDisplay}" VerticalAlignment="Center" Opacity="0.7" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</Page>

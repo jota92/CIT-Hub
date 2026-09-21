@@ -1,0 +1,38 @@
+<Page
+    x:Class="CITHub.Windows.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer Padding="36,28">
+        <StackPanel Spacing="24" MaxWidth="760">
+            <TextBlock Text="設定" Style="{StaticResource TitleTextBlockStyle}" />
+            <StackPanel Spacing="10">
+                <TextBlock Text="marinアカウント" Style="{StaticResource SubtitleTextBlockStyle}" />
+                <TextBox x:Name="UserId" Header="MARINE User ID" />
+                <PasswordBox x:Name="Password" Header="パスワード" />
+                <Button Content="端末に保存" HorizontalAlignment="Left" Click="OnSaveCredentials" />
+            </StackPanel>
+            <StackPanel Spacing="10">
+                <TextBlock Text="ポータル二要素認証" Style="{StaticResource SubtitleTextBlockStyle}" />
+                <TextBlock Text="otpauth:// URL またはシークレットを入力します。設定はWindows資格情報マネージャーで保護します。" TextWrapping="Wrap" Opacity="0.72" />
+                <PasswordBox x:Name="OtpSecret" Header="Authenticator設定" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Content="登録" Click="OnSaveOtp" />
+                    <Button Content="現在のコードを表示" Click="OnShowCode" />
+                </StackPanel>
+                <TextBlock x:Name="OtpCode" FontFamily="Consolas" FontSize="28" />
+            </StackPanel>
+            <StackPanel Spacing="10">
+                <TextBlock Text="表示" Style="{StaticResource SubtitleTextBlockStyle}" />
+                <ToggleSwitch x:Name="DarkMode" Header="ダークモード" Toggled="OnThemeChanged" />
+                <TextBlock Text="テーマカラーはWindowsのアクセントカラーを使用します。" Opacity="0.72" />
+            </StackPanel>
+            <StackPanel Spacing="10">
+                <TextBlock Text="Windows端末の連携" Style="{StaticResource SubtitleTextBlockStyle}" />
+                <TextBlock Text="モバイル版で発行した連携コードを入力すると、アカウントに紐付けて同期します。" TextWrapping="Wrap" Opacity="0.72" />
+                <TextBox x:Name="PairingCode" PlaceholderText="連携コード" />
+                <Button Content="このWindows端末を連携" HorizontalAlignment="Left" Click="OnClaimWindowsDevice" />
+                <TextBlock x:Name="PairingStatus" TextWrapping="Wrap" Opacity="0.72" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

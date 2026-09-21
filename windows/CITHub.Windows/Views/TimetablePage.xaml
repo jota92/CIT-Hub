@@ -1,0 +1,20 @@
+<Page
+    x:Class="CITHub.Windows.Views.TimetablePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer Padding="36,28">
+        <StackPanel Spacing="22" MaxWidth="1040">
+            <TextBlock Text="時間割" Style="{StaticResource TitleTextBlockStyle}" />
+            <TextBlock Text="ポータルから取得した時間割を表示します。授業を選ぶと、課題・メモ・板書をまとめて確認できます。" TextWrapping="Wrap" Opacity="0.72" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Content="日別" IsEnabled="False" />
+                <Button Content="週間" IsEnabled="False" />
+                <Button Content="年間スケジュール" Click="OnOpenCalendar" />
+                <Button Content="ポータルを開く" Click="OnOpenPortal" />
+            </StackPanel>
+            <InfoBar IsOpen="True" IsClosable="False" Severity="Informational" Title="Windows版の時間割取得"
+                     Message="初回は学内サービスのポータルでログインし、時間割を読み込んでください。取得済みのデータは端末に保存されます。" />
+            <ListView x:Name="ScheduleList" SelectionMode="None" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

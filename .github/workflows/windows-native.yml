@@ -1,0 +1,35 @@
+name: Build Windows native package
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "windows/**"
+      - "schedule.json"
+      - "bus-schedule.json"
+      - ".github/workflows/windows-native.yml"
+
+jobs:
+  package:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture: [x64, ARM64]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore
+        run: dotnet restore windows/CITHub.Windows/CITHub.Windows.csproj
+      - name: Build native package
+        shell: pwsh
+        run: ./windows/build-release.ps1 -Architecture ${{ matrix.architecture }}
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: CIT-Hub-Windows-${{ matrix.architecture }}
+          path: windows/CITHub.Windows/bin/Release/**/AppPackages/**/*
+          if-no-files-found: error
