@@ -6,6 +6,9 @@
     Title="CIT Hub">
     <NavigationView x:Name="RootNavigation"
                     PaneDisplayMode="LeftCompact"
+                    IsPaneToggleButtonVisible="True"
+                    OpenPaneLength="248"
+                    CompactPaneLength="48"
                     IsBackButtonVisible="Collapsed"
                     IsSettingsVisible="False"
                     SelectionChanged="OnNavigationSelectionChanged">
