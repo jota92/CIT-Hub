@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
          xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
-         IgnorableNamespaces="uap">
+         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+         IgnorableNamespaces="uap rescap">
   <Identity Name="CITHub.Windows" Publisher="CN=Jota Irie" Version="2.0.1.0" />
   <Properties>
     <DisplayName>CIT Hub</DisplayName>
@@ -25,5 +26,6 @@
   <Capabilities>
     <Capability Name="internetClient" />
     <DeviceCapability Name="webcam" />
+    <rescap:Capability Name="runFullTrust" />
   </Capabilities>
 </Package>
