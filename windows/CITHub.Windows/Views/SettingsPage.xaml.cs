@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using CITHub.Windows.Services;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Windows.System;
@@ -8,11 +9,26 @@ namespace CITHub.Windows.Views;
 
 public sealed partial class SettingsPage : Page
 {
+    private readonly DispatcherQueueTimer _supportRefreshTimer;
+    private bool _supportRefreshInProgress;
+
     public SettingsPage()
     {
         InitializeComponent();
-        Loaded += (_, _) => Load();
+        _supportRefreshTimer = DispatcherQueue.CreateTimer();
+        _supportRefreshTimer.Interval = TimeSpan.FromSeconds(15);
+        _supportRefreshTimer.Tick += async (_, _) => await RefreshSupportAsync();
+        Loaded += OnPageLoaded;
+        Unloaded += OnPageUnloaded;
     }
+
+    private void OnPageLoaded(object sender, RoutedEventArgs e)
+    {
+        Load();
+        _supportRefreshTimer.Start();
+    }
+
+    private void OnPageUnloaded(object sender, RoutedEventArgs e) => _supportRefreshTimer.Stop();
 
     private void Load()
     {
@@ -95,9 +111,19 @@ public sealed partial class SettingsPage : Page
     private async Task RefreshSupportAsync()
     {
         if (!WindowsDeviceSessionService.IsLinked) { SupportStatus.Text = "端末連携後に利用できます。"; return; }
-        var messages = await SupportChatService.LoadAsync();
-        SupportMessages.ItemsSource = messages.Select(message => message.Display).ToList();
-        SupportStatus.Text = messages.Count == 0 ? "メッセージはありません。" : "最新の会話を表示しています。";
+        if (_supportRefreshInProgress) return;
+
+        _supportRefreshInProgress = true;
+        try
+        {
+            var messages = await SupportChatService.LoadAsync();
+            SupportMessages.ItemsSource = messages.Select(message => message.Display).ToList();
+            SupportStatus.Text = messages.Count == 0 ? "メッセージはありません。" : "最新の会話を表示しています。";
+        }
+        finally
+        {
+            _supportRefreshInProgress = false;
+        }
     }
 
     private async void OnRefreshSupport(object sender, RoutedEventArgs e) => await RefreshSupportAsync();
