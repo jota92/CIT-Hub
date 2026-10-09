@@ -434,7 +434,7 @@ SDKのビルド済み実行型拡張機能は利用APIに応じた `minimumHostA
 
 ## 権限状態の確認
 
-`await permissions.status(permission)` は拡張機能の宣言とOSの状態を区別します。未宣言は `undeclared`、カメラと位置情報は実際のOS許可状態、写真・ファイルは利用者が選択したものだけ扱うため `user-selection` を返します。Appleのカメラ未選択状態は `prompt`。Androidでは現在カメラが許可されていなければ `denied` です。statusはOSの許可ダイアログを表示しません。
+`await permissions.status(permission)` は拡張機能の宣言とOSの状態を区別します。未宣言は `undeclared`、カメラ・位置情報・通知などのOS権限は未要求なら `prompt`、要求後に未許可なら `denied`、許可済みなら `granted` です。写真・ファイルは利用者が選択したものだけ扱うため `user-selection` を返します。statusはOSの許可ダイアログを表示しません。
 
 読み取り・書き込みなどの宣言済みの本体データ権限は `granted` ですが、データ未取得やAPI未接続を意味するものではありません。APIの利用可否は別途capabilities.hasで確認してください。`request()` は `camera.use`、`location.use`、`notifications.schedule` に対応し、OS権限は直接のボタン操作から要求し、必要に応じてOSの許可ダイアログを表示します。`openSettings()` は `settings.open` と直接操作を必要とします。どれもOSの実際の状態・対応範囲に従います。
 

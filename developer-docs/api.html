@@ -299,7 +299,7 @@ notification.onOpen(event =&gt; console.log(event.data));</code></pre></div>
 
       <section id="permissions" data-title="Permissions and compatibility" data-group="公開と互換性">
         <h2>権限と互換性</h2>
-        <p>使用するデータやOS機能だけをmanifestの <code>permissions</code> に宣言します。審査・追加確認で利用者に説明されます。Capabilityが存在してもOS権限が許可されたとは限りません。<code>permissions.status()</code> で区別してください。</p>
+        <p>使用するデータやOS機能だけをmanifestの <code>permissions</code> に宣言します。審査・追加確認で利用者に説明されます。Capabilityが存在してもOS権限が許可されたとは限りません。<code>permissions.status()</code> で区別してください。OS権限は全プラットフォームで未要求なら <code>prompt</code>、要求後に未許可なら <code>denied</code>、許可済みなら <code>granted</code> です。Androidの位置情報も要求履歴を保持するため、拒否後に <code>prompt</code> へ戻ることはありません。</p>
         <div class="codebox"><button class="copy" type="button">コピー</button><pre><code>export default defineProgram({
   name: '授業準備',
   version: '1.0.0',
