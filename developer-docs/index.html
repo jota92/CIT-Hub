@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>CIT Hub 開発者ドキュメント</title>
+  <meta name="description" content="CIT Hub拡張機能の設計、TypeScript SDK、データAPI、権限、テストと公開手順を確認できます。">
+  <link rel="stylesheet" href="assets/api.css?v=20261009-v40">
+</head>
+<body>
+  <header class="topbar">
+    <a class="wordmark" href="documentation.html">CIT Hub</a>
+    <span class="product">Developer Documentation</span>
+    <nav class="toplinks" aria-label="グローバルナビゲーション">
+      <a href="documentation.html" aria-current="page">ドキュメント</a>
+      <a href="guide.html">開発ガイド</a>
+      <a href="api.html">APIリファレンス</a>
+      <a href="https://developer.cithub.app/">コンソール</a>
+    </nav>
+  </header>
+  <details class="mobile-nav"><summary>このページの目次</summary><nav class="navgroup" aria-label="ドキュメント目次"><a href="#workflow">開発の流れ</a><a href="#api-map">APIを探す</a><a href="#security">安全性とデータ範囲</a><a href="#release">テストと公開</a></nav></details>
+  <div class="layout">
+    <aside class="sidebar" aria-label="ドキュメント目次">
+      <nav class="navgroup"><h2>開発者ドキュメント</h2>
+        <a href="#start">CIT Hub拡張機能</a><a href="#workflow">開発の流れ</a>
+        <a href="#api-map">APIを探す</a><a href="#security">安全性とデータ範囲</a>
+        <a href="#release">テストと公開</a>
+      </nav>
+      <div class="compat"><strong>Host API v40</strong><br>詳細仕様と対応条件はAPIリファレンスを参照してください。</div>
+    </aside>
+    <main class="content docs-home" id="start">
+      <p class="eyebrow">CIT HUB EXTENSIONS</p>
+      <p class="doc-kicker">開発者ドキュメント <span>/</span> はじめに</p>
+      <h1>自分のアイデアを、<br>キャンパスの道具に。</h1>
+      <p class="lead">CIT Hubの拡張機能はTypeScriptで開発できます。アプリの本人データと端末機能を、権限と安全境界を守りながら組み合わせ、審査前に自分のアプリで試せます。</p>
+      <div class="doc-actions">
+        <a class="doc-button primary" href="guide.html">開発を始める</a>
+        <a class="doc-button" href="api.html">APIリファレンスを見る</a>
+        <a class="doc-button quiet" href="assets/cithub-extension-kit.zip?v=21" download>SDKをダウンロード <span>0.40.0</span></a>
+      </div>
+      <div class="meta"><span><strong>言語</strong> TypeScript</span><span><strong>実行環境</strong> 隔離QuickJS</span><span><strong>画面</strong> OSネイティブUI</span><span><strong>対応</strong> iOS・iPadOS・macOS・Android</span></div>
+
+      <section id="workflow" data-title="開発の流れ" data-group="開始する">
+        <h2>開発の流れ</h2>
+        <p>コードを書いてから公開されるまで、開発版は本人のアプリ内で試せます。公開版は審査で承認されたバージョンだけが利用者に配布されます。</p>
+        <ol class="step-list">
+          <li><span class="step-number">01</span><div><strong>SDKを準備する</strong><p>開発キットを展開し、Node.js 22以降の環境を用意します。</p></div></li>
+          <li><span class="step-number">02</span><div><strong>TypeScriptで機能を作る</strong><p>UI、状態、イベント、本人データAPIを組み合わせます。必要な権限だけを宣言します。</p></div></li>
+          <li><span class="step-number">03</span><div><strong>自分のCIT Hubで確認する</strong><p>生成した拡張機能を開発者コンソールへアップロードし、自分のアプリ内で動作を確認します。</p></div></li>
+          <li><span class="step-number">04</span><div><strong>審査へ提出する</strong><p>機能と変更内容を説明して提出します。承認前の開発版は一般公開されません。</p></div></li>
+        </ol>
+        <p class="doc-actions"><a class="doc-button primary" href="guide.html#start">セットアップと作成手順へ</a><a class="doc-button" href="guide.html#publish">審査・公開の手順へ</a></p>
+      </section>
+
+      <section id="api-map" data-title="APIを探す" data-group="リファレンス">
+        <h2>目的からAPIを探す</h2>
+        <p>APIの存在だけでなく、権限、最低Host API、OSごとの挙動、データの取得条件もリファレンスで確認できます。</p>
+        <div class="api-index">
+          <a href="api.html#ui"><strong>画面・入力・レイアウト</strong><span>ネイティブUI</span></a>
+          <a href="api.html#campus-data"><strong>時間割・課題・ToDo</strong><span>本人データ</span></a>
+          <a href="api.html#storage"><strong>端末保存・Cloud KV</strong><span>データ管理</span></a>
+          <a href="api.html#files"><strong>ファイル・メディア</strong><span>ユーザー選択</span></a>
+          <a href="api.html#network"><strong>HTTPS通信</strong><span>接続先の宣言</span></a>
+          <a href="api.html#notifications"><strong>通知・ライフサイクル</strong><span>イベント</span></a>
+          <a href="api.html#permission-index"><strong>権限一覧</strong><span>許可とスコープ</span></a>
+          <a href="api.html#not-available"><strong>未提供API・制限</strong><span>互換性</span></a>
+        </div>
+      </section>
+
+      <section id="security" data-title="安全性とデータ範囲" data-group="設計">
+        <h2>安全性とデータ範囲</h2>
+        <p>拡張機能は独立した実行環境で動き、画面はアプリのネイティブ部品で描画します。自由なHTMLやネイティブコードを直接実行する仕組みではありません。</p>
+        <div class="callout"><strong>拡張機能から取得できない情報</strong><br>Portal/Manabaのパスワード、OTP秘密鍵、Cookie、CIT Hubのセッショントークン、他の利用者の個人データにはアクセスできません。本人データも宣言した権限と端末に取得済みの範囲に限ります。</div>
+        <ul>
+          <li>外部通信はHTTPSとmanifestで宣言したホストに限定されます。</li>
+          <li>OS権限の要求や写真・ファイルへのアクセスには利用者の操作が必要です。</li>
+          <li>拡張機能APIサーバーは提出されたプログラムを実行しません。</li>
+          <li>未対応のAPIは公開されず、互換性検査で起動が拒否されます。</li>
+        </ul>
+      </section>
+
+      <section id="release" data-title="テストと公開" data-group="配布">
+        <h2>テストと公開</h2>
+        <p>拡張機能名、説明、権限、変更内容を確認してから審査へ提出してください。審査後に公開された版は固定され、開発版のアップロードだけでは一般ユーザーへ配布されません。</p>
+        <div class="doc-intro-grid">
+          <a class="doc-intro-card" href="guide.html#test"><span class="card-index">TEST</span><strong>本人用プレビュー</strong><span>開発版を自分のアカウントで確認します。</span><span class="card-arrow" aria-hidden="true">→</span></a>
+          <a class="doc-intro-card" href="guide.html#publish"><span class="card-index">REVIEW</span><strong>審査に提出</strong><span>機能の説明と更新内容を添えて申請します。</span><span class="card-arrow" aria-hidden="true">→</span></a>
+          <a class="doc-intro-card" href="https://developer.cithub.app/"><span class="card-index">CONSOLE</span><strong>開発者コンソール</strong><span>アカウントでログインして拡張機能を管理します。</span><span class="card-arrow" aria-hidden="true">→</span></a>
+        </div>
+      </section>
+      <p class="callout subtle"><strong>実装状況について</strong><br>本ドキュメントは現行実装の範囲を説明します。計画中の機能やSDK型定義だけのAPIは、利用可能なAPIとして扱いません。各APIの正確な条件は<a href="api.html">APIリファレンス</a>をご確認ください。</p>
+    </main>
+    <aside class="toc-right"><strong>このページ</strong><a href="#workflow">開発の流れ</a><a href="#api-map">APIを探す</a><a href="#security">安全性とデータ範囲</a><a href="#release">テストと公開</a><strong class="related-label">関連ページ</strong><a href="guide.html">開発ガイド</a><a href="api.html">APIリファレンス</a></aside>
+  </div>
+  <footer class="footer">CIT Hub Developer Documentation · Host API v40 · <a href="guide.html">開発ガイド</a> · <a href="api.html">APIリファレンス</a> · <a href="https://developer.cithub.app/">開発者コンソール</a></footer>
+</body>
+</html>

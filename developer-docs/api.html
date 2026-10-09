@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>CIT Hub APIリファレンス — 拡張機能 開発者ドキュメント</title>
+  <meta name="description" content="CIT Hub拡張機能SDKのAPIリファレンス。権限、TypeScriptランタイム、授業データ、保存、通知、ネットワークAPIを解説します。">
+  <meta property="og:title" content="CIT Hub APIリファレンス">
+  <meta property="og:description" content="CIT Hub拡張機能のTypeScript API、権限、互換性、実装例を確認できます。">
+  <link rel="stylesheet" href="assets/api.css?v=20261009-v40">
+  <script src="assets/api.js?v=20261009-v40" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="wordmark" href="documentation.html">CIT Hub</a>
+    <span class="product">Developer Documentation</span>
+    <nav class="toplinks" aria-label="グローバルナビゲーション"><a href="documentation.html">ドキュメント</a><a href="guide.html">開発ガイド</a><a href="api.html" aria-current="page">APIリファレンス</a><a href="https://developer.cithub.app/">コンソール</a></nav>
+  </header>
+  <details class="mobile-nav"><summary>このページの目次</summary><input class="search" id="api-search-mobile" type="search" placeholder="APIを検索" aria-label="APIを検索"><div id="mobile-toc"></div></details>
+  <div class="layout">
+    <aside class="sidebar" aria-label="API目次">
+      <input class="search" id="api-search" type="search" placeholder="APIを検索  ⌘K" aria-label="APIを検索">
+      <div id="side-toc"></div>
+      <div class="compat"><strong>最新ホスト API: v40</strong><br>アプリとSDKの互換性は、拡張機能の最低ホストバージョンで判定されます。</div>
+    </aside>
+    <main class="content" id="main-content">
+      <p class="eyebrow">CIT HUB EXTENSIONS</p>
+      <p class="doc-kicker">開発者ドキュメント <span> / </span> APIリファレンス</p>
+      <h1>APIを使って、<br class="desktop-break">CIT Hubを拡張する。</h1>
+      <p class="lead">TypeScript SDKから利用できる機能、必要な権限、データの範囲、互換性をまとめています。実装例から読み始め、APIの詳細へ進めます。</p>
+      <div class="doc-actions"><a class="doc-button primary" href="guide.html">開発を始める</a><a class="doc-button" href="assets/cithub-extension-kit.zip?v=21" download>SDKをダウンロード <span>v0.40.0</span></a><a class="doc-button quiet" href="api.md" download>Markdown仕様書</a></div>
+      <div class="meta"><span><strong>Host API</strong> v40</span><span><strong>SDK</strong> v0.40.0</span><span><strong>Runtime</strong> QuickJS / TypeScript</span><span><strong>対象</strong> iOS・iPadOS・macOS・Android</span></div>
+      <div class="doc-intro-grid">
+        <a class="doc-intro-card" href="#quickstart"><span class="card-index">01</span><strong>まず動かす</strong><span>TypeScriptで作成し、アプリ上で試すまで。</span><span class="card-arrow" aria-hidden="true">→</span></a>
+        <a class="doc-intro-card" href="#campus-data"><span class="card-index">02</span><strong>アプリのデータを使う</strong><span>本人の時間割、課題、ToDoなど。</span><span class="card-arrow" aria-hidden="true">→</span></a>
+        <a class="doc-intro-card" href="#permissions"><span class="card-index">03</span><strong>権限と互換性</strong><span>宣言、ユーザー操作、ホスト対応を理解する。</span><span class="card-arrow" aria-hidden="true">→</span></a>
+      </div>
+      <div class="callout"><strong>このリファレンスについて</strong><br>ここに記載するのは現行実装を確認できるAPIです。Capabilityが存在するかは <code>capabilities.has()</code> で実行時に確認してください。未提供APIは末尾に明示しています。</div>
+
+      <section id="overview" data-title="APIの全体像" data-group="概要">
+        <h2>APIの全体像</h2>
+        <p>拡張機能はアプリ内の隔離されたTypeScriptランタイムで動作します。画面はiOS・AndroidのネイティブUIで描画し、CIT Hubの個人データは端末内で読み取ります。</p>
+        <div class="api-domain-grid">
+          <a href="#ui"><span>01</span><strong>画面と操作</strong><small>標準UI、入力、状態、イベント</small></a>
+          <a href="#campus-data"><span>02</span><strong>CIT Hubデータ</strong><small>授業、課題、ToDo、学年暦</small></a>
+          <a href="#storage"><span>03</span><strong>保存とファイル</strong><small>専用ストレージ、DB、Cloud KV</small></a>
+          <a href="#network"><span>04</span><strong>ネットワーク</strong><small>宣言したHTTPS接続先への通信</small></a>
+          <a href="#media"><span>05</span><strong>端末機能</strong><small>写真、共有、位置情報、触覚</small></a>
+          <a href="#notifications"><span>06</span><strong>通知と権限</strong><small>端末内通知と利用者の許可</small></a>
+        </div>
+        <h3>最初のAPI呼び出し</h3>
+        <div class="codebox"><button class="copy" type="button">コピー</button><pre><code>import { app, capabilities, cit } from '../sdk/index';
+
+const host = app.hostVersion();
+const canReadSchedule = capabilities.has('timetable.read');
+const nextClass = canReadSchedule ? await cit.timetable.next() : null;
+
+console.log({ host, nextClass });</code></pre></div>
+        <p>APIは機能単位の権限とホストCapabilityを検査します。権限が宣言されていない場合や、古いアプリに必要なAPIがない場合は、呼び出しは明示的なエラーになります。</p>
+      </section>
+
+      <section id="availability" data-title="対応状況の見方" data-group="概要">
+        <h2>対応状況の見方</h2>
+        <p>SDKに型があることと、すべてのOSで実機検証済みであることは同じではありません。次の区分を確認し、必要に応じて実行時Capabilityとエラーを扱ってください。</p>
+        <div class="status-list">
+          <div><span class="status-mark available">●</span><strong>実装済みAPI</strong><p>本ページで説明する範囲。個別のOS制約・権限・データ取得条件は各節に記載しています。</p></div>
+          <div><span class="status-mark limited">●</span><strong>制約・部分対応あり</strong><p>OSや元データの制約を受けます。例: 端末内キャッシュがない場合のデータAPI、OSに任される通知時刻。</p></div>
+          <div><span class="status-mark unavailable">●</span><strong>未提供</strong><p>APIとして公開していない機能です。計画・要望・SDK上の型だけでは利用可能とは限りません。</p></div>
+        </div>
+        <div class="callout subtle"><strong>セキュリティ境界</strong><br>拡張機能はPortal/Manabaのパスワード、OTP秘密鍵、Cookie、他ユーザー情報、任意ネイティブコードにアクセスできません。本人データも宣言権限の範囲に限られ、外部送信は開発者が記述した処理に対して接続先を限定します。</div>
+      </section>
+
+      <section id="quickstart" data-title="はじめに" data-group="開始する">
+        <h2>はじめに</h2>
+        <p>SDK ZIPを展開し、Node.js 22以降の環境で開発キット内のビルダーを使います。サンプルのソースを編集し、生成したJSONを開発者コンソールへアップロードしてください。</p>
+        <div class="codebox"><button class="copy" type="button">コピー</button><pre><code>npm install
+npm run build -- examples/study-status.ts</code></pre></div>
+        <p>TypeScriptソースは開発者のPC上でビルドされます。信頼できないソースをビルドしないでください。アップロードされたコードをCIT Hubのサーバーで実行することはありません。</p>
+        <h3>実行型拡張機能</h3>
+        <div class="codebox"><button class="copy" type="button">コピー</button><pre><code>import { defineProgram, interactive, state, ui } from '../sdk/index';
+
+const count = state.create(0);
+export default defineProgram({
+  name: 'カウンター',
+  version: '1.0.0',
+  description: '操作回数を数えます',
+  permissions: [],
+  render: () =&gt; [
+    ui.page('カウンター', [
+      ui.heading(`現在 ${count.value}`),
+      interactive.button('1増やす', () =&gt; count.set(count.value + 1))
+    ])
+  ]
+});</code></pre></div>
+        <p><code>defineProgram</code> は隔離ランタイムで処理し、画面はネイティブ部品で描画します。DOM、任意のネイティブコード、グローバルなfetch、Portal/ManabaのCookieや秘密情報にはアクセスできません。</p>
+      </section>
+
+      <section id="runtime" data-title="Runtime" data-group="基礎">
+        <h2>Runtime</h2>
+        <p>アプリ内のQuickJS環境は、拡張機能ごとに分離されています。Promise、async/await、標準的なTypeScriptロジックとStateを利用できます。</p>
+        <div class="tablewrap"><table><thead><tr><th>制約</th><th>上限・挙動</th></tr></thead><tbody><tr><td>処理時間</td><td>1回あたり最大250ms。超過時はその実行を停止</td></tr><tr><td>メモリ</td><td>16MB</td></tr><tr><td>未完了のホスト要求</td><td>32件</td></tr><tr><td>タイマー</td><td>同時32件、10ms以上、最大24時間。OSによる遅延あり</td></tr><tr><td>ホスト要求</td><td>1要求10秒、要求内容60KBまで</td></tr></tbody></table></div>
+      </section>
+
+      <section id="lifecycle" data-title="app / capabilities" data-group="基礎">
+        <h2>アプリ情報とライフサイクル</h2>
+        <div class="codebox"><button class="copy" type="button">コピー</button><pre><code>app.version()
+app.extensionId()
+app.environment()       // development | production
+app.hostVersion()
+app.capabilities()
+app.onLaunch(callback)
+app.onAppear(callback)
+app.onDisappear(callback)
+app.onResume(callback)
+app.onSuspend(callback)
+app.onOpenURL(callback)
+app.onNotification(callback)
+app.onMemoryWarning(callback)
+capabilities.has('location.current')</code></pre></div>
+        <p>イベント登録APIは購読解除関数を返します。通知やURLのイベントは対象拡張機能が開いている場合に配送します。アプリ終了後の任意バックグラウンド実行は保証されません。</p>
+      </section>
+
+      <section id="ui" data-title="UI components" data-group="画面">
+        <h2>標準UIと入力</h2>
+        <p>SwiftUI・Jetpack Composeの標準コンポーネントで描画します。任意CSSや固定座標ではなく、宣言型の組み合わせで画面を作ります。</p>
+        <div class="tablewrap"><table><thead><tr><th>分類</th><th>SDK API</th></tr></thead><tbody>
+          <tr><td>テキスト</td><td><code>ui.text</code>, <code>ui.heading</code>, <code>ui.label</code>, <code>ui.markdown</code>, <code>ui.code</code>, <code>ui.caption</code>, <code>ui.badge</code>, <code>ui.icon</code></td></tr>
+          <tr><td>レイアウト</td><td><code>ui.vstack</code>, <code>ui.hstack</code>, <code>ui.zstack</code>, <code>ui.grid</code>, <code>ui.scroll</code>, <code>ui.horizontalScroll</code>, <code>ui.spacer</code>, <code>ui.divider</code>, <code>ui.section</code>, <code>ui.disclosure</code>, <code>ui.footer</code></td></tr>
+          <tr><td>入力</td><td><code>interactive.textField</code>, <code>interactive.textArea</code>, <code>interactive.secureField</code>, <code>interactive.toggle</code>, <code>ui.number</code>, <code>ui.slider</code>, <code>interactive.select</code>, <code>interactive.multiSelect</code>, <code>interactive.dateTime</code>, <code>interactive.dateRange</code></td></tr>
+          <tr><td>画面・操作</td><td><code>ui.page</code>, <code>ui.courseList</code>, <code>ui.dataList</code>, <code>interactive.button</code>, <code>ui.link</code></td></tr>
+          <tr><td>見た目</td><td><code>ui.styled(node, style)</code>。テーマ色、文字サイズ、配置、余白、間隔をホストの許容範囲で指定</td></tr>
+        </tbody></table></div>
+        <p>文字・入力部品の詳細な上限、スタイル属性、動的状態イベントはSDK同梱の型定義と<a href="api.md">詳細API仕様（Markdown）</a>を参照してください。</p>
+        <h3>状態同期する選択入力（host API v32）</h3>
+        <div class="codebox"><button class="copy" type="button">コピー</button><pre><code>const campus = state.create('新習志野');
+interactive.select('campus', 'キャンパス', ['新習志野', '津田沼'], campus);
+ui.text(`選択中: ${campus.value}`);</code></pre></div>
+        <p>選択肢を選ぶと値がStateに入り、そのStateを参照する画面が更新されます。選択肢は1〜100件、1件200文字以内で重複不可です。SDKはこの入力を使う拡張機能に <code>minimumHostAPI: 32</code> を設定します。</p>
+        <h3>状態同期する複数選択（host API v34）</h3>
+        <div class="codebox"><button class="copy" type="button">コピー</button><pre><code>const supplies = state.create&lt;string[]&gt;(['講義資料']);
+interactive.multiSelect('supplies', '持ち物', ['講義資料', '実験器具'], supplies);
+ui.text(`選択中: ${supplies.value.join('、')}`);</code></pre></div>
+        <p>複数選択UIはiOS・iPadOS・macOSとAndroidのネイティブ部品で表示されます。更新値は文字列配列としてStateへ同期されます。選択肢は1〜30件、各120文字以内で重複不可です。SDKが <code>minimumHostAPI: 34</code> を設定します。</p>
+        <h3>状態同期する日時入力（host API v35）</h3>
+        <div class="codebox"><button class="copy" type="button">コピー</button><pre><code>const reminderAt = state.create&lt;number | null&gt;(null);
+interactive.dateTime('reminderAt', '通知する日時', reminderAt);
+ui.text(reminderAt.value === null ? '未設定' : `${reminderAt.value} ms`);</code></pre></div>
+        <p>OS標準の日付・時刻選択UIを使い、選択値はUnix epochミリ秒でStateに同期します。未設定は <code>null</code> です。SDKは <code>minimumHostAPI: 35</code> を設定し、対応前のアプリでは起動できません。</p>
+        <h3>状態同期する日時範囲（host API v36）</h3>
+        <pre><code>const period = state.create&lt;{start:number|null;end:number|null}&gt;({start:null,end:null});
+interactive.dateRange('period', '対象期間', period);</code></pre>
+        <p>開始・終了を別々に設定でき、各値はUnix epochミリ秒または <code>null</code> です。終了より後の開始日時は拒否し、ネイティブUIでは逆転しないよう補正します。SDKは <code>minimumHostAPI: 36</code> を付けます。実例: <code>extensions/examples/interactive-date-range.ts</code></p>
+        <h3>複数行テキスト入力（host API v23）</h3>
+        <div class="codebox"><button class="copy" type="button">コピー</button><pre><code>const memo = state.create('');
+interactive.textArea('memo', '授業メモ', memo);
+ui.caption(`${memo.value.length} / 4000`);</code></pre></div>
+        <p>入力値はStateへ反映され、入力上限は4,000文字です。端末内へ保存する場合は、用途に合う<code>storage</code>などのAPIと権限を別途使用してください。</p>
+      </section>
+
+      <section id="state" data-title="State and events" data-group="画面">
+        <h2>状態とイベント</h2>
+        <div class="codebox"><button class="copy" type="button">コピー</button><pre><code>const value = state.create(0);
+value.get();
+value.set(1);
+value.update(current =&gt; current + 1);
+value.reset();
+const stop = value.watch((next, previous) =&gt; {});
+stop();
+
+interactive.button('保存', async () =&gt; {
+  await storage.set('draft', value.get());
+});</code></pre></div>
+        <p>State更新は画面を再描画します。イベントコールバック内で非同期のホストAPIを呼び出せます。ホスト要求は権限とCapabilityを別々に検査します。</p>
+      </section>
+
+      <section id="campus-data" data-title="CIT Hub data" data-group="CIT Hubデータ">
+        <h2>CIT Hubの本人データ</h2>
+        <div class="tablewrap"><table><thead><tr><th>API</th><th>Permission</th><th>内容</th></tr></thead><tbody>
+          <tr><td><code>cit.courses.list/get/search/byWeekday/forPeriod</code><br><code>cit.timetable.today/tomorrow/week/current/next/at/freePeriods</code></td><td><code>timetable.read</code></td><td>端末に取得済みの授業・教室・時限・日付別授業</td></tr>
+          <tr><td><code>cit.assignments.list/get/pending/overdue/dueSoon/search/byCourse/between</code></td><td><code>assignments.read</code></td><td>端末に取得済みの課題。提出済み状態は元データにない場合推定しません</td></tr>
+          <tr><td><code>cit.todo.list/get/search/watch/create/update/complete/uncomplete/delete</code></td><td><code>todos.read</code>, <code>todos.write</code></td><td>本人が登録したToDo。読み取りと変更は別権限</td></tr>
+          <tr><td><code>cit.courseNotes.list/get/create/update/delete</code></td><td><code>courseNotes.read</code>, <code>courseNotes.write</code></td><td>本人の授業メモ</td></tr>
+          <tr><td><code>cit.semester.current/list</code>, <code>cit.academicCalendar.list/on/between/isClassDay</code></td><td><code>timetable.read</code>, <code>calendar.read</code></td><td>端末キャッシュに存在する学期・学年暦。根拠不足は不明値</td></tr>
+          <tr><td><code>cit.bus.routes/stops/timetable/next/between/serviceStatus</code></td><td><code>bus.read</code></td><td>アプリが取得・キャッシュした公開バス時刻表</td></tr>
+          <tr><td><code>cit.cafeteria.locations/menu/cameraStatus</code></td><td><code>cafeteria.read</code></td><td>食堂拠点、メニューリンク、公開カメラ稼働状況</td></tr>
+          <tr><td><code>cit.settings.appearance/notifications/enabledServices</code>, <code>cit.services.list</code>, <code>cit.user.preferences</code></td><td><code>settings.read</code></td><td>本人が有効にしているサービスのタブ名と表示・通知設定。任意のサービスを自動では開きません</td></tr>
+        </tbody></table></div>
+        <p>これらの情報は端末内で読み、拡張APIサーバーへ転送しません。キャッシュ未取得の場合は空または利用できない旨を返します。元データにない単位数、提出状態、全学休講情報は推定しません。</p>
+        <div class="codebox"><button class="copy" type="button">コピー</button><pre><code>import { cit } from '../sdk/index';
+
+const today = await cit.timetable.today();
+const due = await cit.assignments.dueSoon(7);
+const notes = await cit.courseNotes.list();
+const enabledServices = await cit.services.list();</code></pre></div>
+      </section>
+
+      <section id="storage" data-title="Storage and database" data-group="データと端末">
+        <h2>保存・データベース</h2>
+        <h3>端末内Key-Value</h3><p><code>storage.get/set/has/remove/clear/keys</code> は本人・拡張機能・開発/公開環境ごとに分離されます。拡張機能固有データを最大256KB保存できます。他端末との同期はしません。</p>
+        <h3>保護された端末内保存</h3><p><code>secureStorage.get/set/delete</code> はiOS/macOSのKeychainまたはAndroidの暗号化保存を使います。CIT Hub本体の認証情報にはアクセスできません。</p>
+        <h3>ローカルデータベース</h3><p><code>database.createTable/insert/update/delete/get/query/transaction/watch</code>。比較条件、並べ替え、件数制限のクエリをSDKで構成できます。スキーマは拡張機能専用でSQLite互換ではなく、非同期処理をtransaction callbackから実行できません。</p>
+        <h3>ユーザー専用Cloud KV</h3><p><code>cloudUser.get/set/delete</code> はCIT Hubアカウントと拡張機能に隔離されます。revisionによる競合検出、暗号化、容量上限があります。サーバーFunctionsやユーザー間共有ではありません。</p>
+      </section>
+
+      <section id="files" data-title="Files" data-group="データと端末">
+        <h2>ファイル</h2>
+        <h3>拡張機能専用領域（host API v30）</h3>
+        <div class="codebox"><button class="copy" type="button">コピー</button><pre><code>await files.write('draft.txt', new TextEncoder().encode('メモ'));
+const bytes = await files.read('draft.txt');
+await files.copy('draft.txt', 'backup.txt');
+await files.move('backup.txt', 'archive.txt');
+const names = await files.list();</code></pre></div>
+        <p>権限は<code>files.storage</code>。最大256KiB/ファイル、最大100ファイル・合計5MiBです。ファイル名のみを受け付け、パス区切り、親ディレクトリ指定、シンボリックリンク、既存宛先への上書きを拒否します。拡張機能の領域外へアクセスできません。</p>
+        <h3>ユーザーが選ぶファイル</h3><p><code>ui.file</code> でシステムの選択画面を開きます。<code>files.selection.info/readSelected</code> は選択済みファイルの内容をチャンクで読みます。追加の <code>files.selection.read</code> が必要です。任意フォルダの一覧はできません。</p>
+      </section>
+
+      <section id="media" data-title="Media and sharing" data-group="データと端末">
+        <h2>写真・メディア・共有</h2>
+        <p><code>ui.coursePicker</code>、<code>ui.capturePhoto</code>、<code>ui.importPhotos</code>、<code>ui.photoGrid</code> で、授業選択・撮影・写真取り込み・一覧を組み合わせられます。データは端末内の拡張機能専用領域に保存します。ユーザー操作なしの撮影や写真ライブラリ全体の列挙はできません。</p>
+        <p><code>ui.image/video/audio</code> は許可されたHTTPSメディアを表示します。<code>ui.file</code> でユーザーが選んだファイルをアプリ内プレビューまたは対応アプリへ渡せます。<code>ui.shareText</code>、<code>ui.copyText</code> は利用者の操作から実行します。</p>
+        <p class="notice">全コーデック、画像編集、録音、PDFページ操作のすべてをサポートするわけではありません。対応OS・形式はAPI仕様を確認してください。</p>
+      </section>
+
+      <section id="network" data-title="Network" data-group="システム">
+        <h2>ネットワーク</h2>
+        <p><code>network.status()</code> と <code>network.onChange(callback)</code> は端末の接続状態を参照します。接続先名、IP、SSIDは返しません。</p>
+        <div class="codebox"><button class="copy" type="button">コピー</button><pre><code>const response = await network.fetch('https://api.example.com/items', {
+  method: 'GET',
+  headers: { Accept: 'application/json' }
+});
+if (!response.ok) throw new Error(`HTTP ${response.status}`);</code></pre></div>
+        <p><code>network.fetch/get/post/put/patch/delete</code> は <code>network.fetch</code> 権限とmanifestの許可ホスト宣言を必要とします。HTTPS標準ポートのみ、Cookie/Host等の危険なヘッダーは禁止、本文32 KiB・応答1 MiB・ヘッダー20個までです。リダイレクトは追従せず、プライベート・予約済みIPに解決される接続先も拒否します。任意ホストを宣言なく呼び出すことはできません。</p>
+        <h3>ファイル転送（host API v33）</h3>
+        <div class="codebox"><button class="copy" type="button">コピー</button><pre><code>const downloaded = await network.downloadFile(
+  'https://api.example.com/handout.pdf',
+  'handout.pdf'
+);
+if (downloaded.ok) {
+  const bytes = await files.read(downloaded.file.name);
+  // bytes は拡張機能専用ストレージから読み出した Uint8Array
+}</code></pre></div>
+        <p><code>network.downloadFile(url, destinationName, headers?)</code> は取得したファイルを拡張機能専用ストレージへ保存し、名前・サイズ・HTTP状態を返します。<code>network.uploadFile(url, sourceName, options?)</code> は同じ専用領域に保存済みのファイルをPOSTまたはPUTで送ります。どちらも利用者が押したボタンの処理中に呼ぶ必要があり、<code>network.fetch</code> と <code>files.storage</code> の両権限、manifestの完全一致HTTPSホスト宣言が必要です。任意の端末ファイルパスにはアクセスできません。</p>
+        <p>ファイル転送はリクエスト・レスポンス各256 KiBまでです。ダウンロードはリダイレクトしません。保存時は拡張機能専用ストレージのファイル名・件数・総容量制限を適用します。通常のテキスト通信も応答上限は256 KiBです。通信先には端末のIP等が伝わり、アップロードしたファイルの内容も通信先へ渡ります。</p>
+      </section>
+
+      <section id="device" data-title="Device, location, haptics" data-group="システム">
+        <h2>端末・位置情報・触覚</h2>
+        <p><code>device.info/platform/osVersion/deviceClass/screen/locale/timezone/appearance/capabilities</code> は画面やOSの情報を返します。端末固有識別子は提供しません。</p>
+        <p><code>location.current()</code> は <code>location.use</code> とユーザー操作を必要とし、単発の現在地・精度・取得時刻を返します。バックグラウンド追跡や位置のサーバー保存はありません。</p>
+        <p><code>haptics.light/medium/heavy/success/warning/error</code> は対応端末のみ実行されます。<code>accessibility.status</code> で利用可能なアクセシビリティ状態を取得し、<code>accessibility.label/hint/role</code> で対応UI要素を補助できます。</p>
+      </section>
+
+      <section id="notifications" data-title="Notifications and permissions" data-group="システム">
+        <h2>ローカル通知と権限</h2>
+        <div class="codebox"><button class="copy" type="button">コピー</button><pre><code>const status = await notification.permission();
+await notification.schedule({
+  id: 'study-reminder',
+  title: '復習',
+  body: '今日のノートを確認する',
+  at: new Date(Date.now() + 60 * 60 * 1000),
+  repeat: 'none',
+  data: { screen: 'review' }
+});
+notification.onOpen(event =&gt; console.log(event.data));</code></pre></div>
+        <p><code>notifications.schedule</code> 権限が必要です。許可状態は <code>permissions.status/request</code> で確認し、OS許可を要求する処理はユーザー操作から開始します。<code>schedule/cancel/cancelAll/listScheduled/onOpen</code> を利用できます。端末内通知であり、サーバーPushや端末間同期ではありません。OS都合で通知時刻が遅れる場合があります。</p>
+        <p><code>permissions.openSettings()</code> は <code>settings.open</code> 権限と直接操作が必要です。宣言されていない権限を要求することはできません。</p>
+      </section>
+
+      <section id="utilities" data-title="Utilities and errors" data-group="SDKユーティリティ">
+        <h2>ユーティリティと暗号</h2>
+        <div class="tablewrap"><table><thead><tr><th>Namespace</th><th>API</th></tr></thead><tbody>
+          <tr><td><code>math</code></td><td>round, floor, ceil, min, max, abs, random, clamp, sum, average, median</td></tr>
+          <tr><td><code>text</code></td><td>format, replace, split, join, contains, startsWith, endsWith, trim, lowercase, uppercase, regex</td></tr>
+          <tr><td><code>json</code></td><td>parse, stringify</td></tr>
+          <tr><td><code>date</code></td><td>now, parse, format, add, subtract, diff, startOfDay/endOfDay, startOfWeek/endOfWeek, isToday/isPast/isFuture, timezone</td></tr>
+          <tr><td><code>utils</code></td><td>uuid, sleep, debounce, throttle</td></tr>
+          <tr><td><code>geo</code></td><td>distance, bearing, contains</td></tr>
+          <tr><td><code>crypto</code></td><td>randomBytes, UUID用途の安全乱数、SHA-256、HMAC、AES-256-GCM</td></tr>
+        </tbody></table></div>
+        <p>暗号機能は拡張機能が渡したデータだけを端末内で処理します。CIT HubのKeychain、OTP、ログインCookie、アプリセッションの秘密情報にはアクセスできません。暗号化キーは拡張機能専用の <code>secureStorage</code> で管理してください。</p>
+        <h3>エラー</h3><p><code>ExtensionError</code>、<code>PermissionError</code>、<code>UserInteractionError</code>、<code>UnsupportedError</code>、<code>NetworkError</code>、<code>StorageError</code>、<code>ValidationError</code>、<code>ConflictError</code>、<code>NotFoundError</code>、<code>RateLimitError</code> を提供します。未知のホストエラーもcodeを保持した <code>ExtensionError</code> で通知します。</p>
+      </section>
+
+      <section id="server-api" data-title="Developer server API" data-group="サーバー">
+        <h2>開発者サーバーAPI</h2>
+        <p>開発者コンソールとCIT Hubアプリが使用するAPIです。一般拡張機能のJavaScriptをサーバーで実行するFunctions APIではありません。</p>
+        <div class="tablewrap"><table><thead><tr><th>操作</th><th>説明</th><th>認証</th></tr></thead><tbody>
+          <tr><td><code>capabilities</code></td><td>host API version・対応permissionの固定メタデータ</td><td>不要</td></tr>
+          <tr><td><code>register/login/logout/logout-all/password-change</code></td><td>開発者アカウントとセッション管理</td><td>アカウント認証</td></tr>
+          <tr><td><code>upload/submit/mine/catalog/developer</code></td><td>本人の開発版、審査提出、承認済みカタログ</td><td>アプリ確認または開発者セッション</td></tr>
+          <tr><td><code>install/open/uninstall</code></td><td>アプリ内の追加、起動、削除。host API互換性を検査</td><td>本人のアカウント</td></tr>
+          <tr><td><code>data-save</code></td><td>拡張機能専用のユーザー入力値</td><td>本人・拡張機能scope</td></tr>
+          <tr><td><code>list/review</code></td><td>審査・公開停止</td><td>別管理キー</td></tr>
+        </tbody></table></div>
+        <p>ユーザーデータはアカウント単位で隔離され、レビュー権限と一般ユーザー権限は別です。APIトークンやアプリ認証情報を拡張機能へ渡しません。</p>
+      </section>
+
+      <section id="permissions" data-title="Permissions and compatibility" data-group="公開と互換性">
+        <h2>権限と互換性</h2>
+        <p>使用するデータやOS機能だけをmanifestの <code>permissions</code> に宣言します。審査・追加確認で利用者に説明されます。Capabilityが存在してもOS権限が許可されたとは限りません。<code>permissions.status()</code> で区別してください。</p>
+        <div class="codebox"><button class="copy" type="button">コピー</button><pre><code>export default defineProgram({
+  name: '授業準備',
+  version: '1.0.0',
+  description: '次の授業と準備メモを表示します',
+  permissions: ['timetable.read', 'courseNotes.read'],
+  render: () =&gt; [/* native UI */]
+});</code></pre></div>
+        <p>SDK builderは利用APIから <code>minimumHostAPI</code> を設定します。現行アプリより新しいhost APIを要求する拡張機能は、古いアプリで追加・起動できません。</p>
+      </section>
+
+      <section id="permission-index" data-title="Permission index" data-group="公開と互換性">
+        <h2>権限一覧</h2>
+        <p>manifestには、実際に使う機能の権限だけを記載します。CIT Hubデータの権限は本人の端末内データへのアクセスを許可し、OS権限や外部通信の許可とは別に検査されます。</p>
+        <div class="tablewrap"><table><thead><tr><th>権限</th><th>対象API</th><th>範囲</th></tr></thead><tbody>
+          <tr><td><code>timetable.read</code></td><td><code>cit.courses.*</code> / <code>cit.timetable.*</code></td><td>端末に取得済みの本人の時間割</td></tr>
+          <tr><td><code>assignments.read</code></td><td><code>cit.assignments.*</code></td><td>端末に取得済みの本人の課題</td></tr>
+          <tr><td><code>todos.read</code> / <code>todos.write</code></td><td><code>cit.todo.*</code></td><td>本人が作成したToDoの読み取り・変更</td></tr>
+          <tr><td><code>courseNotes.read</code> / <code>courseNotes.write</code></td><td><code>cit.courseNotes.*</code></td><td>本人の授業メモ</td></tr>
+          <tr><td><code>calendar.read</code> / <code>bus.read</code> / <code>cafeteria.read</code></td><td><code>cit.academicCalendar.*</code> / <code>cit.bus.*</code> / <code>cit.cafeteria.*</code></td><td>アプリに取り込まれた学年暦・公開交通/食堂情報</td></tr>
+          <tr><td><code>settings.read</code></td><td><code>cit.settings.*</code> / <code>cit.services.list()</code></td><td>本人の表示・通知・有効タブ設定。認証情報は含まない</td></tr>
+          <tr><td><code>storage.*</code> / <code>files.storage</code> / <code>cloud.storage</code></td><td>端末保存・専用ファイル・本人専用Cloud KV</td><td>拡張機能ごとに隔離。任意の他ユーザー情報は取得不可</td></tr>
+          <tr><td><code>network.fetch</code> + <code>files.storage</code></td><td><code>network.uploadFile()</code> / <code>network.downloadFile()</code></td><td>宣言したHTTPSホスト・拡張機能専用領域のみ。利用者操作が必須</td></tr>
+          <tr><td><code>network.fetch</code></td><td><code>network.fetch/get/post/put/patch/delete</code></td><td>manifestで列挙したHTTPSホストのみ</td></tr>
+          <tr><td><code>camera.use</code> / <code>location.use</code> / <code>notifications.schedule</code></td><td>カメラ・現在地・ローカル通知</td><td>宣言に加えて、必要な場合はユーザー操作とOS許可が必要</td></tr>
+          <tr><td><code>files.user</code> / <code>files.selection.read</code> / <code>photos.user</code></td><td>ファイル選択・選択内容の読取・写真選択</td><td>利用者が選択した項目のみ</td></tr>
+        </tbody></table></div>
+      </section>
+
+      <section id="troubleshooting" data-title="Troubleshooting" data-group="開発ワークフロー">
+        <h2>動かない場合の確認順</h2>
+        <ol>
+          <li><code>app.hostVersion()</code> と <code>capabilities.has()</code> でホスト対応状況を確認します。</li>
+          <li>APIの権限をmanifestに宣言し、開発版を再ビルド・再アップロードします。</li>
+          <li>端末側で対象データが一度取得済みか、設定やOS権限が許可されているかを確認します。</li>
+          <li>例外は握りつぶさず、エラーの <code>name</code> と <code>code</code> を記録して原因別に案内します。</li>
+        </ol>
+        <div class="codebox"><button class="copy" type="button">コピー</button><pre><code>try {
+  const status = await network.status();
+  const next = await cit.timetable.next();
+  // UIへ結果を反映
+} catch (error) {
+  console.error(error.name, error.code, error.message);
+  // PermissionError / UnsupportedError / data_unavailable などを個別に扱う
+}</code></pre></div>
+        <p>エラーコードはSDKの型定義と<a href="api.md">詳細仕様書</a>を正としてください。未実装APIはCapabilityとして公開されず、代替動作を推測して実行しません。</p>
+      </section>
+
+      <section id="changelog" data-title="API changelog" data-group="開発ワークフロー">
+        <h2>ホストAPIの主な追加履歴</h2>
+        <div class="tablewrap"><table><thead><tr><th>Host API</th><th>追加内容</th></tr></thead><tbody>
+          <tr><td>v40</td><td>ネイティブカード・余白グループ・レスポンシブコンテナ <code>ui.card()</code> / <code>ui.group()</code> / <code>ui.container()</code></td></tr>
+          <tr><td>v39</td><td>読み込み・空・エラー状態の標準表示 <code>ui.loading()</code> / <code>ui.emptyState()</code> / <code>ui.errorState()</code></td></tr>
+          <tr><td>v38</td><td>ネイティブ線形進捗表示 <code>ui.progress()</code></td></tr>
+          <tr><td>v37</td><td>ネイティブStepper・Checkbox・RadioとTypeScript State同期</td></tr>
+          <tr><td>v36</td><td>ネイティブ日時範囲入力とState同期 <code>interactive.dateRange()</code></td></tr>
+          <tr><td>v35</td><td>ネイティブ日時入力とState同期 <code>interactive.dateTime()</code></td></tr>
+          <tr><td>v34</td><td>ネイティブ複数選択UIとState同期 <code>interactive.multiSelect()</code></td></tr>
+          <tr><td>v33</td><td>ボタン操作を必須にした専用領域とのHTTPSファイル転送 <code>network.uploadFile()</code> / <code>network.downloadFile()</code></td></tr>
+          <tr><td>v32</td><td>選択変更をTypeScript Stateへ同期する <code>interactive.select()</code></td></tr>
+          <tr><td>v31</td><td>本人が有効にしている学内サービス名の一覧 <code>cit.services.list()</code></td></tr>
+          <tr><td>v30</td><td>拡張機能専用ファイルの複製・移動</td></tr>
+          <tr><td>v29</td><td>縦・横スクロールコンテナ</td></tr>
+          <tr><td>v28</td><td>ネットワーク接続状態の変更購読</td></tr>
+          <tr><td>v24–v27</td><td>位置情報、接続状態、レイアウト、文字スタイル</td></tr>
+          <tr><td>v21–v23</td><td>本人専用Cloud KV、テキストUI、複数行入力</td></tr>
+          <tr><td>v16–v20</td><td>時間割・課題・ToDo・学年暦・バス・食堂データAPI</td></tr>
+          <tr><td>v9–v15</td><td>実行型SDK、端末保存、ファイル、クリップボード、設定、通知など</td></tr>
+        </tbody></table></div>
+        <p>各バージョンの厳密な制約と未実装範囲は<a href="api.md">詳細API仕様書</a>を参照してください。</p>
+      </section>
+
+      <section id="semantic-status" data-title="状態表示" data-group="画面">
+        <h2>読み込み・空・エラー状態</h2>
+        <p><code>ui.loading(label)</code>、<code>ui.emptyState(title, message)</code>、<code>ui.errorState(title, message)</code>は、読み込み中・該当データなし・エラーを区別して伝える標準UIです。iOS・iPadOS・macOS・Androidでネイティブ描画します。SDKビルダーは最低Host API v39を自動設定し、古いホストでは互換性エラーとして起動を防ぎます。</p>
+        <pre><code>ui.loading("時間割を読み込み中")
+ui.emptyState("課題はありません", "新しい課題が届くとここに表示されます")
+ui.errorState("読み込めませんでした", "通信状態を確認して再度お試しください")</code></pre>
+      </section>
+
+      <section id="responsive-layouts" data-title="レスポンシブレイアウト" data-group="画面">
+        <h2>カード・グループ・コンテナ</h2>
+        <p><code>ui.card(children, label?)</code> はOS標準のカード面、<code>ui.group(children)</code> は背景を足さず間隔を整理するグループ、<code>ui.container(children)</code> は画面幅に追従する領域です。固定座標に依存せず、iOS・iPadOS・macOS・AndroidのネイティブUIで表示します。最低Host API v40が必要で、SDKが最低バージョンを自動記録します。</p>
+        <pre><code>ui.container([
+  ui.card([ui.heading("今週の授業"), ui.data("timetable.week")], "時間割"),
+  ui.group([ui.caption("操作"), ui.button("更新", "refresh")])
+])</code></pre>
+      </section>
+
+      <section id="not-available" data-title="Not available" data-group="公開と互換性">
+        <h2>公開していないAPI</h2>
+        <p>添付の構想すべてが実装済みではありません。サーバーFunctions/KV/DB/Cron、ユーザー間共有・グループ・Realtime・Push、WebSocket、OAuth/OIDC、拡張機能間Intents、OSウィジェット/App Intents、地図UI、画像変換、音声録音、モーションセンサー、汎用ドラッグ&ドロップ、任意Canvas/グラフ、PDFのページ操作、転送進捗は未実装または未接続です。</p>
+        <p>これらは使用できるAPIや権限として公開していません。APIの詳しい型・挙動・制限は<a href="api.md">詳細API仕様（Markdown）</a>を確認してください。</p>
+        <div class="callout">Portalパスワード、OTP秘密鍵、認証Cookie、CIT Hubセッショントークン、他ユーザーの個人データ、別拡張機能のprivate storage、端末固有識別子、無音撮影、無制限ファイルアクセス、任意ネイティブコード、無制限バックグラウンド実行はAPIとして提供しません。</div>
+      </section>
+    <section><h2>状態と同期する入力コントロール</h2><p><code>interactive.stepper</code>、<code>interactive.checkbox</code>、<code>interactive.radio</code>はOS標準の入力UIを使用し、ユーザーの変更を型付きイベントとしてTypeScript Stateへ反映します。範囲・刻み・選択肢はビルド時とサーバーで検証されます。Host API v37。</p><pre><code>interactive.stepper("count", "個数", count, 0, 10, 1)
+interactive.checkbox("ready", "確認しました", ready)
+interactive.radio("campus", "キャンパス", ["新習志野", "津田沼"], campus)</code></pre></section><section><h2>進捗表示</h2><p><code>ui.progress(label, value)</code>はOSネイティブの線形進捗表示です。値は0から1までの有限値で指定し、SDKビルドが最低Host API v38を設定します。</p><pre><code>ui.progress("ファイルを処理中", 0.62)</code></pre></section></main>
+    <aside class="toc-right"><strong>このページ</strong><div id="right-toc"></div></aside>
+  </div>
+      <footer class="footer">CIT Hub 開発者ドキュメント · Host API v40 · <a href="documentation.html">ドキュメント</a> · <a href="guide.html">開発ガイド</a> · <a href="https://developer.cithub.app/">開発者コンソール</a> · <a href="api.md">詳細仕様書</a></footer>
+</body>
+</html>

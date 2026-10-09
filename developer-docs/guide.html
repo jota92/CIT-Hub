@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>CIT Hub 拡張機能 開発ガイド</title>
+  <meta name="description" content="CIT Hub拡張機能をTypeScriptで作成し、自分のアプリで確認して公開審査へ提出するまでの開発者ガイド。">
+  <link rel="stylesheet" href="assets/api.css?v=20261009-v40">
+</head>
+<body>
+  <header class="topbar"><a class="wordmark" href="documentation.html">CIT Hub</a><span class="product">Developer Documentation</span><nav class="toplinks" aria-label="グローバルナビゲーション"><a href="documentation.html">ドキュメント</a><a href="guide.html" aria-current="page">開発ガイド</a><a href="api.html">APIリファレンス</a><a href="https://developer.cithub.app/">コンソール</a></nav></header>
+  <details class="mobile-nav"><summary>このページの目次</summary><nav class="navgroup" aria-label="開発の流れ"><a href="#start">始める</a><a href="#build">ビルド</a><a href="#test">アプリで試す</a><a href="#publish">公開申請</a><a href="#security">権限と安全性</a></nav></details>
+  <div class="layout">
+    <aside class="sidebar">
+      <nav class="navgroup"><h2>開発の流れ</h2><a href="#start">始める</a><a href="#build">ビルド</a><a href="#test">アプリで試す</a><a href="#publish">公開申請</a><a href="#security">権限と安全性</a></nav>
+      <div class="compat"><strong>最新ホスト API: v40</strong><br>対応OSや権限はAPIリファレンスをご確認ください。</div>
+    </aside>
+    <main class="content">
+      <p class="eyebrow">CIT HUB EXTENSIONS</p>
+      <h1>拡張機能の開発</h1>
+      <p class="lead">TypeScriptで画面と動作を作成し、自分のCIT Hubアプリで検証してから公開審査へ提出できます。</p>
+      <p class="doc-actions"><a class="doc-button primary" href="assets/cithub-extension-kit.zip?v=21" download>開発用SDKをダウンロード <span>v0.40.0</span></a><a class="doc-button" href="api.html">APIリファレンス</a><a class="doc-button quiet" href="api.md" download>Markdown仕様書</a></p>
+
+      <section id="start"><h2>1. 開発環境を準備</h2><p>SDK ZIPを展開し、Node.js 22以降が利用できる環境で開きます。SDKにはTypeScript型定義、ビルダー、使用例が含まれます。</p><p class="notice">自分で書いたコードのみビルドしてください。ビルド処理は開発PC上でソースを実行するため、出所が分からない拡張機能コードを実行しないでください。</p></section>
+
+      <section id="build"><h2>2. TypeScriptをビルド</h2><p>同梱サンプルを編集してから、コマンドでJSONを生成します。</p><div class="codebox"><pre><code>npm install
+npm run build -- examples/study-status.ts</code></pre></div><p>生成された <code>dist/*.json</code> を開発者コンソールのアップロード欄で選択します。SDKは利用するAPIに合わせて最低ホストバージョンを記録します。古いアプリでは互換性がない版を起動できません。</p></section>
+
+      <section id="test"><h2>3. 自分のアプリでテスト</h2><ol><li>CIT Hubの拡張機能タブから設定を開き、開発者アカウントを作成します。</li><li>開発者コンソールへログインし、ビルドしたJSONをアップロードします。</li><li>同じCIT Hubアカウントでアプリの拡張機能タブを開き、本人用プレビューを実行します。</li></ol><p>開発版の保存データは公開版と分離されます。APIが使えない場合は、ホストバージョン・宣言権限・端末設定を確認してください。</p></section>
+
+      <section id="publish"><h2>4. 公開を申請</h2><p>開発者コンソールから機能説明を添えて審査へ提出します。更新時は変更内容を記載します。承認されるまでは一般の利用者へ配布されません。拡張機能名は原則として作成後に変更できません。</p><p>審査では、必要な権限、扱うデータ、外部通信先、利用者が行う操作、エラー時の挙動を確認します。個人情報や秘密情報を収集する機能は追加できません。</p></section>
+
+      <section id="security"><h2>権限と安全性</h2><ul><li>利用するCIT Hubデータ・端末機能だけをmanifestへ宣言します。</li><li>権限宣言とOS権限は別です。カメラ・位置情報・通知などは必要時に利用者の操作を経て要求します。</li><li>拡張機能のTypeScriptはQuickJS隔離環境で動き、DOM・任意ネイティブコード・無制限のファイルアクセスは利用できません。</li><li>Portal/Manabaのパスワード、OTP秘密鍵、Cookie、CIT Hubセッショントークン、他ユーザー情報はAPIで公開しません。</li><li>ユーザー間共有、サーバーFunctions、WebSocket、OSウィジェットなど未実装のAPIは利用できません。</li></ul><p>実装済みAPI、型、permission、容量・実行制限は<a href="api.html">APIリファレンス</a>と<a href="api.md">詳細仕様書</a>を参照してください。</p></section>
+    </main>
+    <aside class="toc-right"><strong>次に読む</strong><a href="api.html">APIリファレンス</a><a href="api.html#not-available">未対応APIと制限</a><a href="https://developer.cithub.app/">開発者コンソール</a></aside>
+  </div>
+  <footer class="footer">CIT Hub Developer Documentation · Host API v40 · <a href="documentation.html">ドキュメント</a> · <a href="api.html">APIリファレンス</a> · <a href="https://developer.cithub.app/">コンソール</a></footer>
+</body>
+</html>
