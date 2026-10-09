@@ -8,8 +8,8 @@
   <meta name="description" content="CIT Hub拡張機能SDKのAPIリファレンス。権限、TypeScriptランタイム、授業データ、保存、通知、ネットワークAPIを解説します。">
   <meta property="og:title" content="CIT Hub APIリファレンス">
   <meta property="og:description" content="CIT Hub拡張機能のTypeScript API、権限、互換性、実装例を確認できます。">
-  <link rel="stylesheet" href="assets/api.css?v=20261009-v40">
-  <script src="assets/api.js?v=20261009-v40" defer></script>
+  <link rel="stylesheet" href="assets/api.css?v=20261009-v41">
+  <script src="assets/api.js?v=20261009-v41" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -22,16 +22,16 @@
     <aside class="sidebar" aria-label="API目次">
       <input class="search" id="api-search" type="search" placeholder="APIを検索  ⌘K" aria-label="APIを検索">
       <div id="side-toc"></div>
-      <div class="compat"><strong>最新ホスト API: v40</strong><br>アプリとSDKの互換性は、拡張機能の最低ホストバージョンで判定されます。</div>
+      <div class="compat"><strong>最新ホスト API: v41</strong><br>アプリとSDKの互換性は、拡張機能の最低ホストバージョンで判定されます。</div>
     </aside>
     <main class="content" id="main-content">
       <p class="eyebrow">CIT HUB EXTENSIONS</p>
       <p class="doc-kicker">開発者ドキュメント <span> / </span> APIリファレンス</p>
       <h1>APIを使って、<br class="desktop-break">CIT Hubを拡張する。</h1>
       <p class="lead">TypeScript SDKから利用できる機能、必要な権限、データの範囲、互換性をまとめています。実装例から読み始め、APIの詳細へ進めます。</p>
-      <div class="doc-actions"><a class="doc-button primary" href="guide.html">開発を始める</a><a class="doc-button" href="assets/cithub-extension-kit.zip?v=21" download>SDKをダウンロード <span>v0.40.0</span></a><a class="doc-button quiet" href="api.md" download>Markdown仕様書</a></div>
-      <div class="meta"><span><strong>Host API</strong> v40</span><span><strong>SDK</strong> v0.40.0</span><span><strong>Runtime</strong> QuickJS / TypeScript</span><span><strong>対象</strong> iOS・iPadOS・macOS・Android</span></div>
-      <div class="callout"><strong>公開サーバーへの反映待ち</strong><br>このリファレンスとSDKはHost API v40です。現在の開発者コンソールサーバーはHost API v34を返すため、v40専用UIを使う拡張機能はサーバー更新までアップロード・起動できません。</div>
+      <div class="doc-actions"><a class="doc-button primary" href="guide.html">開発を始める</a><a class="doc-button" href="assets/cithub-extension-kit.zip?v=22" download>SDKをダウンロード <span>v0.41.0</span></a><a class="doc-button quiet" href="api.md" download>Markdown仕様書</a></div>
+      <div class="meta"><span><strong>Host API</strong> v41</span><span><strong>SDK</strong> v0.41.0</span><span><strong>Runtime</strong> QuickJS / TypeScript</span><span><strong>対象</strong> iOS・iPadOS・macOS・Android</span></div>
+      <div class="callout"><strong>公開サーバーへの反映待ち</strong><br>このリファレンスとSDKはHost API v41です。現在の開発者コンソールサーバーはHost API v34を返すため、v35以降を必要とするAPIはサーバー更新までアップロード・起動できません。</div>
       <div class="doc-intro-grid">
         <a class="doc-intro-card" href="#quickstart"><span class="card-index">01</span><strong>まず動かす</strong><span>TypeScriptで作成し、アプリ上で試すまで。</span><span class="card-arrow" aria-hidden="true">→</span></a>
         <a class="doc-intro-card" href="#campus-data"><span class="card-index">02</span><strong>アプリのデータを使う</strong><span>本人の時間割、課題、ToDoなど。</span><span class="card-arrow" aria-hidden="true">→</span></a>
@@ -351,6 +351,7 @@ notification.onOpen(event =&gt; console.log(event.data));</code></pre></div>
         <h2>ホストAPIの主な追加履歴</h2>
         <div class="tablewrap"><table><thead><tr><th>Host API</th><th>追加内容</th></tr></thead><tbody>
           <tr><td>v40</td><td>ネイティブカード・余白グループ・レスポンシブコンテナ <code>ui.card()</code> / <code>ui.group()</code> / <code>ui.container()</code></td></tr>
+          <tr><td>v41</td><td>状態更新を包むOS標準アニメーション <code>animation.animate()</code> / <code>animation.spring()</code> / <code>animation.transition()</code></td></tr>
           <tr><td>v39</td><td>読み込み・空・エラー状態の標準表示 <code>ui.loading()</code> / <code>ui.emptyState()</code> / <code>ui.errorState()</code></td></tr>
           <tr><td>v38</td><td>ネイティブ線形進捗表示 <code>ui.progress()</code></td></tr>
           <tr><td>v37</td><td>ネイティブStepper・Checkbox・RadioとTypeScript State同期</td></tr>
@@ -388,6 +389,16 @@ ui.errorState("読み込めませんでした", "通信状態を確認して再�
 ])</code></pre>
       </section>
 
+      <section id="animation" data-title="アニメーション" data-group="画面">
+        <h2>ネイティブアニメーション</h2>
+        <p><code>animation.animate(options, update)</code> は更新関数内のState変更をネイティブ画面へ渡し、iOS・iPadOS・macOSではSwiftUI、AndroidではComposeのレイアウトアニメーションとして描画します。期間は0.05〜1.5秒、曲線はlinear/easeIn/easeOut/easeInOut/springに限定します。自由な描画ループは実行しません。</p>
+        <pre><code>await animation.animate({ duration: 0.25, curve: "easeInOut" }, () =&gt; {
+  expanded.set(!expanded.value);
+});
+await animation.spring(() =&gt; expanded.set(true), { damping: 0.82 });</code></pre>
+        <p>利用にはHost API v41が必要です。SDKビルダーが最低ホストバージョンを設定し、未対応端末では起動を拒否します。</p>
+      </section>
+
       <section id="not-available" data-title="Not available" data-group="公開と互換性">
         <h2>公開していないAPI</h2>
         <p>添付の構想すべてが実装済みではありません。サーバーFunctions/KV/DB/Cron、ユーザー間共有・グループ・Realtime・Push、WebSocket、OAuth/OIDC、拡張機能間Intents、OSウィジェット/App Intents、地図UI、画像変換、音声録音、モーションセンサー、汎用ドラッグ&ドロップ、任意Canvas/グラフ、PDFのページ操作、転送進捗は未実装または未接続です。</p>
@@ -399,6 +410,6 @@ interactive.checkbox("ready", "確認しました", ready)
 interactive.radio("campus", "キャンパス", ["新習志野", "津田沼"], campus)</code></pre></section><section><h2>進捗表示</h2><p><code>ui.progress(label, value)</code>はOSネイティブの線形進捗表示です。値は0から1までの有限値で指定し、SDKビルドが最低Host API v38を設定します。</p><pre><code>ui.progress("ファイルを処理中", 0.62)</code></pre></section></main>
     <aside class="toc-right"><strong>このページ</strong><div id="right-toc"></div></aside>
   </div>
-      <footer class="footer">CIT Hub 開発者ドキュメント · Host API v40 · <a href="documentation.html">ドキュメント</a> · <a href="guide.html">開発ガイド</a> · <a href="index.html">開発者コンソール</a> · <a href="api.md">詳細仕様書</a></footer>
+      <footer class="footer">CIT Hub 開発者ドキュメント · Host API v41 · <a href="documentation.html">ドキュメント</a> · <a href="guide.html">開発ガイド</a> · <a href="index.html">開発者コンソール</a> · <a href="api.md">詳細仕様書</a></footer>
 </body>
 </html>

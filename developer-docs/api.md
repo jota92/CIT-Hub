@@ -1,4 +1,4 @@
-# 拡張機能API v40
+# 拡張機能API v41
 
 ## TypeScriptの実行時処理
 
@@ -135,7 +135,7 @@ host API v33のファイル転送は次のとおりです。
 - `profile-save` / `mine`: 公開プロフィール・自分の開発版。
 - `upload` / `submit`: 開発版保存・審査申請。
 - `catalog` / `developer`: 承認済み版・公開作者ページ。
-- `install` / `open` / `uninstall`: 追加・起動・削除。v40ホストはhost_api_version=40を送信し、使用APIに応じた最低互換性を確認します。
+- `install` / `open` / `uninstall`: 追加・起動・削除。v41ホストはhost_api_version=41を送信し、使用APIに応じた最低互換性を確認します。
 - `data-save`: 拡張機能専用の入力値をrevision付きで保存。
 - `list` / `review`: 別の管理キーでのみ審査・公開停止。
 
@@ -427,7 +427,7 @@ const nextRevision = await cloudUser.set('preferences', current.revision, { them
 
 ## API互換性
 
-SDKのビルド済み実行型拡張機能は利用APIに応じた `minimumHostAPI` を含みます。通常の実行型拡張機能はv9、授業メモ・外部通信はv10、拡張機能ファイル保存はv11、選択ファイル読み取りはv12、クリップボードはv13、OS設定への遷移はv14、ローカル通知はv15、構造化時間割・課題はv16、ToDo完了操作はv17、学年暦読み取りはv18、バスv19、食堂v20、本人専用Cloud KV v21、文字UI v22、複数行入力v23、位置情報v24、接続状態v25、レイアウトv26、文字スタイルv27、ネットワーク変更購読v28、独立スクロールv29、ファイル複製・移動v30、本人の有効サービス一覧v31、状態同期する選択UI v32、専用領域とのファイル転送v33、状態同期する複数選択v34、日時選択v35、開始・終了日時の範囲入力v36、State同期するStepper・Checkbox・Radio v37、ネイティブ進捗表示v38、読み込み・空・エラー状態v39、カード・グループ・レスポンシブコンテナv40です。配布サーバーは追加・起動時にアプリの対応APIを比較し、足りなければ `host_update_required` を返します。
+SDKのビルド済み実行型拡張機能は利用APIに応じた `minimumHostAPI` を含みます。通常の実行型拡張機能はv9、授業メモ・外部通信はv10、拡張機能ファイル保存はv11、選択ファイル読み取りはv12、クリップボードはv13、OS設定への遷移はv14、ローカル通知はv15、構造化時間割・課題はv16、ToDo完了操作はv17、学年暦読み取りはv18、バスv19、食堂v20、本人専用Cloud KV v21、文字UI v22、複数行入力v23、位置情報v24、接続状態v25、レイアウトv26、文字スタイルv27、ネットワーク変更購読v28、独立スクロールv29、ファイル複製・移動v30、本人の有効サービス一覧v31、状態同期する選択UI v32、専用領域とのファイル転送v33、状態同期する複数選択v34、日時選択v35、開始・終了日時の範囲入力v36、State同期するStepper・Checkbox・Radio v37、ネイティブ進捗表示v38、読み込み・空・エラー状態v39、カード・グループ・レスポンシブコンテナv40、State更新に適用する制限付きネイティブアニメーションv41です。配布サーバーは追加・起動時にアプリの対応APIを比較し、足りなければ `host_update_required` を返します。
 
 `minimumHostAPI` は整数1〜40です。アプリ自身のバージョン番号とAPI番号は別です。対応していないアプリでAPIを呼び出してから失敗する状態を避けるため、新しいSDKは使用APIを検出してこの指定を自動で入れます。
 
@@ -599,3 +599,14 @@ ui.container([
   ui.group([ui.caption('必要な操作'), ui.button('更新', 'refresh')])
 ]);
 ```
+
+## ネイティブアニメーション（Host API v41）
+
+`animation.animate(options, update)` はStateの更新をOS標準のアニメーション付きネイティブ再描画へ渡します。`animation.spring(update, options)` はバネ曲線、`animation.transition(update, options)` は指定曲線を使います。期間は0.05〜1.5秒、dampingは0.4〜1.0に制限されます。任意の描画ループは提供しません。
+
+```ts
+await animation.animate({ duration: 0.25, curve: 'easeInOut' }, () => expanded.set(!expanded.value));
+await animation.spring(() => expanded.set(true), { duration: 0.3, damping: 0.78 });
+```
+
+SDKビルダーはこのAPIの利用時に `minimumHostAPI: 41` を設定します。サーバーとアプリの互換チェックもv41を要求します。

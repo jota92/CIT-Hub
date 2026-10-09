@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#ffffff">
   <title>CIT Hub 拡張機能 開発ガイド</title>
   <meta name="description" content="CIT Hub拡張機能をTypeScriptで作成し、自分のアプリで確認して公開審査へ提出するまでの開発者ガイド。">
-  <link rel="stylesheet" href="assets/api.css?v=20261009-v40">
+  <link rel="stylesheet" href="assets/api.css?v=20261009-v41">
 </head>
 <body>
   <header class="topbar"><a class="wordmark" href="documentation.html">CIT Hub</a><span class="product">Developer Documentation</span><nav class="toplinks" aria-label="グローバルナビゲーション"><a href="documentation.html">ドキュメント</a><a href="guide.html" aria-current="page">開発ガイド</a><a href="api.html">APIリファレンス</a><a href="index.html">コンソール</a></nav></header>
@@ -14,14 +14,14 @@
   <div class="layout">
     <aside class="sidebar">
       <nav class="navgroup"><h2>開発の流れ</h2><a href="#start">始める</a><a href="#build">ビルド</a><a href="#test">アプリで試す</a><a href="#publish">公開申請</a><a href="#security">権限と安全性</a></nav>
-      <div class="compat"><strong>最新ホスト API: v40</strong><br>対応OSや権限はAPIリファレンスをご確認ください。</div>
+      <div class="compat"><strong>最新ホスト API: v41</strong><br>対応OSや権限はAPIリファレンスをご確認ください。</div>
     </aside>
     <main class="content">
       <p class="eyebrow">CIT HUB EXTENSIONS</p>
       <h1>拡張機能の開発</h1>
       <p class="lead">TypeScriptで画面と動作を作成し、自分のCIT Hubアプリで検証してから公開審査へ提出できます。</p>
-      <p class="doc-actions"><a class="doc-button primary" href="assets/cithub-extension-kit.zip?v=21" download>開発用SDKをダウンロード <span>v0.40.0</span></a><a class="doc-button" href="api.html">APIリファレンス</a><a class="doc-button quiet" href="api.md" download>Markdown仕様書</a></p>
-      <div class="callout"><strong>公開サーバーへの反映待ち</strong><br>開発者コンソールサーバーは現在Host API v34です。v40専用UIを使う拡張機能は、サーバー更新が完了するまでアップロード・起動できません。</div>
+      <p class="doc-actions"><a class="doc-button primary" href="assets/cithub-extension-kit.zip?v=22" download>開発用SDKをダウンロード <span>v0.41.0</span></a><a class="doc-button" href="api.html">APIリファレンス</a><a class="doc-button quiet" href="api.md" download>Markdown仕様書</a></p>
+      <div class="callout"><strong>公開サーバーへの反映待ち</strong><br>開発者コンソールサーバーは現在Host API v34です。v41アニメーションAPIを使う拡張機能は、サーバー更新が完了するまでアップロード・起動できません。</div>
 
       <section id="start"><h2>1. 開発環境を準備</h2><p>SDK ZIPを展開し、Node.js 22以降が利用できる環境で開きます。SDKにはTypeScript型定義、ビルダー、使用例が含まれます。</p><p class="notice">自分で書いたコードのみビルドしてください。ビルド処理は開発PC上でソースを実行するため、出所が分からない拡張機能コードを実行しないでください。</p></section>
 
@@ -36,6 +36,6 @@ npm run build -- examples/study-status.ts</code></pre></div><p>生成された <
     </main>
     <aside class="toc-right"><strong>次に読む</strong><a href="api.html">APIリファレンス</a><a href="api.html#not-available">未対応APIと制限</a><a href="index.html">開発者コンソール</a></aside>
   </div>
-  <footer class="footer">CIT Hub Developer Documentation · Host API v40 · <a href="documentation.html">ドキュメント</a> · <a href="api.html">APIリファレンス</a> · <a href="index.html">コンソール</a></footer>
+  <footer class="footer">CIT Hub Developer Documentation · Host API v41 · <a href="documentation.html">ドキュメント</a> · <a href="api.html">APIリファレンス</a> · <a href="index.html">コンソール</a></footer>
 </body>
 </html>
