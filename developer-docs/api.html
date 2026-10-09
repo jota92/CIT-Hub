@@ -15,7 +15,7 @@
   <header class="topbar">
     <a class="wordmark" href="documentation.html">CIT Hub</a>
     <span class="product">Developer Documentation</span>
-    <nav class="toplinks" aria-label="グローバルナビゲーション"><a href="documentation.html">ドキュメント</a><a href="guide.html">開発ガイド</a><a href="api.html" aria-current="page">APIリファレンス</a><a href="https://developer.cithub.app/">コンソール</a></nav>
+    <nav class="toplinks" aria-label="グローバルナビゲーション"><a href="documentation.html">ドキュメント</a><a href="guide.html">開発ガイド</a><a href="api.html" aria-current="page">APIリファレンス</a><a href="index.html">コンソール</a></nav>
   </header>
   <details class="mobile-nav"><summary>このページの目次</summary><input class="search" id="api-search-mobile" type="search" placeholder="APIを検索" aria-label="APIを検索"><div id="mobile-toc"></div></details>
   <div class="layout">
@@ -31,6 +31,7 @@
       <p class="lead">TypeScript SDKから利用できる機能、必要な権限、データの範囲、互換性をまとめています。実装例から読み始め、APIの詳細へ進めます。</p>
       <div class="doc-actions"><a class="doc-button primary" href="guide.html">開発を始める</a><a class="doc-button" href="assets/cithub-extension-kit.zip?v=21" download>SDKをダウンロード <span>v0.40.0</span></a><a class="doc-button quiet" href="api.md" download>Markdown仕様書</a></div>
       <div class="meta"><span><strong>Host API</strong> v40</span><span><strong>SDK</strong> v0.40.0</span><span><strong>Runtime</strong> QuickJS / TypeScript</span><span><strong>対象</strong> iOS・iPadOS・macOS・Android</span></div>
+      <div class="callout"><strong>公開サーバーへの反映待ち</strong><br>このリファレンスとSDKはHost API v40です。現在の開発者コンソールサーバーはHost API v34を返すため、v40専用UIを使う拡張機能はサーバー更新までアップロード・起動できません。</div>
       <div class="doc-intro-grid">
         <a class="doc-intro-card" href="#quickstart"><span class="card-index">01</span><strong>まず動かす</strong><span>TypeScriptで作成し、アプリ上で試すまで。</span><span class="card-arrow" aria-hidden="true">→</span></a>
         <a class="doc-intro-card" href="#campus-data"><span class="card-index">02</span><strong>アプリのデータを使う</strong><span>本人の時間割、課題、ToDoなど。</span><span class="card-arrow" aria-hidden="true">→</span></a>
@@ -398,6 +399,6 @@ interactive.checkbox("ready", "確認しました", ready)
 interactive.radio("campus", "キャンパス", ["新習志野", "津田沼"], campus)</code></pre></section><section><h2>進捗表示</h2><p><code>ui.progress(label, value)</code>はOSネイティブの線形進捗表示です。値は0から1までの有限値で指定し、SDKビルドが最低Host API v38を設定します。</p><pre><code>ui.progress("ファイルを処理中", 0.62)</code></pre></section></main>
     <aside class="toc-right"><strong>このページ</strong><div id="right-toc"></div></aside>
   </div>
-      <footer class="footer">CIT Hub 開発者ドキュメント · Host API v40 · <a href="documentation.html">ドキュメント</a> · <a href="guide.html">開発ガイド</a> · <a href="https://developer.cithub.app/">開発者コンソール</a> · <a href="api.md">詳細仕様書</a></footer>
+      <footer class="footer">CIT Hub 開発者ドキュメント · Host API v40 · <a href="documentation.html">ドキュメント</a> · <a href="guide.html">開発ガイド</a> · <a href="index.html">開発者コンソール</a> · <a href="api.md">詳細仕様書</a></footer>
 </body>
 </html>
