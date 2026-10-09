@@ -21,7 +21,7 @@
       <h1>拡張機能の開発</h1>
       <p class="lead">TypeScriptで画面と動作を作成し、自分のCIT Hubアプリで検証してから公開審査へ提出できます。</p>
       <p class="doc-actions"><a class="doc-button primary" href="assets/cithub-extension-kit.zip?v=47" download>開発用SDKをダウンロード <span>v0.47.0</span></a><a class="doc-button" href="api.html">APIリファレンス</a><a class="doc-button quiet" href="api.md" download>Markdown仕様書</a></p>
-      <div class="callout"><strong>公開サーバーへの反映待ち</strong><br>開発者コンソールサーバーは現在Host API v34です。v47ネイティブリンクボタンAPIを使う拡張機能は、サーバー更新が完了するまでアップロード・起動できません。</div>
+      <div class="callout"><strong>ホストAPIの互換性</strong><br>利用するSDKのAPIバージョンと、開発者コンソールが示すサーバー対応バージョンを確認してください。必要バージョンが満たされない場合、アップロードまたは起動は拒否されます。</div>
 
       <section id="start"><h2>1. 開発環境を準備</h2><p>SDK ZIPを展開し、Node.js 22以降が利用できる環境で開きます。SDKにはTypeScript型定義、ビルダー、使用例が含まれます。</p><p class="notice">自分で書いたコードのみビルドしてください。ビルド処理は開発PC上でソースを実行するため、出所が分からない拡張機能コードを実行しないでください。</p></section>
 

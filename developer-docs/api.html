@@ -347,11 +347,16 @@ notification.onOpen(event =&gt; console.log(event.data));</code></pre></div>
         <p>エラーコードはSDKの型定義と<a href="api.md">詳細仕様書</a>を正としてください。未実装APIはCapabilityとして公開されず、代替動作を推測して実行しません。</p>
       </section>
 
-      <section id="changelog" data-title="API changelog" data-group="開発ワークフロー">
+      <section id="changelog" data-title="API変更履歴" data-group="公開と互換性">
         <h2>ホストAPIの主な追加履歴</h2>
         <div class="tablewrap"><table><thead><tr><th>Host API</th><th>追加内容</th></tr></thead><tbody>
+          <tr><td>v47</td><td>OSのリンク動作を使うアクセシブルなネイティブリンクボタン <code>ui.linkButton()</code></td></tr>
+          <tr><td>v46</td><td>Stateと同期するネイティブ検索欄 <code>interactive.searchField()</code></td></tr>
+          <tr><td>v45</td><td>アクセシブルなネイティブアイコンボタン <code>interactive.iconButton()</code></td></tr>
+          <tr><td>v44</td><td>入力フォーカス・送信イベント <code>onFocus</code> / <code>onBlur</code> / <code>onSubmit</code></td></tr>
+          <tr><td>v43</td><td>安全領域・最小最大寸法・縦横比を扱うレスポンシブレイアウト <code>ui.safeArea()</code> / <code>ui.frame()</code></td></tr>
+          <tr><td>v42</td><td>検証済みデータから描画するネイティブ横棒グラフ <code>ui.barChart()</code></td></tr>
           <tr><td>v40</td><td>ネイティブカード・余白グループ・レスポンシブコンテナ <code>ui.card()</code> / <code>ui.group()</code> / <code>ui.container()</code></td></tr>
-          <tr><td>v42</td><td>検証済みデータから描画するネイティブ横棒グラフ <code>ui.barChart()</code></td></tr><tr><td>v43</td><td>安全領域・最小最大寸法・縦横比を扱うレスポンシブレイアウト <code>ui.safeArea()</code> / <code>ui.frame()</code></td></tr>
           <tr><td>v41</td><td>状態更新を包むOS標準アニメーション <code>animation.animate()</code> / <code>animation.spring()</code> / <code>animation.transition()</code></td></tr>
           <tr><td>v39</td><td>読み込み・空・エラー状態の標準表示 <code>ui.loading()</code> / <code>ui.emptyState()</code> / <code>ui.errorState()</code></td></tr>
           <tr><td>v38</td><td>ネイティブ線形進捗表示 <code>ui.progress()</code></td></tr>
@@ -373,7 +378,7 @@ notification.onOpen(event =&gt; console.log(event.data));</code></pre></div>
         <p>各バージョンの厳密な制約と未実装範囲は<a href="api.md">詳細API仕様書</a>を参照してください。</p>
       </section>
 
-      <section id="semantic-status" data-title="状態表示" data-group="画面">
+      <section id="semantic-status" data-title="読み込み・空・エラー状態" data-group="画面">
         <h2>読み込み・空・エラー状態</h2>
         <p><code>ui.loading(label)</code>、<code>ui.emptyState(title, message)</code>、<code>ui.errorState(title, message)</code>は、読み込み中・該当データなし・エラーを区別して伝える標準UIです。iOS・iPadOS・macOS・Androidでネイティブ描画します。SDKビルダーは最低Host API v39を自動設定し、古いホストでは互換性エラーとして起動を防ぎます。</p>
         <pre><code>ui.loading("時間割を読み込み中")
@@ -381,7 +386,7 @@ ui.emptyState("課題はありません", "新しい課題が届くとここに�
 ui.errorState("読み込めませんでした", "通信状態を確認して再度お試しください")</code></pre>
       </section>
 
-      <section id="responsive-layouts" data-title="レスポンシブレイアウト" data-group="画面">
+      <section id="responsive-layouts" data-title="カード・グループ・コンテナ" data-group="画面">
         <h2>カード・グループ・コンテナ</h2>
         <p><code>ui.card(children, label?)</code> はOS標準のカード面、<code>ui.group(children)</code> は背景を足さず間隔を整理するグループ、<code>ui.container(children)</code> は画面幅に追従する領域です。固定座標に依存せず、iOS・iPadOS・macOS・AndroidのネイティブUIで表示します。最低Host API v40が必要で、SDKが最低バージョンを自動記録します。</p>
         <pre><code>ui.container([
@@ -390,7 +395,7 @@ ui.errorState("読み込めませんでした", "通信状態を確認して再�
 ])</code></pre>
       </section>
 
-      <section id="animation" data-title="アニメーション" data-group="画面">
+      <section id="animation" data-title="ネイティブアニメーション" data-group="画面">
         <h2>ネイティブアニメーション</h2>
         <p><code>animation.animate(options, update)</code> は更新関数内のState変更をネイティブ画面へ渡し、iOS・iPadOS・macOSではSwiftUI、AndroidではComposeのレイアウトアニメーションとして描画します。期間は0.05〜1.5秒、曲線はlinear/easeIn/easeOut/easeInOut/springに限定します。自由な描画ループは実行しません。</p>
         <pre><code>await animation.animate({ duration: 0.25, curve: "easeInOut" }, () =&gt; {
@@ -400,28 +405,55 @@ await animation.spring(() =&gt; expanded.set(true), { damping: 0.82 });</code></
         <p>利用にはHost API v41が必要です。SDKビルダーが最低ホストバージョンを設定し、未対応端末では起動を拒否します。</p>
       </section>
 
-      <section id="not-available" data-title="Not available" data-group="公開と互換性">
-        <h2>公開していないAPI</h2>
-        <p>添付の構想すべてが実装済みではありません。サーバーFunctions/KV/DB/Cron、ユーザー間共有・グループ・Realtime・Push、WebSocket、OAuth/OIDC、拡張機能間Intents、OSウィジェット/App Intents、地図UI、画像変換、音声録音、モーションセンサー、汎用ドラッグ&ドロップ、自由なCanvas描画・棒グラフ以外のチャート、PDFのページ操作、転送進捗は未実装または未接続です。</p>
-        <p>これらは使用できるAPIや権限として公開していません。APIの詳しい型・挙動・制限は<a href="api.md">詳細API仕様（Markdown）</a>を確認してください。</p>
-        <div class="callout">Portalパスワード、OTP秘密鍵、認証Cookie、CIT Hubセッショントークン、他ユーザーの個人データ、別拡張機能のprivate storage、端末固有識別子、無音撮影、無制限ファイルアクセス、任意ネイティブコード、無制限バックグラウンド実行はAPIとして提供しません。</div>
-      </section>
-    <section><h2>状態と同期する入力コントロール</h2><p><code>interactive.stepper</code>、<code>interactive.checkbox</code>、<code>interactive.radio</code>はOS標準の入力UIを使用し、ユーザーの変更を型付きイベントとしてTypeScript Stateへ反映します。範囲・刻み・選択肢はビルド時とサーバーで検証されます。Host API v37。</p><pre><code>interactive.stepper("count", "個数", count, 0, 10, 1)
+      <section id="input-controls" data-title="Stepper・Checkbox・Radio" data-group="画面">
+        <h2>状態と同期する入力コントロール</h2>
+        <p><code>interactive.stepper</code>、<code>interactive.checkbox</code>、<code>interactive.radio</code>はOS標準の入力UIを使用し、ユーザーの変更を型付きイベントとしてTypeScript Stateへ反映します。範囲・刻み・選択肢はビルド時とサーバーで検証されます。Host API v37。</p>
+        <pre><code>interactive.stepper("count", "個数", count, 0, 10, 1)
 interactive.checkbox("ready", "確認しました", ready)
-interactive.radio("campus", "キャンパス", ["新習志野", "津田沼"], campus)</code></pre></section><section><h2>進捗表示</h2><p><code>ui.progress(label, value)</code>はOSネイティブの線形進捗表示です。値は0から1までの有限値で指定し、SDKビルドが最低Host API v38を設定します。</p><pre><code>ui.progress("ファイルを処理中", 0.62)</code></pre></section><section id="bar-chart"><h2>横棒グラフ</h2><p><code>ui.barChart(title, categories, series)</code>はカテゴリ1〜12件、系列1〜4件、0〜1,000,000の有限値からOS標準の横棒表示を作ります。各系列の値数はカテゴリ数と一致させます。自由なCanvas描画は行いません。Host API v42が必要です。</p><pre><code>ui.barChart("今週の学習時間", ["月", "火", "水"], [{ label: "時間", values: [1.5, 2, 0.75] }])</code></pre></section><section id="responsive-geometry"><h2>Safe Area とレスポンシブ寸法</h2><p><code>ui.safeArea(children)</code>はノッチ・システムバー・画面端を避けるOSネイティブ領域です。<code>ui.frame(node, bounds)</code>では最小/最大の幅と高さ、縦横比を指定できます。単位はiOS/macOSがpt、Androidがdp。幅・高さは0〜2000、縦横比は0.1〜10で、最小値は最大値以下である必要があります。固定座標に頼らず、画面サイズの異なるスマートフォン・タブレット・デスクトップへ適応するUIに使います。最低Host API v43です。</p><pre><code>ui.safeArea([ui.frame(ui.column([ui.heading("今週の授業"), ui.data("timetable.periods")]), { minWidth: 240, maxWidth: 860 })])</code></pre></section><section id="input-events"><h2>入力フォーカスと送信イベント</h2><p><code>interactive.textField</code>と<code>interactive.secureField</code>は<code>onFocus</code>、<code>onBlur</code>、<code>onSubmit</code>を受け取ります。実際のフォーカス変化と単一行キーボードの完了操作だけを通知します。複数行<code>textArea</code>では改行と送信を区別できないため<code>onSubmit</code>は提供しません。入力値とフォーカス状態は端末内QuickJSで扱い、サーバーに送信しません。Host API v44が必要です。</p><pre><code>interactive.textField("query", "キーワード", query, {
+interactive.radio("campus", "キャンパス", ["新習志野", "津田沼"], campus)</code></pre>
+      </section>
+      <section id="progress" data-title="進捗表示" data-group="画面">
+        <h2>進捗表示</h2><p><code>ui.progress(label, value)</code>はOSネイティブの線形進捗表示です。値は0から1までの有限値で指定し、SDKビルドが最低Host API v38を設定します。</p><pre><code>ui.progress("ファイルを処理中", 0.62)</code></pre>
+      </section>
+      <section id="bar-chart" data-title="横棒グラフ" data-group="画面">
+        <h2>横棒グラフ</h2><p><code>ui.barChart(title, categories, series)</code>はカテゴリ1〜12件、系列1〜4件、0〜1,000,000の有限値からOS標準の横棒表示を作ります。各系列の値数はカテゴリ数と一致させます。自由なCanvas描画は行いません。Host API v42が必要です。</p><pre><code>ui.barChart("今週の学習時間", ["月", "火", "水"], [{ label: "時間", values: [1.5, 2, 0.75] }])</code></pre>
+      </section>
+      <section id="responsive-geometry" data-title="Safe Area・レスポンシブ寸法" data-group="画面">
+        <h2>Safe Area とレスポンシブ寸法</h2><p><code>ui.safeArea(children)</code>はノッチ・システムバー・画面端を避けるOSネイティブ領域です。<code>ui.frame(node, bounds)</code>では最小/最大の幅と高さ、縦横比を指定できます。単位はiOS/macOSがpt、Androidがdp。幅・高さは0〜2000、縦横比は0.1〜10で、最小値は最大値以下である必要があります。最低Host API v43です。</p><pre><code>ui.safeArea([ui.frame(ui.column([ui.heading("今週の授業"), ui.data("timetable.periods")]), { minWidth: 240, maxWidth: 860 })])</code></pre>
+      </section>
+      <section id="input-events" data-title="入力フォーカス・送信イベント" data-group="画面">
+        <h2>入力フォーカスと送信イベント</h2><p><code>interactive.textField</code>と<code>interactive.secureField</code>は<code>onFocus</code>、<code>onBlur</code>、<code>onSubmit</code>を受け取ります。複数行<code>textArea</code>では<code>onSubmit</code>を提供しません。入力値とフォーカス状態は端末内QuickJSで扱い、サーバーに送信しません。Host API v44が必要です。</p><pre><code>interactive.textField("query", "キーワード", query, {
   onFocus: () =&gt; status.set("入力中"),
   onBlur: () =&gt; status.set("入力終了"),
   onSubmit: () =&gt; status.set(query.value),
-})</code></pre><section id="icon-button"><h2>ネイティブアイコンボタン（Host API v45）</h2><p><code>interactive.iconButton(icon, label, onPress)</code>はOS標準アイコンを44pt/dp以上のタップ領域で表示し、VoiceOverとTalkBack用のラベルを設定します。操作はユーザーのタップからQuickJSへ渡し、未許可・未知のアイコン・不正イベントIDはネイティブ側とサーバー側で拒否します。許可アイコンは<code>book</code>、<code>calendar</code>、<code>bus</code>、<code>check</code>、<code>clock</code>、<code>info</code>、<code>map</code>、<code>person</code>、<code>photo</code>、<code>plus</code>、<code>search</code>、<code>edit</code>、<code>list</code>、<code>bell</code>です。</p><pre><code>interactive.iconButton("plus", "回数を増やす", () =&gt; count.set(count.value + 1))</code></pre></section><section id="search-field"><h2>ネイティブ検索欄（Host API v46）</h2><p><code>interactive.searchField(key, label, value, events?)</code>はStateと同期する入力、検索アイコン、入力消去、検索キーを備えた検索向けネイティブ部品です。任意の<code>onFocus</code>・<code>onBlur</code>・<code>onSubmit</code>コールバックはiOS/macOSとAndroidで動作します。最大4000文字で、検索キーから送信イベントを実行します。ホストv45以前では起動を拒否します。</p><pre><code>const query = state.create('');
+})</code></pre>
+      </section>
+      <section id="icon-button" data-title="ネイティブアイコンボタン" data-group="画面">
+        <h2>ネイティブアイコンボタン（Host API v45）</h2><p><code>interactive.iconButton(icon, label, onPress)</code>はOS標準アイコンを44pt/dp以上のタップ領域で表示し、VoiceOverとTalkBack用ラベルを設定します。許可アイコンは<code>book</code>、<code>calendar</code>、<code>bus</code>、<code>check</code>、<code>clock</code>、<code>info</code>、<code>map</code>、<code>person</code>、<code>photo</code>、<code>plus</code>、<code>search</code>、<code>edit</code>、<code>list</code>、<code>bell</code>です。</p><pre><code>interactive.iconButton("plus", "回数を増やす", () =&gt; count.set(count.value + 1))</code></pre>
+      </section>
+      <section id="search-field" data-title="ネイティブ検索欄" data-group="画面">
+        <h2>ネイティブ検索欄（Host API v46）</h2><p><code>interactive.searchField(key, label, value, events?)</code>はStateと同期する検索用ネイティブ部品です。検索アイコン、入力消去、検索キーを備え、最大4,000文字です。Host API v46以降が必要です。</p><pre><code>const query = state.create('');
 interactive.searchField('query', '課題名を入力', query, {
   onSubmit: () =&gt; searchAssignments(query.value)
-});</code></pre><p>実例: <code>extensions/examples/interactive-search-field.ts</code></p></section><section id="link-button" data-title="ネイティブリンクボタン" data-group="画面と操作"><h2>ネイティブリンクボタン（Host API v47）</h2><p><code>ui.linkButton(label, httpsURL)</code>は、OSの標準リンク動作を使う強調ボタンです。VoiceOver・TalkBackにリンクとして認識され、44pt/dp以上の操作領域で表示します。リンク先はHTTPSのみで、ユーザー情報を含むURLは受け付けません。タップ時にシステムのリンク処理へ渡します。静的UI・実行時UIの両方で利用でき、ビルダーが<code>minimumHostAPI: 47</code>を設定します。</p><div class="codebox"><button class="copy" type="button">コピー</button><pre><code>import { defineExtension, ui } from '../sdk/index';
+});</code></pre><p>実例: <code>extensions/examples/interactive-search-field.ts</code></p>
+      </section>
+      <section id="link-button" data-title="ネイティブリンクボタン" data-group="画面">
+        <h2>ネイティブリンクボタン（Host API v47）</h2><p><code>ui.linkButton(label, httpsURL)</code>はOS標準のリンク動作を使う強調ボタンです。VoiceOver・TalkBackにリンクとして認識され、44pt/dp以上の操作領域で表示します。HTTPSのみ、ユーザー情報を含まないURLに限定します。静的UI・実行型UIの両方で使え、ビルダーが<code>minimumHostAPI: 47</code>を設定します。</p>
+        <div class="codebox"><button class="copy" type="button">コピー</button><pre><code>import { defineExtension, ui } from '../sdk/index';
 
 export default defineExtension({
   name: '参考リンク', version: '1.0.0',
   description: '公式情報を開く', permissions: [],
   content: [ui.linkButton('大学公式サイトを開く', 'https://www.it-chiba.ac.jp/')]
-});</code></pre></div><p>HTTP、資格情報付きURL、長すぎるURLはビルド時・サーバー側・アプリ側で拒否します。Host API v46以前のアプリでは起動できません。</p></section>
+});</code></pre></div>
+        <p>HTTP、資格情報付きURL、2,000文字を超えるURLはビルド時・サーバー側・アプリ側で拒否します。Host API v46以前のアプリでは起動できません。</p>
+      </section>
+      <section id="not-available" data-title="未提供APIとセキュリティ境界" data-group="公開と互換性">
+        <h2>公開していないAPI</h2>
+        <p>添付の構想すべてが実装済みではありません。サーバーFunctions/KV/DB/Cron、ユーザー間共有・グループ・Realtime・Push、WebSocket、OAuth/OIDC、拡張機能間Intents、OSウィジェット/App Intents、地図UI、画像変換、音声録音、モーションセンサー、汎用ドラッグ&ドロップ、自由なCanvas描画・棒グラフ以外のチャート、PDFのページ操作、転送進捗は未実装または未接続です。</p>
+        <p>これらは使用できるAPIや権限として公開していません。APIの詳しい型・挙動・制限は<a href="api.md">詳細API仕様（Markdown）</a>を確認してください。</p>
+        <div class="callout">Portalパスワード、OTP秘密鍵、認証Cookie、CIT Hubセッショントークン、他ユーザーの個人データ、別拡張機能のprivate storage、端末固有識別子、無音撮影、無制限ファイルアクセス、任意ネイティブコード、無制限バックグラウンド実行はAPIとして提供しません。</div>
+      </section>
 </main>
     <aside class="toc-right"><strong>このページ</strong><div id="right-toc"></div></aside>
   </div>
