@@ -1,4 +1,4 @@
-# 拡張機能API v42
+# 拡張機能API v43
 
 ## TypeScriptの実行時処理
 
@@ -135,7 +135,7 @@ host API v33のファイル転送は次のとおりです。
 - `profile-save` / `mine`: 公開プロフィール・自分の開発版。
 - `upload` / `submit`: 開発版保存・審査申請。
 - `catalog` / `developer`: 承認済み版・公開作者ページ。
-- `install` / `open` / `uninstall`: 追加・起動・削除。v42ホストはhost_api_version=42を送信し、使用APIに応じた最低互換性を確認します。
+- `install` / `open` / `uninstall`: 追加・起動・削除。v43ホストはhost_api_version=43を送信し、使用APIに応じた最低互換性を確認します。
 - `data-save`: 拡張機能専用の入力値をrevision付きで保存。
 - `list` / `review`: 別の管理キーでのみ審査・公開停止。
 
@@ -427,7 +427,7 @@ const nextRevision = await cloudUser.set('preferences', current.revision, { them
 
 ## API互換性
 
-SDKのビルド済み実行型拡張機能は利用APIに応じた `minimumHostAPI` を含みます。通常の実行型拡張機能はv9、授業メモ・外部通信はv10、拡張機能ファイル保存はv11、選択ファイル読み取りはv12、クリップボードはv13、OS設定への遷移はv14、ローカル通知はv15、構造化時間割・課題はv16、ToDo完了操作はv17、学年暦読み取りはv18、バスv19、食堂v20、本人専用Cloud KV v21、文字UI v22、複数行入力v23、位置情報v24、接続状態v25、レイアウトv26、文字スタイルv27、ネットワーク変更購読v28、独立スクロールv29、ファイル複製・移動v30、本人の有効サービス一覧v31、状態同期する選択UI v32、専用領域とのファイル転送v33、状態同期する複数選択v34、日時選択v35、開始・終了日時の範囲入力v36、State同期するStepper・Checkbox・Radio v37、ネイティブ進捗表示v38、読み込み・空・エラー状態v39、カード・グループ・レスポンシブコンテナv40、制限付きネイティブアニメーションv41、検証済みネイティブ横棒グラフv42です。配布サーバーは追加・起動時にアプリの対応APIを比較し、足りなければ `host_update_required` を返します。
+SDKのビルド済み実行型拡張機能は利用APIに応じた `minimumHostAPI` を含みます。通常の実行型拡張機能はv9、授業メモ・外部通信はv10、拡張機能ファイル保存はv11、選択ファイル読み取りはv12、クリップボードはv13、OS設定への遷移はv14、ローカル通知はv15、構造化時間割・課題はv16、ToDo完了操作はv17、学年暦読み取りはv18、バスv19、食堂v20、本人専用Cloud KV v21、文字UI v22、複数行入力v23、位置情報v24、接続状態v25、レイアウトv26、文字スタイルv27、ネットワーク変更購読v28、独立スクロールv29、ファイル複製・移動v30、本人の有効サービス一覧v31、状態同期する選択UI v32、専用領域とのファイル転送v33、状態同期する複数選択v34、日時選択v35、開始・終了日時の範囲入力v36、State同期するStepper・Checkbox・Radio v37、ネイティブ進捗表示v38、読み込み・空・エラー状態v39、カード・グループ・レスポンシブコンテナv40、制限付きネイティブアニメーションv41、検証済みネイティブ横棒グラフv42、Safe Areaとレスポンシブ寸法v43です。配布サーバーは追加・起動時にアプリの対応APIを比較し、足りなければ `host_update_required` を返します。
 
 `minimumHostAPI` は整数1〜40です。アプリ自身のバージョン番号とAPI番号は別です。対応していないアプリでAPIを呼び出してから失敗する状態を避けるため、新しいSDKは使用APIを検出してこの指定を自動で入れます。
 
@@ -622,3 +622,14 @@ ui.barChart('今週の学習時間', ['月', '火', '水'], [
 ```
 
 SDKビルダーは `minimumHostAPI: 42` を設定します。APIサーバーとアプリは互換バージョン未満の実行を拒否します。公開コンソールサーバーがv34の間は、このAPIを含む拡張機能を公開・起動できません。
+
+
+## Safe Area とレスポンシブ寸法（Host API v43）
+
+`ui.safeArea(children)` はノッチ、システムバー、画面端の安全領域を避けるネイティブコンテナです。`ui.frame(node, { minWidth, maxWidth, minHeight, maxHeight, aspectRatio })` はポイント（iOS/macOS）またはdp（Android）単位で寸法を制約します。幅・高さは0〜2000、最小値は最大値以下、縦横比は0.1〜10です。固定座標の代わりに親幅と寸法制約を使います。SDKビルダーは最低Host API v43を設定し、範囲外・矛盾値を拒否します。
+
+```ts
+ui.safeArea([
+  ui.frame(ui.column([ui.heading("今週の授業"), ui.data("timetable.periods")]), { minWidth: 240, maxWidth: 860 }),
+]);
+```
