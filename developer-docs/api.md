@@ -1,4 +1,4 @@
-# 拡張機能API v45
+# 拡張機能API v46
 
 ## TypeScriptの実行時処理
 
@@ -23,6 +23,7 @@ SDKのホスト要求は失敗理由ごとに `PermissionError`、`UserInteracti
 - host API v33で `network.uploadFile()` / `network.downloadFile()` を追加しました。両APIとも利用者のボタン操作中のみ、宣言済みHTTPSホストと `network.fetch`・`files.storage` の両権限で利用できます。ファイルは拡張機能専用ストレージのみを扱い、各転送は256 KiBまでです。
 - host API v34で `interactive.multiSelect(key, label, options, state)` を追加しました。選択変更は文字列配列としてTypeScriptのStateへ反映されます。選択肢は1〜30件、各120文字以内で重複不可です。
 - host API v35で `interactive.dateTime(key, label, state.create<number | null>(null))` を追加しました。OS標準の日付・時刻選択UIの値はUnix epochミリ秒のnumberとしてStateへ反映され、未設定はnullです。SDKが `minimumHostAPI: 35` を設定します。例は `extensions/examples/interactive-date-time.ts` です。
+- host API v42で `ui.barChart(title, categories, series)` を追加しました。1〜12カテゴリ、1〜4系列、各値0〜1,000,000の検証済みデータをiOS・macOS・Androidのネイティブ横棒表示で描画します。自由なCanvas描画やスクリプト描画は行いません。各系列の値数はカテゴリ数と一致させ、SDKビルダーは `minimumHostAPI: 42` を設定します。
 - `cit.bus.*`: `bus.read` が必要です。端末に保存された公開バス時刻表のみを読みます。時刻表データを取得するには、アプリで一度バスダイヤを表示して取得してください。
 - `app.version/extensionId/environment/hostVersion/capabilities`: 同期的に実行環境を確認します。
 - `capabilities.has(name)`: 同期的に対応を確認します。未実装APIはfalseです。OS権限の許可とは別です。
@@ -135,7 +136,7 @@ host API v33のファイル転送は次のとおりです。
 - `profile-save` / `mine`: 公開プロフィール・自分の開発版。
 - `upload` / `submit`: 開発版保存・審査申請。
 - `catalog` / `developer`: 承認済み版・公開作者ページ。
-- `install` / `open` / `uninstall`: 追加・起動・削除。v45ホストはhost_api_version=45を送信し、使用APIに応じた最低互換性を確認します。
+- `install` / `open` / `uninstall`: 追加・起動・削除。v40ホストはhost_api_version=40を送信し、使用APIに応じた最低互換性を確認します。
 - `data-save`: 拡張機能専用の入力値をrevision付きで保存。
 - `list` / `review`: 別の管理キーでのみ審査・公開停止。
 
@@ -427,9 +428,9 @@ const nextRevision = await cloudUser.set('preferences', current.revision, { them
 
 ## API互換性
 
-SDKのビルド済み実行型拡張機能は利用APIに応じた `minimumHostAPI` を含みます。通常の実行型拡張機能はv9、授業メモ・外部通信はv10、拡張機能ファイル保存はv11、選択ファイル読み取りはv12、クリップボードはv13、OS設定への遷移はv14、ローカル通知はv15、構造化時間割・課題はv16、ToDo完了操作はv17、学年暦読み取りはv18、バスv19、食堂v20、本人専用Cloud KV v21、文字UI v22、複数行入力v23、位置情報v24、接続状態v25、レイアウトv26、文字スタイルv27、ネットワーク変更購読v28、独立スクロールv29、ファイル複製・移動v30、本人の有効サービス一覧v31、状態同期する選択UI v32、専用領域とのファイル転送v33、状態同期する複数選択v34、日時選択v35、開始・終了日時の範囲入力v36、State同期するStepper・Checkbox・Radio v37、ネイティブ進捗表示v38、読み込み・空・エラー状態v39、カード・グループ・レスポンシブコンテナv40、制限付きネイティブアニメーションv41、検証済みネイティブ横棒グラフv42、Safe Areaとレスポンシブ寸法v43、入力フォーカス・単一行送信イベントv44、アクセシブルなネイティブアイコン操作v45です。配布サーバーは追加・起動時にアプリの対応APIを比較し、足りなければ `host_update_required` を返します。
+SDKのビルド済み実行型拡張機能は利用APIに応じた `minimumHostAPI` を含みます。通常の実行型拡張機能はv9、授業メモ・外部通信はv10、拡張機能ファイル保存はv11、選択ファイル読み取りはv12、クリップボードはv13、OS設定への遷移はv14、ローカル通知はv15、構造化時間割・課題はv16、ToDo完了操作はv17、学年暦読み取りはv18、バスv19、食堂v20、本人専用Cloud KV v21、文字UI v22、複数行入力v23、位置情報v24、接続状態v25、レイアウトv26、文字スタイルv27、ネットワーク変更購読v28、独立スクロールv29、ファイル複製・移動v30、本人の有効サービス一覧v31、状態同期する選択UI v32、専用領域とのファイル転送v33、状態同期する複数選択v34、日時選択v35、開始・終了日時の範囲入力v36、State同期するStepper・Checkbox・Radio v37、ネイティブ進捗表示v38、読み込み・空・エラー状態v39、カード・グループ・レスポンシブコンテナv40、制限付きネイティブアニメーションv41、検証済みネイティブ横棒グラフv42、Safe Areaとレスポンシブ寸法v43、入力フォーカス・単一行送信イベントv44、アクセシブルなネイティブアイコン操作v45、状態同期するネイティブ検索欄v46です。配布サーバーは追加・起動時にアプリの対応APIを比較し、足りなければ `host_update_required` を返します。
 
-`minimumHostAPI` は整数1〜45です。アプリ自身のバージョン番号とAPI番号は別です。対応していないアプリでAPIを呼び出してから失敗する状態を避けるため、新しいSDKは使用APIを検出してこの指定を自動で入れます。
+`minimumHostAPI` は整数1〜46です。アプリ自身のバージョン番号とAPI番号は別です。対応していないアプリでAPIを呼び出してから失敗する状態を避けるため、新しいSDKは使用APIを検出してこの指定を自動で入れます。
 
 ## 権限状態の確認
 
@@ -600,43 +601,22 @@ ui.container([
 ]);
 ```
 
-## ネイティブアニメーション（Host API v41）
-
-`animation.animate(options, update)` はStateの更新をOS標準のアニメーション付きネイティブ再描画へ渡します。`animation.spring(update, options)` はバネ曲線、`animation.transition(update, options)` は指定曲線を使います。期間は0.05〜1.5秒、dampingは0.4〜1.0に制限されます。任意の描画ループは提供しません。
-
-```ts
-await animation.animate({ duration: 0.25, curve: 'easeInOut' }, () => expanded.set(!expanded.value));
-await animation.spring(() => expanded.set(true), { duration: 0.3, damping: 0.78 });
-```
-
-SDKビルダーはこのAPIの利用時に `minimumHostAPI: 41` を設定します。サーバーとアプリの互換チェックもv41を要求します。
-
-## 横棒グラフ（Host API v42）
-
-`ui.barChart(title, categories, series)` は、カテゴリ1〜12件、系列1〜4件の有限な非負値をOS標準の横棒UIで表示します。各系列の`values`数はカテゴリ数と一致し、値は0〜1,000,000です。任意Canvasやスクリプト描画は提供しません。
-
-```ts
-ui.barChart('今週の学習時間', ['月', '火', '水'], [
-  { label: '時間', values: [1.5, 2, 0.75] }
-]);
-```
-
-SDKビルダーは `minimumHostAPI: 42` を設定します。APIサーバーとアプリは互換バージョン未満の実行を拒否します。公開コンソールサーバーがv34の間は、このAPIを含む拡張機能を公開・起動できません。
-
-
 ## Safe Area とレスポンシブ寸法（Host API v43）
 
-`ui.safeArea(children)` はノッチ、システムバー、画面端の安全領域を避けるネイティブコンテナです。`ui.frame(node, { minWidth, maxWidth, minHeight, maxHeight, aspectRatio })` はポイント（iOS/macOS）またはdp（Android）単位で寸法を制約します。幅・高さは0〜2000、最小値は最大値以下、縦横比は0.1〜10です。固定座標の代わりに親幅と寸法制約を使います。SDKビルダーは最低Host API v43を設定し、範囲外・矛盾値を拒否します。
+`ui.safeArea(children)` はノッチ、システムバー、画面端の安全領域を避けるネイティブコンテナです。`ui.frame(node, { minWidth, maxWidth, minHeight, maxHeight, aspectRatio })` はポイント（iOS/macOS）またはdp（Android）単位で寸法を制約します。幅・高さは0〜2000、最小値は最大値以下、縦横比は0.1〜10です。固定座標の代わりに親幅と寸法制約を使い、端末サイズへ適応させてください。SDKビルダーは最低Host API v43を付け、範囲外・矛盾した値はビルドとサーバー検証で拒否します。
 
 ```ts
 ui.safeArea([
-  ui.frame(ui.column([ui.heading("今週の授業"), ui.data("timetable.periods")]), { minWidth: 240, maxWidth: 860 }),
+  ui.frame(ui.column([
+    ui.heading('今週の授業'),
+    ui.data('timetable.periods'),
+  ]), { minWidth: 240, maxWidth: 860 }),
 ]);
 ```
 
 ## 入力フォーカスと送信イベント（Host API v44）
 
-`interactive.textField` と `interactive.secureField` は、OSネイティブ入力の `onFocus`、`onBlur`、`onSubmit` コールバックを受け取れます。イベントはフォーカスが実際に変化した時だけ通知し、単一行の送信はキーボードの完了操作で通知します。複数行 `textArea` は改行入力と送信操作を混同しないため `onSubmit` を提供しません。イベントはQuickJS内で処理し、入力値・フォーカス状態をサーバーへ送信しません。SDKビルダーは `minimumHostAPI: 44` を設定し、サーバーは宣言・イベントID・ホスト互換性を検証します。
+`interactive.textField` と `interactive.secureField` は、OSネイティブ入力の `onFocus`、`onBlur`、`onSubmit` コールバックを受け取れます。イベントはフォーカスが実際に変化した時だけ通知し、単一行の送信はキーボードの完了操作で通知します。複数行 `textArea` は改行入力と送信操作を混同しないため `onSubmit` を提供しません。イベントはQuickJS内で処理し、入力値・フォーカス状態をサーバーへ送信しません。
 
 ```ts
 interactive.textField('query', 'キーワード', query, {
@@ -646,6 +626,8 @@ interactive.textField('query', 'キーワード', query, {
 });
 ```
 
+SDKビルダーはイベントを含む拡張機能に `minimumHostAPI: 44` を設定します。配信サーバーは宣言漏れ、無効なイベントID、非入力部品へのイベント付与を拒否し、v43以前のホストでの実行も拒否します。
+
 
 ## ネイティブアイコンボタン（Host API v45）
 
@@ -654,3 +636,16 @@ interactive.textField('query', 'キーワード', query, {
 ```ts
 interactive.iconButton("plus", "回数を増やす", () => count.set(count.value + 1));
 ```
+
+## ネイティブ検索欄（Host API v46）
+
+`interactive.searchField(key, label, value, events?)` はiOS/macOSとAndroidのネイティブ入力を検索用に構成します。値は `State<string>` に同期され、4000文字までです。検索アイコン、入力を消す操作、検索用キーボードアクションを備え、任意で `onFocus`・`onBlur`・`onSubmit` を指定できます。`onSubmit` は検索キー／検索アクションでのみ呼び出されます。SDKビルダーはこのAPIを検出して `minimumHostAPI: 46` を設定し、Host API v45以前での実行を拒否します。
+
+```ts
+const query = state.create('');
+interactive.searchField('query', '課題名を入力', query, {
+  onSubmit: () => searchAssignments(query.value),
+});
+```
+
+サンプル: `extensions/examples/interactive-search-field.ts`。
