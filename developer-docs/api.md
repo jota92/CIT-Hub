@@ -1,6 +1,6 @@
 # Host API v80: サーバーファイル
 
-2026年10月29日現在、CloudflareのAndroid Play Integrity検証Workerと拡張機能サーバー本番サーバーの稼働を確認しています。拡張機能サーバーはrelease v87.1、公開ヘルスチェックHTTP 200、Host API v80、`authenticated`登録モードです。開発者登録ポリシーは有効ですが、実ユーザーによる新規登録E2Eは未確認です。OS別のテスト範囲と制約は[API監査一覧](api-inventory.md)を参照してください。
+Host API v80に対応しています。TypeScript SDKのAPI、権限、データ範囲、対応プラットフォームと利用条件を以下に記載します。
 
 `server.files` は拡張機能サーバーのCIT Hub拡張機能サーバーに、ファイルをユーザー・拡張機能・環境別に保存します。`cloud.storage`を宣言してください。開発環境と本番環境は分離され、他ユーザーのファイルを参照できません。内容は保存時にサーバー側でAES-256-GCM暗号化されます。
 
@@ -23,8 +23,6 @@ await server.files.delete('notes', created.revision);
 `cit.campus.facilities/buildings/rooms/room/search/roomAvailability` は `timetable.read` で本人の取得済み時間割に含まれる教室情報のみを検索します。3桁教室は津田沼、4桁教室は新習志野、それ以外は不明と分類します。`roomAvailability` は本人の時間割上の授業だけを返し、大学全体の空室情報ではありません。
 
 # Host API v64: 本人プロフィール・書類スキャン
-
-Host API v64で追加した機能です。`cit.user.displayName()` は `profile.read` 権限で本人の端末内にキャッシュされたmanaba表示名だけを返します。`scanner.document()` と `image.scanDocument()` は利用者の操作で書類をスキャンし、PDFを拡張機能専用領域へ保存します。両方とも `camera.use` と `files.storage` が必要です。PDFは最大5 MiBで既存の5 MiB保存枠を共有します。iOSはVisionKit、AndroidはGoogle ML KitのOS提供スキャナーを利用し、Mac Catalystでは提供しません。保存先にアクセスできるのは同じ拡張機能だけです。本番サーバーへの配備と実機操作確認は別途必要です。
 
 ```ts
 const result = await scanner.document({ name: 'lecture.pdf', maxPages: 8 });
@@ -54,9 +52,6 @@ requestは公開中の拡張機能の追加確認画面を開きます。自動�
 
 # Host API v61: 撮影・音声録音・写真保存・QR生成
 
-対応済みのネイティブHost APIはv80です。要件433メソッドすべてにSDKの型付き呼び出し口がありますが、これは実行可能なネイティブ機能433件や各APIの個別E2Eを意味しません。2026-10-29の監査ではiOS 27.1 Simulator XCTest 32件、Android API 33 AVD計装テスト116件、Mac Catalystスモーク14系統を実行しました。SDK契約433/433、Node focused suite 405要件行、Android 433行、iOS 276行、Catalyst 255行に通過証拠があり、3環境すべてに対応するのは250/433要件行です。これらはテスト群とAPI要件の対応表であり、独立APIごとの網羅や実機ハードウェア動作を証明しません。APIごとの通過fixture対応表は[`api-inventory.md`](api-inventory.md) / [`api-inventory.json`](api-inventory.json)を参照してください。`background.register/unregister`はHost API v71以降で拡張機能サーバーの承認済み`serverFunctions`へ接続し、サーバー稼働中のベストエフォートで実行します。任意の端末OSコードは実行しません。検索APIとアプリ内タイル、Androidの動的ランチャーショートカット、AppleのApp Intentsは実装済みです。`widget.define/reload`はAndroidの計装テストおよびiOS Simulator / Mac CatalystのQuickJSネイティブホストテストで定義の保存と更新時刻を確認済みです。カードの画面描画・更新連携は未確認です。ウィジェットはCIT Hub内の拡張機能画面に表示する端末内機能で、OSホーム画面ウィジェットではなく、他端末にも同期しません。`host.registerAction`はSDKで遷移先を必須化し、許可ページ・サービス名だけを受け付けるアプリ内遷移ボタンです。`shortcuts.register`は`host.registerShortcut`と同じアプリ内タイルを登録します。`push.sendToCurrentUser`はiOS/iPadOS/Android/Mac CatalystとCloudflare Workerへ接続済みですが、Pushの実配信は確認していません。通知許可・APNs/FCM端末登録が必要です。OAuth 2.0 PKCEとOIDC RS256検証は実装済みですが、外部プロバイダーとの実認証フローは確認していません。
-
-監査上、SDKの86個のリテラルHostブリッジ操作名はSwift/Kotlinソース双方への静的照合で不一致0です。これは文字列の存在確認であり、433メソッドすべてのランタイム動作を証明しません。詳細な未監査項目は実装一覧を参照してください。
 
 | API | 返却値 | 必要な宣言 |
 | --- | --- | --- |
@@ -87,15 +82,13 @@ QR生成は外部通信不要です。UTF-8で1〜1000バイト、要求サイ�
 
 主なエラー: `recording_busy`, `recording_start_failed`, `recording_failed`, `recording_save_failed`, `capture_options_invalid`, `capture_too_large`, `capture_duration_exceeded`, `capture_save_failed`, `photos_permission_denied`, `photos_save_failed`, `qr_options_invalid`, `qr_generation_failed`。エラーは表示して処理し、成功を仮装しません。
 
-仕様確認先: [Apple AVAudioRecorder](https://developer.apple.com/documentation/avfaudio/avaudiorecorder)、[Android MediaRecorder](https://developer.android.com/media/platform/mediarecorder)、[Android MediaStore](https://developer.android.com/training/data-storage/shared/media)、[ZXing](https://github.com/zxing/zxing)。端末別の録音品質やカメラアプリの挙動は実機検証が必要です。
+仕様確認先: [Apple AVAudioRecorder](https://developer.apple.com/documentation/avfaudio/avaudiorecorder)、[Android MediaRecorder](https://developer.android.com/media/platform/mediarecorder)、[Android MediaStore](https://developer.android.com/training/data-storage/shared/media)、[ZXing](https://github.com/zxing/zxing)。端末により録音品質やカメラアプリの挙動が異なる場合があります。
 
 ---
 
 # 拡張機能API v60
 
 ## v60: センサー・経路・表示言語・グループ共有
-
-ローカル実装の契約です。SDKは0.60.0、最低Host APIは60です。本番サーバーへの配備・実機での操作試験は別途必要で、全APIの完成を意味しません。
 
 ### 端末の動き
 
@@ -147,7 +140,7 @@ ExtensionGroupは`{id,name,role,memberID,createdAt}`、SharedValueは`{key,value
 
 ## v59: サーバー保存・文書・読み取り・再生・開発ログ
 
-以下はローカル実装の契約です。本番サーバーの配備と実機の操作確認は別途必要です。SDK 0.59.0を使ってビルドすると、対象APIを使用するプログラムには最低Host API 59が設定されます。全要件の完了を意味しません。
+SDK 0.59.0を使ってビルドすると、対象APIを使用するプログラムには最低Host API 59が設定されます。全要件の完了を意味しません。
 
 ### 本人専用のサーバー保存
 
@@ -202,11 +195,9 @@ await server.db.transaction([
 
 ログはアプリ内の本人用プレビューでのみ確認できます。端末内の一時表示であり、サーバーへ送信・保存する機能はありません。
 
-使用例: `examples/server-records.ts`、`document-tools.ts`、`media-playback.ts`、`developer-logs.ts`。SDK/runtime/backendのテスト、Androidエミュレーター計装テスト、iOS SimulatorとMac Catalystのビルドを実施しています。例のすべてを各OSの実機で操作したことを意味するものではありません。
 
 ## v58 の一括追加
 
-検証状況: SDK/runtime/backendテスト、iOS Simulatorビルド、Apple Silicon向けMac Catalystビルドを実施しました。Mac Catalystアプリは起動し初期画面を表示します。拡張機能サーバー本番サーバーの `/health` と `capabilities` をローカル・公開URLの両方から確認し、Host API v80を応答しました。これらは433件すべてのAPIをOS別に個別操作した証明ではありません。カメラ等の機器依存機能やMac Catalystで未確認の機能は、能力応答と該当APIの制約を参照してください。全呼び出し名のSDK提供状況と未監査項目は `EXTENSION_API_INVENTORY.md` に記録します。
 
 - 入力: `ui.textField/searchField/textArea/secureField/toggle/stepper/checkbox/radio/multiSelect/date/time/dateTime/dateRange/filePicker/photoPicker` に状態を接続できます。`field.create(key, initialValue)` は値の変更・リセット・フォーカス操作を持つ入力ハンドルです。
 - 画面: `navigation.register({name,title,render})` で登録し、`push/pop/popToRoot/sheet/fullScreen/dismiss/tabs` で切り替えます。ルートの引数はJSON値の辞書で、他の拡張機能やホスト画面への遷移はこの版には含みません。
@@ -263,7 +254,7 @@ SDKのホスト要求は失敗理由ごとに `PermissionError`、`UserInteracti
 
 ## 要求元端末へのリモート通知要求（API v78）
 
-`notifications.schedule`権限と公開・追加済み拡張機能が必要です。ボタンなどのユーザー操作から `push.sendToCurrentUser({title,body,data})` を呼ぶと、現行実装はリクエストに含まれる登録端末1台にだけ即時通知を要求します。端末間配信や任意のユーザーID指定はしません。共有アプリトークンとクライアント指定IDは本人性の証明ではなく、端末登録のアカウント紐付けにも強い暗号学的本人確認はありません。このためアカウント認証済みの通知として扱わず、通知本文に機微情報を含めないでください。サーバー本人確認が実装されるまで、アカウント全端末への配信は無効です。Apple端末はAPNsトークンの登録が必要です。Mac Catalystにもホスト経路がありますが、APNsトークンが必要で、Apple実配信は未検証です。FCMを含むプロバイダー実配信もE2E未確認です。1拡張機能・1申告アカウントあたり3回/分、20回/日のサーバー制限があり、dataは10項目以内、各300文字以内、JSON全体800バイト以内です。開発プレビューは未対応です。端末登録、通知許可、Apple/FCM配信状態により失敗することがあり、受信・表示時刻は保証されません。Cloudflare Worker経由の移行中の配信で、ローカル通知とは別の仕組みです。
+`notifications.schedule`権限と公開・追加済み拡張機能が必要です。ボタンなどのユーザー操作から `push.sendToCurrentUser({title,body,data})` を呼ぶと、現行実装はリクエストに含まれる登録端末1台にだけ即時通知を要求します。端末間配信や任意のユーザーID指定はしません。共有アプリトークンとクライアント指定IDは本人性の証明ではなく、端末登録のアカウント紐付けにも強い暗号学的本人確認はありません。このためアカウント認証済みの通知として扱わず、通知本文に機微情報を含めないでください。サーバー本人確認が実装されるまで、アカウント全端末への配信は無効です。Apple端末はAPNsトークンの登録が必要です。Mac CatalystではAPNsトークン登録が必要です。1拡張機能・1申告アカウントあたり3回/分、20回/日のサーバー制限があり、dataは10項目以内、各300文字以内、JSON全体800バイト以内です。開発プレビューは未対応です。端末登録、通知許可、Apple/FCM配信状態により失敗することがあり、受信・表示時刻は保証されません。Cloudflare Worker経由の移行中の配信で、ローカル通知とは別の仕組みです。
 
 ## ローカル通知（API v15）
 
@@ -363,7 +354,7 @@ host API v33のファイル転送は次のとおりです。
 - `login` / `logout`: 開発者ログイン・現在のセッション失効。
 - `logout-all`: 自分の全開発者セッションを失効。
 - `password-change`: current_password・new_passwordで変更。旧セッションを全失効。
-- `capabilities`: 認証不要の固定メタデータ。対応ホストAPIバージョン・権限・読み取り要求に加えて、主要なネイティブAPIの`available`/`partial`/`unavailable`状態と対応プラットフォームを返します。個人データは含みません。SDK宣言があるだけで実機接続済みとは限らないため、`native_api_status`も確認してください。
+- `capabilities`: 認証不要の固定メタデータ。対応ホストAPIバージョン・権限・読み取り要求に加えて、主要なネイティブAPIの`available`/`partial`/`unavailable`状態と対応プラットフォームを返します。個人データは含みません。`native_api_status`も確認してください。
 - `profile-save` / `mine`: 公開プロフィール・自分の開発版。
 - `support-list` / `support-send`: 開発者本人の運営チャット。メッセージはアカウントごとに分離されます。
 - `upload` / `submit`: 開発版保存・審査申請。
@@ -415,7 +406,7 @@ host API v33のファイル転送は次のとおりです。
 
 host API v30では拡張機能専用の端末内ファイル `copy` / `move`、v31では `settings.read` を使う本人の有効な学内サービス一覧 `cit.services.list()`、v32ではStateへ変更を返す `interactive.select()`、v33ではユーザー操作を必要とする隔離ストレージとのHTTPSファイル転送を追加しました。SDK ZIPに含まれるビルダーは必要な最低ホストバージョンを自動設定します。v9以降の追加履歴は各API節を参照してください。
 
-`background.register/unregister`は端末ローカルのOSタスクではなく、`server.functions`権限で拡張機能サーバーの承認済みサーバー関数をスケジュールします。IDは同名の`serverFunctions`関数に対応し、間隔は15分〜30日です。サーバー停止中やネットワーク断では実行されず、時刻・頻度は保証されません。`chargingRequired: true`および`networkRequired: false`は実行環境で保証できないため拒否します。`search.registerItems/removeItems` は端末内アカウント別索引を登録し、公開済み現行版のみ検索対象にします。`widget.define/reload` はCIT Hub内ウィジェットを登録・更新し、宣言済み権限で許可された本人データを表示します。定義は端末内保存で値は保存しません。1拡張10個・1アカウント50個・128 KiBまで、プレビューは禁止です。OSホーム画面ウィジェットではなく、他端末へ同期しません。`host.registerShortcut` は`host.navigate`権限を必要とし、CIT Hubの拡張機能画面に端末内・アカウント別の永続タイルを登録します。タップ時は`app.onOpenURL`へ`source: "hostShortcut"`、ID、任意routeを渡します。1拡張8件・1アカウント50件・64 KiBまで、公開版のみ利用でき、追加済み現行版だけを表示し、アンインストール時に削除します。`shortcuts.register`は`host.registerShortcut`と同じCIT Hub内の永続タイルを登録し、OSホーム画面やSiriショートカットは作成しません。検索・ウィジェット・アプリ内ショートカットはiOS/Androidにコード接続済みですが、実機およびMac Catalyst動作は未検証です。`host.registerAction` は拡張機能実行画面内のアプリ内遷移ボタンとして接続済み・実機検証保留です。routeをSDKで必須化し、許可されたページまたは学内サービス名のみを受け付けます。端末内の任意バックグラウンド実行は提供しません。定期実行は承認済みサーバー関数に限り、サーバー稼働中のベストエフォートです。`push.sendToCurrentUser`はiOS/iPadOS/Android/Mac Catalystのホスト経路に接続済みですが、Apple実配信は未検証です。現行の本人確認はアカウント所有者の証明にならないため、要求元端末1台への配信に限定し、Mac CatalystではAPNsトークン登録を要求します。OIDCは`auth.openIDConnect`でissuer discovery、HTTPSのJWKS取得、RS256署名、issuer/audience/authorized-party/nonce/iat/exp検証を行います。プロバイダー別token revocation、ID tokenの永続保存、認証情報の端末間同期は行いません。信頼できる学内データソースのない空き教室情報は生成しません。認証情報、OTP、Cookie、本人に共有されていない他ユーザー情報、任意ネイティブコード、無制限バックグラウンド実行は提供しません。
+`background.register/unregister`は端末ローカルのOSタスクではなく、`server.functions`権限で拡張機能サーバーの承認済みサーバー関数をスケジュールします。IDは同名の`serverFunctions`関数に対応し、間隔は15分〜30日です。サーバー停止中やネットワーク断では実行されず、時刻・頻度は保証されません。`chargingRequired: true`および`networkRequired: false`は実行環境で保証できないため拒否します。`search.registerItems/removeItems` は端末内アカウント別索引を登録し、公開済み現行版のみ検索対象にします。`widget.define/reload` はCIT Hub内ウィジェットを登録・更新し、宣言済み権限で許可された本人データを表示します。定義は端末内保存で値は保存しません。1拡張10個・1アカウント50個・128 KiBまで、プレビューは禁止です。OSホーム画面ウィジェットではなく、他端末へ同期しません。`host.registerShortcut` は`host.navigate`権限を必要とし、CIT Hubの拡張機能画面に端末内・アカウント別の永続タイルを登録します。タップ時は`app.onOpenURL`へ`source: "hostShortcut"`、ID、任意routeを渡します。1拡張8件・1アカウント50件・64 KiBまで、公開版のみ利用でき、追加済み現行版だけを表示し、アンインストール時に削除します。`shortcuts.register`は`host.registerShortcut`と同じCIT Hub内の永続タイルを登録し、OSホーム画面やSiriショートカットは作成しません。検索・ウィジェット・アプリ内ショートカットの対応可否は、実行時Capabilityで確認してください。`host.registerAction` は拡張機能実行画面内のアプリ内遷移ボタンです。routeをSDKで必須化し、許可されたページまたは学内サービス名のみを受け付けます。端末内の任意バックグラウンド実行は提供しません。定期実行は承認済みサーバー関数に限り、サーバー稼働中のベストエフォートです。`push.sendToCurrentUser`は通知許可と端末登録を必要とします。現行の本人確認はアカウント所有者の証明にならないため、要求元端末1台への配信に限定し、Mac CatalystではAPNsトークン登録を要求します。OIDCは`auth.openIDConnect`でissuer discovery、HTTPSのJWKS取得、RS256署名、issuer/audience/authorized-party/nonce/iat/exp検証を行います。プロバイダー別token revocation、ID tokenの永続保存、認証情報の端末間同期は行いません。信頼できる学内データソースのない空き教室情報は生成しません。認証情報、OTP、Cookie、本人に共有されていない他ユーザー情報、任意ネイティブコード、無制限バックグラウンド実行は提供しません。
 
 ## 構造化時間割（API v16）
 
@@ -641,7 +632,6 @@ OS中断時は確認を停止し、再開時に最新値を読み込みます。
 
 保存は本体の授業メモ設定処理へ渡します。空白のみの本文は本体の仕様に従って削除として扱います。更新はメモまたはnull、削除はnullを返します。本文は4000文字、授業名/IDは1000文字までです。ID正規化は本体と同じ処理を使います。授業名変更時のID移行、学内サーバーの科目コードとの紐付けは提供していません。
 
-AndroidのWebViewとテスト専用保存領域で、作成・更新・古い本文による更新拒否・読み取り・削除を検証しています。本体の設定保存処理への接続はApple・Androidのビルドで確認済みです。別端末へのサーバー同期の実動作は未検証です。
 
 ## v21: ユーザー専用クラウドKV
 
@@ -669,7 +659,7 @@ const nextRevision = await cloudUser.set('preferences', current.revision, { them
 
 SDKのビルド済み実行型拡張機能は利用APIに応じた `minimumHostAPI` を含みます。転送進捗コールバックはv55、外部ブラウザ起動はv56です。通常の実行型拡張機能はv9、授業メモ・外部通信はv10、拡張機能ファイル保存はv11、選択ファイル読み取りはv12、クリップボードはv13、OS設定への遷移はv14、ローカル通知はv15、構造化時間割・課題はv16、ToDo完了操作はv17、学年暦読み取りはv18、バスv19、食堂v20、本人専用Cloud KV v21、文字UI v22、複数行入力v23、位置情報v24、接続状態v25、レイアウトv26、文字スタイルv27、ネットワーク変更購読v28、独立スクロールv29、ファイル複製・移動v30、本人の有効サービス一覧v31、状態同期する選択UI v32、専用領域とのファイル転送v33、状態同期する複数選択v34、日時選択v35、開始・終了日時の範囲入力v36、State同期するStepper・Checkbox・Radio v37、ネイティブ進捗表示v38、読み込み・空・エラー状態v39、カード・グループ・レスポンシブコンテナv40、制限付きネイティブアニメーションv41、検証済みネイティブ横棒グラフv42、Safe Areaとレスポンシブ寸法v43、入力フォーカス・単一行送信イベントv44、アクセッシブルなネイティブアイコン操作v45、状態同期するネイティブ検索欄v46、HTTPSのネイティブリンクボタンv47、セキュアWebSocket v48、単一ファイルピッカー v49、複数ファイルピッカー v50、OS標準の保存画面への書き出し v51、OS標準の共有シート v52、利用者が選択したファイルの共有 v53、選択済み画像の端末内縮小・JPEG変換 v54、既定ブラウザ起動v56です。配布サーバーは追加・起動時にアプリの対応APIを比較し、足りなければ `host_update_required` を返します。
 
-`minimumHostAPI` は整数1〜80です。アプリ自身のバージョン番号とAPI番号は別です。対応していないアプリでAPIを呼び出してから失敗する状態を避けるため、新しいSDKは使用APIを検出してこの指定を自動で入れます。Host API v68は`background.status()`による読み取り専用のOS状態確認です。Host API v70は招待制グループRealtimeを追加します。`background.register/unregister`はHost API v71以降、`server.functions`権限でサーバー関数の定期実行を登録・解除します。端末側のバックグラウンド処理ではありません。
+`background.register/unregister`は承認・公開されたserverFunctionsを拡張機能サーバーでスケジュールします。端末OS上の任意コード実行ではなく、サーバー稼働中のベストエフォート実行です。検索は端末内索引、ウィジェットはCIT Hub内表示、ショートカットはCIT Hub内タイルを基本とします。OSホーム画面ウィジェットではなく、端末間同期もしません。Pushは通知許可と端末登録が必要で、要求元端末宛です。OAuth/OIDCではプロバイダー側の設定が必要です。
 
 ## 権限状態の確認
 
@@ -681,7 +671,6 @@ SDKのビルド済み実行型拡張機能は利用APIに応じた `minimumHostA
 
 `await permissions.request('camera.use')` は宣言済みのカメラ権限だけを対象に、必要ならOSの確認を表示し、granted/deniedを返します。既に許可済みなら再表示しません。未宣言の要求はpermission_requiredです。写真・ファイルは選択式なので、このrequestの対象ではありません。
 
-確認待ちは60秒まで。閉じた実行画面の応答は新しい画面へ転送しません。Apple・Androidでのビルドやテスト状況は機能ごとの実装追跡を参照してください。OSダイアログの許可・拒否や設定画面への遷移を全対応OS・実機で確認したことを意味しません。
 # 触覚フィードバックとカメラ許可（Host API 10）
 
 ## 表示支援設定
@@ -1137,448 +1126,446 @@ interactive.button('授業', openCourse, {
 
 ### 2026-10-20 実装状況追記
 
-`host.registerShortcut` / `shortcuts.register` は、従来のCIT Hub内タイルに加え、Androidで動的ランチャーショートカット、Apple各OSでShortcutsアプリのCIT Hub App Shortcutを提供します。iOS Simulator/Mac CatalystのビルドとApp Intentsメタデータ生成、Android API 33エミュレーター計装テスト52件を確認しました。Shortcutsアプリからの項目追加・実行とMac Catalystでの拡張機能UI操作は未確認です。起動時には項目IDを現在のアカウント・登録状態で照合し、無効な保留要求を破棄します。拡張機能サーバー本番サービスはrelease v87.1で稼働し、公開health、Host API v80、API HTML/Markdownの配信を確認しています。433 APIすべてのOS別実動作監査は未完了です。
-
 <!-- GENERATED PUBLIC API INDEX START -->
 
 ## 全API署名索引（自動生成）
 
-[API要件433件](api-inventory.json)のSDK呼び出し署名、実装位置、監査済みOSを示します。権限・データ範囲・制約は上記の機能別説明を参照してください。検証状態は個別APIの網羅的E2Eを意味しません。canvas.*の描画操作はcanvas.create()が返すインスタンスメソッドです。
+TypeScript SDKで利用できるAPI名と呼び出し署名です。必要な権限、データ範囲、利用条件は各機能の説明を参照してください。canvas.*の描画操作はcanvas.create()が返すインスタンスメソッドです。
 
-| API | SDK呼び出し署名 | 実装位置 | 実行監査状態 |
-| --- | --- | --- | --- |
-| `app.onLaunch` | <code>app.onLaunch(callback: () =&gt; unknown): () =&gt; void</code> | extensions/sdk/host.ts:388 | verified-ios-android-mac |
-| `app.onAppear` | <code>app.onAppear(callback: () =&gt; unknown): () =&gt; void</code> | extensions/sdk/host.ts:389 | verified-ios-android-mac |
-| `app.onDisappear` | <code>app.onDisappear(callback: () =&gt; unknown): () =&gt; void</code> | extensions/sdk/host.ts:390 | verified-ios-android-mac |
-| `app.onResume` | <code>app.onResume(callback: () =&gt; unknown): () =&gt; void</code> | extensions/sdk/host.ts:391 | verified-ios-android-mac |
-| `app.onSuspend` | <code>app.onSuspend(callback: () =&gt; unknown): () =&gt; void</code> | extensions/sdk/host.ts:392 | verified-ios-android-mac |
-| `app.onOpenURL` | <code>app.onOpenURL(callback: (payload: AppOpenURLPayload) =&gt; unknown): () =&gt; void</code> | extensions/sdk/host.ts:393 | verified-ios-android-mac |
-| `app.onNotification` | <code>app.onNotification(callback: (payload: { identifier?: string | undefined; action?: string | undefined; data?: Record&lt;string, string&gt; | undefined; }) =&gt; unknown): () =&gt; void</code> | extensions/sdk/host.ts:394 | verified-ios-android-mac |
-| `app.onMemoryWarning` | <code>app.onMemoryWarning(callback: () =&gt; unknown): () =&gt; void</code> | extensions/sdk/host.ts:395 | verified-ios-android-mac |
-| `app.version` | <code>app.version(): string</code> | extensions/sdk/host.ts:397 | verified-ios-android-mac |
-| `app.extensionId` | <code>app.extensionId(): string</code> | extensions/sdk/host.ts:398 | verified-ios-android-mac |
-| `app.environment` | <code>app.environment(): "development" | "production"</code> | extensions/sdk/host.ts:398 | verified-ios-android-mac |
-| `app.hostVersion` | <code>app.hostVersion(): string</code> | extensions/sdk/host.ts:399 | verified-ios-android-mac |
-| `app.capabilities` | <code>app.capabilities(): string[]</code> | extensions/sdk/host.ts:399 | verified-ios-android-mac |
-| `ui.text` | <code>ui.text(text: string): Node</code> | extensions/sdk/index.ts:137 | verified-ios-android-mac |
-| `ui.heading` | <code>ui.heading(text: string): Node</code> | extensions/sdk/index.ts:131 | verified-ios-android-mac |
-| `ui.label` | <code>ui.label(text: string): Node</code> | extensions/sdk/index.ts:98 | verified-ios-android-mac |
-| `ui.markdown` | <code>ui.markdown(text: string): Node</code> | extensions/sdk/index.ts:99 | verified-ios-android-mac |
-| `ui.code` | <code>ui.code(text: string): Node</code> | extensions/sdk/index.ts:100 | verified-ios-android-mac |
-| `ui.caption` | <code>ui.caption(text: string): Node</code> | extensions/sdk/index.ts:101 | verified-ios-android-mac |
-| `ui.badge` | <code>ui.badge(text: string, tone?: "primary" | "secondary" | "accent" | undefined): Node</code> | extensions/sdk/index.ts:102 | verified-ios-android-mac |
-| `ui.icon` | <code>ui.icon(name: string, accessibilityLabel: string): Node</code> | extensions/sdk/index.ts:103 | verified-ios-android-mac |
-| `ui.vstack` | <code>ui.vstack(children: Node[]): Node</code> | extensions/sdk/index.ts:147 | verified-ios-android-mac |
-| `ui.hstack` | <code>ui.hstack(children: Node[]): Node</code> | extensions/sdk/index.ts:148 | verified-ios-android-mac |
-| `ui.zstack` | <code>ui.zstack(children: Node[]): Node</code> | extensions/sdk/index.ts:149 | verified-ios-android-mac |
-| `ui.grid` | <code>ui.grid(columns: number, children: Node[]): Node</code> | extensions/sdk/index.ts:112 | verified-ios-android-mac |
-| `ui.lazyGrid` | <code>ui.lazyGrid(columns: number, children: Node[]): Node</code> | extensions/sdk/index.ts:94 | verified-ios-android-mac |
-| `ui.scroll` | <code>ui.scroll(children: Node[]): Node</code> | extensions/sdk/index.ts:110 | verified-ios-android-mac |
-| `ui.horizontalScroll` | <code>ui.horizontalScroll(children: Node[]): Node</code> | extensions/sdk/index.ts:111 | verified-ios-android-mac |
-| `ui.spacer` | <code>ui.spacer(size?: number): Node</code> | extensions/sdk/index.ts:150 | verified-ios-android-mac |
-| `ui.divider` | <code>ui.divider(): Node</code> | extensions/sdk/index.ts:132 | verified-ios-android-mac |
-| `ui.card` | <code>ui.card(children: Node[], label?: string | undefined): Node</code> | extensions/sdk/index.ts:140 | verified-ios-android-mac |
-| `ui.group` | <code>ui.group(children: Node[]): Node</code> | extensions/sdk/index.ts:141 | verified-ios-android-mac |
-| `ui.section` | <code>ui.section(label: string, children: Node[]): Node</code> | extensions/sdk/index.ts:139 | verified-ios-android-mac |
-| `ui.container` | <code>ui.container(children: Node[]): Node</code> | extensions/sdk/index.ts:142 | verified-ios-android-mac |
-| `ui.safeArea` | <code>ui.safeArea(children: Node[]): Node</code> | extensions/sdk/index.ts:143 | verified-ios-android-mac |
-| `ui.textField` | <code>ui.textField(key: string, label: string, value: State&lt;string&gt;, events?: { onFocus?: (() =&gt; unknown) | undefined; onBlur?: (() =&gt; unknown) | undefined; onSubmit?: (() =&gt; unknown) | undefined; }): Node</code> | extensions/sdk/index.ts:70 | verified-ios-android-mac |
-| `ui.textArea` | <code>ui.textArea(key: string, label: string, value?: State&lt;string&gt; | undefined): Node</code> | extensions/sdk/index.ts:81 | verified-ios-android-mac |
-| `ui.secureField` | <code>ui.secureField(key: string, label: string, value?: State&lt;string&gt; | undefined): Node</code> | extensions/sdk/index.ts:157 | verified-ios-android-mac |
-| `ui.number` | <code>ui.number(key: string, label: string, min?: number, max?: number, step?: number): Node</code> | extensions/sdk/index.ts:104 | verified-ios-android-mac |
-| `ui.slider` | <code>ui.slider(key: string, label: string, min?: number, max?: number, step?: number): Node</code> | extensions/sdk/index.ts:105 | verified-ios-android-mac |
-| `ui.stepper` | <code>ui.stepper(key: string, label: string, value: State&lt;number&gt;, min: number, max: number, step?: number): Node</code> | extensions/sdk/index.ts:72 | verified-ios-android-mac |
-| `ui.toggle` | <code>ui.toggle(key: string, label: string, value?: State&lt;boolean&gt; | undefined): Node</code> | extensions/sdk/index.ts:158 | verified-ios-android-mac |
-| `ui.checkbox` | <code>ui.checkbox(key: string, label: string, value: State&lt;boolean&gt;): Node</code> | extensions/sdk/index.ts:73 | verified-ios-android-mac |
-| `ui.radio` | <code>ui.radio(key: string, label: string, options: string[], value: State&lt;string&gt;): Node</code> | extensions/sdk/index.ts:74 | verified-ios-android-mac |
-| `ui.select` | <code>ui.select(key: string, label: string, options: string[]): Node</code> | extensions/sdk/index.ts:133 | verified-ios-android-mac |
-| `ui.multiSelect` | <code>ui.multiSelect(key: string, label: string, options: string[], value: State&lt;string[]&gt;): Node</code> | extensions/sdk/index.ts:75 | verified-ios-android-mac |
-| `ui.date` | <code>ui.date(key: string, label: string, value?: State&lt;number | null&gt; | undefined): Node</code> | extensions/sdk/index.ts:129 | verified-ios-android-mac |
-| `ui.time` | <code>ui.time(key: string, label: string, value: State&lt;number | null&gt;): Node</code> | extensions/sdk/index.ts:78 | verified-ios-android-mac |
-| `ui.dateTime` | <code>ui.dateTime(key: string, label: string, value: State&lt;number | null&gt;): Node</code> | extensions/sdk/index.ts:76 | verified-ios-android-mac |
-| `ui.dateRange` | <code>ui.dateRange(key: string, label: string, value: State&lt;{ start: number | null; end: number | null; }&gt;): Node</code> | extensions/sdk/index.ts:77 | verified-ios-android-mac |
-| `ui.coursePicker` | <code>ui.coursePicker(key: string, label: string): Node</code> | extensions/sdk/index.ts:116 | verified-ios-android-mac |
-| `ui.filePicker` | <code>ui.filePicker(key: string, label: string, value: State&lt;string&gt;): Node</code> | extensions/sdk/index.ts:79 | verified-ios-android-mac |
-| `ui.photoPicker` | <code>ui.photoPicker(key: string, label: string, value: State&lt;string&gt;): Node</code> | extensions/sdk/index.ts:80 | verified-ios-android-mac |
-| `ui.searchField` | <code>ui.searchField(key: string, label: string, value: State&lt;string&gt;, events?: { onFocus?: (() =&gt; unknown) | undefined; onBlur?: (() =&gt; unknown) | undefined; onSubmit?: (() =&gt; unknown) | undefined; }): Node</code> | extensions/sdk/index.ts:71 | verified-ios-android-mac |
-| `field.set` | <code>field.set(value: T): void</code> | extensions/sdk/core.ts:67 | verified-ios-android-mac |
-| `field.reset` | <code>field.reset(): void</code> | extensions/sdk/core.ts:67 | verified-ios-android-mac |
-| `field.focus` | <code>field.focus(): Promise&lt;void&gt;</code> | extensions/sdk/fields.ts:3 | verified-on-some-hosts |
-| `field.blur` | <code>field.blur(): Promise&lt;void&gt;</code> | extensions/sdk/fields.ts:3 | verified-on-some-hosts |
-| `ui.button` | <code>ui.button(label: string, action: "save" | "reset" | (() =&gt; unknown)): Node</code> | extensions/sdk/index.ts:159 | verified-ios-android-mac |
-| `ui.iconButton` | <code>ui.iconButton(icon: string, label: string, onPress: () =&gt; unknown, events?: ButtonEvents): Node</code> | extensions/sdk/index.ts:82 | verified-ios-android-mac |
-| `ui.linkButton` | <code>ui.linkButton(label: string, url: string): Node</code> | extensions/sdk/index.ts:136 | verified-ios-android-mac |
-| `ui.menu` | <code>ui.menu(label: string, actions: Node[]): Node</code> | extensions/sdk/index.ts:89 | verified-ios-android-mac |
-| `ui.contextMenu` | <code>ui.contextMenu(content: Node, actions: Node[]): Node</code> | extensions/sdk/index.ts:90 | verified-ios-android-mac |
-| `ui.swipeActions` | <code>ui.swipeActions(content: Node, actions: Node[]): Node</code> | extensions/sdk/index.ts:91 | verified-ios-android-mac |
-| `ui.toolbar` | <code>ui.toolbar(children: Node[]): Node</code> | extensions/sdk/index.ts:92 | verified-ios-android-mac |
-| `ui.floatingButton` | <code>ui.floatingButton(label: string, onPress: () =&gt; unknown, content?: Node[]): Node</code> | extensions/sdk/index.ts:93 | verified-ios-android-mac |
-| `navigation.push` | <code>navigation.push(name: string, parameters?: RouteParameters): void</code> | extensions/sdk/navigation.ts:35 | verified-on-some-hosts |
-| `navigation.pop` | <code>navigation.pop(): boolean</code> | extensions/sdk/navigation.ts:39 | verified-on-some-hosts |
-| `navigation.popToRoot` | <code>navigation.popToRoot(): void</code> | extensions/sdk/navigation.ts:44 | verified-on-some-hosts |
-| `navigation.present` | <code>navigation.present(name: string, parameters?: RouteParameters, mode?: "sheet" | "fullScreen"): void</code> | extensions/sdk/navigation.ts:48 | verified-on-some-hosts |
-| `navigation.dismiss` | <code>navigation.dismiss(): boolean</code> | extensions/sdk/navigation.ts:57 | verified-on-some-hosts |
-| `navigation.sheet` | <code>navigation.sheet(name: string, parameters?: RouteParameters): void</code> | extensions/sdk/navigation.ts:55 | verified-on-some-hosts |
-| `navigation.fullScreen` | <code>navigation.fullScreen(name: string, parameters?: RouteParameters): void</code> | extensions/sdk/navigation.ts:56 | verified-on-some-hosts |
-| `navigation.tabs` | <code>navigation.tabs(tabs: { id: string; title: string; render: () =&gt; Node[]; }[], selected: State&lt;string&gt;): Node</code> | extensions/sdk/navigation.ts:62 | verified-on-some-hosts |
-| `navigation.openExtension` | <code>navigation.openExtension(id: string): Promise&lt;void&gt;</code> | extensions/sdk/navigation.ts:26 | verified-on-some-hosts |
-| `navigation.openHostPage` | <code>navigation.openHostPage(page: HostPage): Promise&lt;void&gt;</code> | extensions/sdk/navigation.ts:27 | verified-on-some-hosts |
-| `ui.alert` | <code>ui.alert(title: string, message?: string): Promise&lt;void&gt;</code> | extensions/sdk/index.ts:83 | verified-on-some-hosts |
-| `ui.confirm` | <code>ui.confirm(title: string, message?: string): Promise&lt;boolean&gt;</code> | extensions/sdk/index.ts:84 | verified-on-some-hosts |
-| `ui.prompt` | <code>ui.prompt(title: string, message?: string, initialValue?: string): Promise&lt;string | null&gt;</code> | extensions/sdk/index.ts:85 | verified-on-some-hosts |
-| `ui.actionSheet` | <code>ui.actionSheet(title: string, items: ActionSheetItem[], message?: string): Promise&lt;string | null&gt;</code> | extensions/sdk/index.ts:86 | verified-on-some-hosts |
-| `ui.toast` | <code>ui.toast(text: string, duration?: number): void</code> | extensions/sdk/index.ts:87 | verified-on-some-hosts |
-| `ui.banner` | <code>ui.banner(text: string, duration?: number): void</code> | extensions/sdk/index.ts:88 | verified-on-some-hosts |
-| `ui.loading` | <code>ui.loading(label: string): Node</code> | extensions/sdk/index.ts:153 | verified-ios-android-mac |
-| `ui.progress` | <code>ui.progress(label: string, value: number): Node</code> | extensions/sdk/index.ts:151 | verified-ios-android-mac |
-| `ui.emptyState` | <code>ui.emptyState(title: string, message: string): Node</code> | extensions/sdk/index.ts:154 | verified-ios-android-mac |
-| `ui.errorState` | <code>ui.errorState(title: string, message: string): Node</code> | extensions/sdk/index.ts:155 | verified-ios-android-mac |
-| `ui.list` | <code>ui.list&lt;T&gt;(items: ExtensionList&lt;T&gt;): Node</code> | extensions/sdk/index.ts:95 | verified-on-some-hosts |
-| `ui.lazyList` | <code>ui.lazyList&lt;T&gt;(items: ExtensionList&lt;T&gt;): Node</code> | extensions/sdk/index.ts:96 | verified-on-some-hosts |
-| `ui.sectionedList` | <code>ui.sectionedList&lt;T&gt;(sections: { title: string; list: ExtensionList&lt;T&gt;; }[]): Node</code> | extensions/sdk/index.ts:97 | verified-on-some-hosts |
-| `list.filter` | <code>list.filter(predicate: (item: T) =&gt; boolean): ExtensionList&lt;T&gt;</code> | extensions/sdk/lists.ts:39 | verified-on-some-hosts |
-| `list.sort` | <code>list.sort(compare: (a: T, b: T) =&gt; number): ExtensionList&lt;T&gt;</code> | extensions/sdk/lists.ts:40 | verified-on-some-hosts |
-| `list.search` | <code>list.search(query: string, stringify?: ((item: T) =&gt; string) | undefined): ExtensionList&lt;T&gt;</code> | extensions/sdk/lists.ts:41 | verified-on-some-hosts |
-| `list.select` | <code>list.select(key: string): void</code> | extensions/sdk/lists.ts:47 | verified-on-some-hosts |
-| `list.multiSelect` | <code>list.multiSelect(keys: string[]): void</code> | extensions/sdk/lists.ts:48 | verified-on-some-hosts |
-| `list.refresh` | <code>list.refresh(): Promise&lt;void&gt;</code> | extensions/sdk/lists.ts:53 | verified-on-some-hosts |
-| `list.loadMore` | <code>list.loadMore(): Promise&lt;void&gt;</code> | extensions/sdk/lists.ts:59 | verified-on-some-hosts |
-| `list.swipe` | <code>list.swipe(actions: { title: string; perform: (item: T) =&gt; unknown; }[]): ExtensionList&lt;T&gt;</code> | extensions/sdk/lists.ts:80 | verified-on-some-hosts |
-| `list.contextMenu` | <code>list.contextMenu(actions: { title: string; perform: (item: T) =&gt; unknown; }[]): ExtensionList&lt;T&gt;</code> | extensions/sdk/lists.ts:81 | verified-on-some-hosts |
-| `list.move` | <code>list.move(from: number, to: number): Promise&lt;void&gt;</code> | extensions/sdk/lists.ts:67 | verified-on-some-hosts |
-| `list.delete` | <code>list.delete(key: string): Promise&lt;boolean&gt;</code> | extensions/sdk/lists.ts:73 | verified-on-some-hosts |
-| `state.create` | <code>state.create&lt;T&gt;(initial: T): State&lt;T&gt;</code> | extensions/sdk/core.ts:68 | verified-ios-android-mac |
-| `state.get` | <code>state.get&lt;T&gt;(value: State&lt;T&gt;): T</code> | extensions/sdk/core.ts:89 | verified-on-some-hosts |
-| `state.set` | <code>state.set&lt;T&gt;(value: State&lt;T&gt;, next: T): void</code> | extensions/sdk/core.ts:90 | verified-ios-android-mac |
-| `state.update` | <code>state.update&lt;T&gt;(value: State&lt;T&gt;, fn: (current: T) =&gt; T): void</code> | extensions/sdk/core.ts:91 | verified-on-some-hosts |
-| `state.reset` | <code>state.reset&lt;T&gt;(value: State&lt;T&gt;): void</code> | extensions/sdk/core.ts:92 | verified-on-some-hosts |
-| `state.watch` | <code>state.watch&lt;T&gt;(value: State&lt;T&gt;, fn: (next: T, previous: T) =&gt; void): () =&gt; void</code> | extensions/sdk/core.ts:93 | verified-on-some-hosts |
-| `state.computed` | <code>state.computed&lt;T&gt;(dependencies: State&lt;unknown&gt;[], calculate: () =&gt; T): State&lt;T&gt; &amp; { dispose(): void; }</code> | extensions/sdk/core.ts:80 | verified-on-some-hosts |
-| `date.now` | <code>date.now(): Date</code> | extensions/sdk/core.ts:123 | verified-ios-android-mac |
-| `date.parse` | <code>date.parse(value: DateInput): Date</code> | extensions/sdk/core.ts:124 | verified-ios-android-mac |
-| `date.format` | <code>date.format(value: DateInput, options?: DateTimeFormatOptions, locale?: string): string</code> | extensions/sdk/core.ts:124 | verified-ios-android-mac |
-| `date.add` | <code>date.add(value: DateInput, milliseconds: number): Date</code> | extensions/sdk/core.ts:130 | verified-ios-android-mac |
-| `date.subtract` | <code>date.subtract(value: DateInput, milliseconds: number): Date</code> | extensions/sdk/core.ts:131 | verified-ios-android-mac |
-| `date.diff` | <code>date.diff(a: DateInput, b: DateInput): number</code> | extensions/sdk/core.ts:132 | verified-ios-android-mac |
-| `date.startOfDay` | <code>date.startOfDay(value: DateInput): Date</code> | extensions/sdk/core.ts:133 | verified-ios-android-mac |
-| `date.endOfDay` | <code>date.endOfDay(value: DateInput): Date</code> | extensions/sdk/core.ts:134 | verified-ios-android-mac |
-| `date.startOfWeek` | <code>date.startOfWeek(value: DateInput, firstDay?: number): Date</code> | extensions/sdk/core.ts:135 | verified-ios-android-mac |
-| `date.endOfWeek` | <code>date.endOfWeek(value: DateInput, firstDay?: number): Date</code> | extensions/sdk/core.ts:136 | verified-ios-android-mac |
-| `date.isToday` | <code>date.isToday(value: DateInput): boolean</code> | extensions/sdk/core.ts:137 | verified-ios-android-mac |
-| `date.isPast` | <code>date.isPast(value: DateInput): boolean</code> | extensions/sdk/core.ts:138 | verified-ios-android-mac |
-| `date.isFuture` | <code>date.isFuture(value: DateInput): boolean</code> | extensions/sdk/core.ts:139 | verified-ios-android-mac |
-| `date.timezone` | <code>date.timezone(): string</code> | extensions/sdk/core.ts:139 | verified-ios-android-mac |
-| `cit.calendar.isClassDay` | <code>cit.calendar.isClassDay(date: Date): Promise&lt;boolean | null&gt;</code> | extensions/sdk/host.ts:756 | verified-ios-android-mac |
-| `cit.calendar.currentSemester` | <code>cit.calendar.currentSemester(): Promise&lt;string | null&gt;</code> | extensions/sdk/host.ts:733 | verified-ios-android-mac |
-| `cit.calendar.weekNumber` | <code>cit.calendar.weekNumber(date: Date): number</code> | extensions/sdk/host.ts:757 | verified-ios-android-mac |
-| `math.round` | <code>math.round(x: number): number</code> | extensions/sdk/core.ts:97 | verified-ios-android-mac |
-| `math.floor` | <code>math.floor(x: number): number</code> | extensions/sdk/core.ts:98 | verified-ios-android-mac |
-| `math.ceil` | <code>math.ceil(x: number): number</code> | extensions/sdk/core.ts:98 | verified-ios-android-mac |
-| `math.min` | <code>math.min(...values: number[]): number</code> | extensions/sdk/core.ts:98 | verified-ios-android-mac |
-| `math.max` | <code>math.max(...values: number[]): number</code> | extensions/sdk/core.ts:98 | verified-ios-android-mac |
-| `math.abs` | <code>math.abs(x: number): number</code> | extensions/sdk/core.ts:98 | verified-ios-android-mac |
-| `math.random` | <code>math.random(): number</code> | extensions/sdk/core.ts:98 | verified-ios-android-mac |
-| `math.clamp` | <code>math.clamp(value: number, min: number, max: number): number</code> | extensions/sdk/core.ts:98 | verified-ios-android-mac |
-| `math.sum` | <code>math.sum(values: number[]): number</code> | extensions/sdk/core.ts:99 | verified-ios-android-mac |
-| `math.average` | <code>math.average(values: number[]): number</code> | extensions/sdk/core.ts:100 | verified-ios-android-mac |
-| `math.median` | <code>math.median(values: number[]): number</code> | extensions/sdk/core.ts:101 | verified-ios-android-mac |
-| `utils.uuid` | <code>utils.uuid(): string</code> | extensions/sdk/core.ts:147 | verified-ios-android-mac |
-| `utils.debounce` | <code>utils.debounce&lt;T extends unknown[]&gt;(callback: (...args: T) =&gt; void, milliseconds: number): ((...args: T) =&gt; void) &amp; { cancel(): void; }</code> | extensions/sdk/core.ts:167 | verified-ios-android-mac |
-| `utils.throttle` | <code>utils.throttle&lt;T extends unknown[]&gt;(callback: (...args: T) =&gt; void, milliseconds: number): (...args: T) =&gt; void</code> | extensions/sdk/core.ts:173 | verified-ios-android-mac |
-| `utils.sleep` | <code>utils.sleep(milliseconds: number, signal?: AbortSignal | undefined): Promise&lt;void&gt;</code> | extensions/sdk/core.ts:158 | verified-ios-android-mac |
-| `text.format` | <code>text.format(template: string, values: Record&lt;string, string | number&gt;): string</code> | extensions/sdk/core.ts:104 | verified-ios-android-mac |
-| `text.replace` | <code>text.replace(value: string, search: string, replacement: string): string</code> | extensions/sdk/core.ts:105 | verified-ios-android-mac |
-| `text.split` | <code>text.split(value: string, separator: string): string[]</code> | extensions/sdk/core.ts:106 | verified-ios-android-mac |
-| `text.join` | <code>text.join(values: string[], separator?: string): string</code> | extensions/sdk/core.ts:107 | verified-ios-android-mac |
-| `text.contains` | <code>text.contains(value: string, search: string): boolean</code> | extensions/sdk/core.ts:107 | verified-ios-android-mac |
-| `text.startsWith` | <code>text.startsWith(value: string, search: string): boolean</code> | extensions/sdk/core.ts:108 | verified-ios-android-mac |
-| `text.endsWith` | <code>text.endsWith(value: string, search: string): boolean</code> | extensions/sdk/core.ts:108 | verified-ios-android-mac |
-| `text.trim` | <code>text.trim(value: string): string</code> | extensions/sdk/core.ts:108 | verified-ios-android-mac |
-| `text.lowercase` | <code>text.lowercase(value: string): string</code> | extensions/sdk/core.ts:109 | verified-ios-android-mac |
-| `text.uppercase` | <code>text.uppercase(value: string): string</code> | extensions/sdk/core.ts:109 | verified-ios-android-mac |
-| `text.regex` | <code>text.regex(pattern: string, flags?: string): RegExp</code> | extensions/sdk/core.ts:109 | verified-ios-android-mac |
-| `json.parse` | <code>json.parse(value: string): unknown</code> | extensions/sdk/core.ts:118 | verified-ios-android-mac |
-| `json.stringify` | <code>json.stringify(value: unknown): string</code> | extensions/sdk/core.ts:118 | verified-ios-android-mac |
-| `cit.courses.list` | <code>cit.courses.list(): Promise&lt;Course[]&gt;</code> | extensions/sdk/host.ts:591 | verified-ios-android-mac |
-| `cit.courses.get` | <code>cit.courses.get(id: string): Promise&lt;Course | null&gt;</code> | extensions/sdk/host.ts:592 | verified-ios-android-mac |
-| `cit.courses.search` | <code>cit.courses.search(query: string): Promise&lt;Course[]&gt;</code> | extensions/sdk/host.ts:596 | verified-ios-android-mac |
-| `cit.timetable.today` | <code>cit.timetable.today(at?: Date): Promise&lt;CourseOccurrence[]&gt;</code> | extensions/sdk/host.ts:619 | verified-ios-android-mac |
-| `cit.timetable.tomorrow` | <code>cit.timetable.tomorrow(at?: Date): Promise&lt;CourseOccurrence[]&gt;</code> | extensions/sdk/host.ts:620 | verified-ios-android-mac |
-| `cit.timetable.week` | <code>cit.timetable.week(at?: Date): Promise&lt;CourseOccurrence[]&gt;</code> | extensions/sdk/host.ts:622 | verified-ios-android-mac |
-| `cit.timetable.current` | <code>cit.timetable.current(at?: Date): Promise&lt;CourseOccurrence[]&gt;</code> | extensions/sdk/host.ts:633 | verified-ios-android-mac |
-| `cit.timetable.next` | <code>cit.timetable.next(at?: Date): Promise&lt;CourseOccurrence | null&gt;</code> | extensions/sdk/host.ts:637 | verified-ios-android-mac |
-| `cit.timetable.at` | <code>cit.timetable.at(date: Date): Promise&lt;CourseOccurrence[]&gt;</code> | extensions/sdk/host.ts:621 | verified-ios-android-mac |
-| `cit.timetable.freePeriods` | <code>cit.timetable.freePeriods(weekday?: number): Promise&lt;PeriodSlot[]&gt;</code> | extensions/sdk/host.ts:647 | verified-ios-android-mac |
-| `cit.assignments.list` | <code>cit.assignments.list(): Promise&lt;Task[]&gt;</code> | extensions/sdk/host.ts:655 | verified-ios-android-mac |
-| `cit.assignments.get` | <code>cit.assignments.get(id: string): Promise&lt;Task | null&gt;</code> | extensions/sdk/host.ts:656 | verified-ios-android-mac |
-| `cit.assignments.pending` | <code>cit.assignments.pending(at?: Date): Promise&lt;Task[]&gt;</code> | extensions/sdk/host.ts:657 | verified-ios-android-mac |
-| `cit.assignments.overdue` | <code>cit.assignments.overdue(at?: Date): Promise&lt;Task[]&gt;</code> | extensions/sdk/host.ts:661 | verified-ios-android-mac |
-| `cit.assignments.dueSoon` | <code>cit.assignments.dueSoon(days?: number, at?: Date): Promise&lt;Task[]&gt;</code> | extensions/sdk/host.ts:662 | verified-ios-android-mac |
-| `cit.assignments.search` | <code>cit.assignments.search(query: string): Promise&lt;Task[]&gt;</code> | extensions/sdk/host.ts:658 | verified-ios-android-mac |
-| `cit.assignments.byCourse` | <code>cit.assignments.byCourse(course: string): Promise&lt;Task[]&gt;</code> | extensions/sdk/host.ts:659 | verified-ios-android-mac |
-| `cit.assignments.between` | <code>cit.assignments.between(start: Date, end: Date): Promise&lt;Task[]&gt;</code> | extensions/sdk/host.ts:660 | verified-ios-android-mac |
-| `cit.todo.list` | <code>cit.todo.list(): Promise&lt;PersonalTodo[]&gt;</code> | extensions/sdk/host.ts:668 | verified-ios-android-mac |
-| `cit.todo.get` | <code>cit.todo.get(id: string): Promise&lt;PersonalTodo | null&gt;</code> | extensions/sdk/host.ts:674 | verified-ios-android-mac |
-| `cit.todo.create` | <code>cit.todo.create(fields: TodoFields): Promise&lt;PersonalTodo&gt;</code> | extensions/sdk/host.ts:669 | verified-ios-android-mac |
-| `cit.todo.update` | <code>cit.todo.update(expected: PersonalTodo, fields: TodoFields): Promise&lt;PersonalTodo&gt;</code> | extensions/sdk/host.ts:670 | verified-ios-android-mac |
-| `cit.todo.complete` | <code>cit.todo.complete(id: string): Promise&lt;PersonalTodo | null&gt;</code> | extensions/sdk/host.ts:671 | verified-ios-android-mac |
-| `cit.todo.uncomplete` | <code>cit.todo.uncomplete(id: string): Promise&lt;PersonalTodo | null&gt;</code> | extensions/sdk/host.ts:672 | verified-ios-android-mac |
-| `cit.todo.delete` | <code>cit.todo.delete(expected: PersonalTodo): Promise&lt;null&gt;</code> | extensions/sdk/host.ts:673 | verified-ios-android-mac |
-| `cit.todo.search` | <code>cit.todo.search(query: string): Promise&lt;PersonalTodo[]&gt;</code> | extensions/sdk/host.ts:678 | verified-ios-android-mac |
-| `cit.todo.watch` | <code>cit.todo.watch(callback: (rows: PersonalTodo[]) =&gt; void, onError?: ((error: unknown) =&gt; void) | undefined): () =&gt; void</code> | extensions/sdk/host.ts:683 | verified-on-some-hosts |
-| `cit.courseNotes.list` | <code>cit.courseNotes.list(): Promise&lt;{ id: string; courseKey: string; content: string; }[]&gt;</code> | extensions/sdk/host.ts:584 | verified-ios-android-mac |
-| `cit.courseNotes.get` | <code>cit.courseNotes.get(id: string): Promise&lt;{ id: string; courseKey: string; content: string; } | null&gt;</code> | extensions/sdk/host.ts:585 | verified-ios-android-mac |
-| `cit.courseNotes.create` | <code>cit.courseNotes.create(title: string, content: string): Promise&lt;{ id: string; courseKey: string; content: string; } | null&gt;</code> | extensions/sdk/host.ts:581 | verified-on-some-hosts |
-| `cit.courseNotes.update` | <code>cit.courseNotes.update(id: string, content: string, expectedContent: string): Promise&lt;{ id: string; courseKey: string; content: string; } | null&gt;</code> | extensions/sdk/host.ts:582 | verified-on-some-hosts |
-| `cit.courseNotes.delete` | <code>cit.courseNotes.delete(id: string, expectedContent: string): Promise&lt;null&gt;</code> | extensions/sdk/host.ts:583 | verified-on-some-hosts |
-| `cit.semester.current` | <code>cit.semester.current(): Promise&lt;string | null&gt;</code> | extensions/sdk/host.ts:770 | verified-ios-android-mac |
-| `cit.semester.list` | <code>cit.semester.list(): Promise&lt;string[]&gt;</code> | extensions/sdk/host.ts:767 | verified-ios-android-mac |
-| `cit.calendar.events` | <code>cit.calendar.events(): Promise&lt;AcademicCalendarEvent[]&gt;</code> | extensions/sdk/host.ts:734 | verified-ios-android-mac |
-| `cit.calendar.holidays` | <code>cit.calendar.holidays(start?: Date | undefined, end?: Date | undefined): Promise&lt;AcademicCalendarEvent[]&gt;</code> | extensions/sdk/host.ts:735 | verified-ios-android-mac |
-| `cit.calendar.classDays` | <code>cit.calendar.classDays(start: Date, end: Date): Promise&lt;string[]&gt;</code> | extensions/sdk/host.ts:740 | verified-ios-android-mac |
-| `cit.bus.routes` | <code>cit.bus.routes(): Promise&lt;BusRoute[]&gt;</code> | extensions/sdk/host.ts:545 | verified-ios-android-mac |
-| `cit.bus.stops` | <code>cit.bus.stops(): Promise&lt;string[]&gt;</code> | extensions/sdk/host.ts:546 | verified-ios-android-mac |
-| `cit.bus.timetable` | <code>cit.bus.timetable(at?: Date, routeFilter?: { from?: string | undefined; to?: string | undefined; } | undefined): Promise&lt;BusDeparture[]&gt;</code> | extensions/sdk/host.ts:547 | verified-ios-android-mac |
-| `cit.bus.next` | <code>cit.bus.next(from?: string | undefined, to?: string | undefined, at?: Date): Promise&lt;BusDeparture | null&gt;</code> | extensions/sdk/host.ts:552 | verified-ios-android-mac |
-| `cit.bus.between` | <code>cit.bus.between(start: Date, end: Date, routeFilter?: { from?: string | undefined; to?: string | undefined; } | undefined): Promise&lt;BusDeparture[]&gt;</code> | extensions/sdk/host.ts:563 | verified-ios-android-mac |
-| `cit.bus.serviceStatus` | <code>cit.bus.serviceStatus(at?: Date): Promise&lt;BusServiceStatus&gt;</code> | extensions/sdk/host.ts:574 | verified-ios-android-mac |
-| `cit.cafeteria.locations` | <code>cit.cafeteria.locations(): Promise&lt;CafeteriaLocation[]&gt;</code> | extensions/sdk/host.ts:539 | verified-ios-android-mac |
-| `cit.cafeteria.menu` | <code>cit.cafeteria.menu(): Promise&lt;CafeteriaLocation[]&gt;</code> | extensions/sdk/host.ts:540 | verified-ios-android-mac |
-| `cit.cafeteria.hours` | <code>cit.cafeteria.hours(): Promise&lt;CafeteriaHours[]&gt;</code> | extensions/sdk/host.ts:542 | verified-ios-android-mac |
-| `cit.cafeteria.cameraStatus` | <code>cit.cafeteria.cameraStatus(): Promise&lt;CafeteriaCameraStatus[]&gt;</code> | extensions/sdk/host.ts:541 | verified-ios-android-mac |
-| `cit.cafeteria.openCamera` | <code>cit.cafeteria.openCamera(): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:538 | verified-on-some-hosts |
-| `cit.campus.facilities` | <code>cit.campus.facilities(): Promise&lt;CampusRoom[]&gt;</code> | extensions/sdk/host.ts:503 | verified-ios-android-mac |
-| `cit.campus.buildings` | <code>cit.campus.buildings(): Promise&lt;{ campus: "新習志野" | "津田沼" | "不明"; building: string; rooms: CampusRoom[]; }[]&gt;</code> | extensions/sdk/host.ts:504 | verified-ios-android-mac |
-| `cit.campus.rooms` | <code>cit.campus.rooms(): Promise&lt;CampusRoom[]&gt;</code> | extensions/sdk/host.ts:509 | verified-ios-android-mac |
-| `cit.campus.room` | <code>cit.campus.room(id: string): Promise&lt;CampusRoom | null&gt;</code> | extensions/sdk/host.ts:510 | verified-ios-android-mac |
-| `cit.campus.search` | <code>cit.campus.search(query: string): Promise&lt;CampusRoom[]&gt;</code> | extensions/sdk/host.ts:514 | verified-ios-android-mac |
-| `cit.campus.roomAvailability` | <code>cit.campus.roomAvailability(roomID: string, at?: Date): Promise&lt;RoomScheduleStatus&gt;</code> | extensions/sdk/host.ts:519 | verified-ios-android-mac |
-| `cit.services.list` | <code>cit.services.list(): Promise&lt;CampusService[]&gt;</code> | extensions/sdk/host.ts:530 | verified-ios-android-mac |
-| `cit.services.open` | <code>cit.services.open(service: HostService): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:529 | verified-on-some-hosts |
-| `cit.user.displayName` | <code>cit.user.displayName(): Promise&lt;string | null&gt;</code> | extensions/sdk/host.ts:711 | verified-ios-android-mac |
-| `cit.user.preferences` | <code>cit.user.preferences(): Promise&lt;UserPreferences&gt;</code> | extensions/sdk/host.ts:710 | verified-ios-android-mac |
-| `cit.settings.appearance` | <code>cit.settings.appearance(): Promise&lt;Pick&lt;UserPreferences, "accentColor"&gt;&gt;</code> | extensions/sdk/host.ts:705 | verified-ios-android-mac |
-| `cit.settings.notifications` | <code>cit.settings.notifications(): Promise&lt;{ classStart: boolean; assignments: boolean; }&gt;</code> | extensions/sdk/host.ts:706 | verified-ios-android-mac |
-| `cit.settings.language` | <code>cit.settings.language(): Promise&lt;string&gt;</code> | extensions/sdk/host.ts:704 | verified-ios-android-mac |
-| `cit.settings.enabledServices` | <code>cit.settings.enabledServices(): Promise&lt;string[]&gt;</code> | extensions/sdk/host.ts:707 | verified-ios-android-mac |
-| `storage.get` | <code>storage.get&lt;T = unknown&gt;(name: string): Promise&lt;T | null&gt;</code> | extensions/sdk/host.ts:316 | verified-ios-android-mac |
-| `storage.set` | <code>storage.set(name: string, value: unknown): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:317 | verified-ios-android-mac |
-| `storage.has` | <code>storage.has(name: string): Promise&lt;boolean&gt;</code> | extensions/sdk/host.ts:318 | verified-ios-android-mac |
-| `storage.remove` | <code>storage.remove(name: string): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:319 | verified-ios-android-mac |
-| `storage.clear` | <code>storage.clear(): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:320 | verified-ios-android-mac |
-| `storage.keys` | <code>storage.keys(): Promise&lt;string[]&gt;</code> | extensions/sdk/host.ts:321 | verified-ios-android-mac |
-| `database.createTable` | <code>database.createTable(name: string): Promise&lt;void&gt;</code> | extensions/sdk/database.ts:130 | verified-ios-android-mac |
-| `database.insert` | <code>database.insert(name: string, row: RecordValue): Promise&lt;void&gt;</code> | extensions/sdk/database.ts:131 | verified-ios-android-mac |
-| `database.update` | <code>database.update(name: string, id: string, changes: Record&lt;string, unknown&gt;): Promise&lt;void&gt;</code> | extensions/sdk/database.ts:132 | verified-ios-android-mac |
-| `database.delete` | <code>database.delete(name: string, id: string): Promise&lt;void&gt;</code> | extensions/sdk/database.ts:133 | verified-ios-android-mac |
-| `database.get` | <code>database.get(name: string, id: string): Promise&lt;RecordValue | null&gt;</code> | extensions/sdk/database.ts:134 | verified-ios-android-mac |
-| `database.query` | <code>database.query(name: string): Promise&lt;RecordValue[]&gt;</code> | extensions/sdk/database.ts:135 | verified-ios-android-mac |
-| `database.transaction` | <code>database.transaction&lt;T&gt;(work: (transaction: Transaction) =&gt; T): Promise&lt;T&gt;</code> | extensions/sdk/database.ts:120 | verified-ios-android-mac |
-| `database.watch` | <code>database.watch(name: string, callback: (rows: RecordValue[]) =&gt; void, onError?: ((error: unknown) =&gt; void) | undefined): () =&gt; void</code> | extensions/sdk/database.ts:136 | verified-on-some-hosts |
-| `files.read` | <code>files.read(name: string): Promise&lt;Uint8Array&lt;ArrayBufferLike&gt; | null&gt;</code> | extensions/sdk/host.ts:281 | verified-ios-android-mac |
-| `files.write` | <code>files.write(name: string, bytes: Uint8Array&lt;ArrayBufferLike&gt;): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:282 | verified-ios-android-mac |
-| `files.delete` | <code>files.delete(name: string): Promise&lt;boolean&gt;</code> | extensions/sdk/host.ts:285 | verified-ios-android-mac |
-| `files.move` | <code>files.move(source: string, destination: string): Promise&lt;boolean&gt;</code> | extensions/sdk/host.ts:284 | verified-ios-android-mac |
-| `files.copy` | <code>files.copy(source: string, destination: string): Promise&lt;boolean&gt;</code> | extensions/sdk/host.ts:283 | verified-ios-android-mac |
-| `files.exists` | <code>files.exists(name: string): Promise&lt;boolean&gt;</code> | extensions/sdk/host.ts:286 | verified-ios-android-mac |
-| `files.list` | <code>files.list(): Promise&lt;string[]&gt;</code> | extensions/sdk/host.ts:287 | verified-ios-android-mac |
-| `files.info` | <code>files.info(name: string): Promise&lt;ExtensionFileInfo | null&gt;</code> | extensions/sdk/host.ts:288 | verified-ios-android-mac |
-| `files.pick` | <code>files.pick(kind?: FilePickerKind): Promise&lt;PickedFileInfo | null&gt;</code> | extensions/sdk/host.ts:260 | verified-ios-android-mac |
-| `files.pickMultiple` | <code>files.pickMultiple(kind?: FilePickerKind): Promise&lt;PickedFileInfo[] | null&gt;</code> | extensions/sdk/host.ts:270 | verified-ios-android-mac |
-| `files.pickImage` | <code>files.pickImage(): Promise&lt;PickedFileInfo | null&gt;</code> | extensions/sdk/host.ts:266 | verified-ios-android-mac |
-| `files.pickVideo` | <code>files.pickVideo(): Promise&lt;PickedFileInfo | null&gt;</code> | extensions/sdk/host.ts:267 | verified-ios-android-mac |
-| `files.pickAudio` | <code>files.pickAudio(): Promise&lt;PickedFileInfo | null&gt;</code> | extensions/sdk/host.ts:268 | verified-ios-android-mac |
-| `files.pickDocument` | <code>files.pickDocument(): Promise&lt;PickedFileInfo | null&gt;</code> | extensions/sdk/host.ts:269 | verified-ios-android-mac |
-| `files.export` | <code>files.export(name: string, suggestedName?: string): Promise&lt;boolean&gt;</code> | extensions/sdk/host.ts:275 | verified-on-some-hosts |
-| `files.saveAs` | <code>files.saveAs(name: string, suggestedName?: string): Promise&lt;boolean&gt;</code> | extensions/sdk/host.ts:280 | verified-on-some-hosts |
-| `camera.capturePhoto` | <code>camera.capturePhoto(): Promise&lt;PickedFileInfo | null&gt;</code> | extensions/sdk/camera.ts:4 | verified-on-some-hosts |
-| `camera.captureVideo` | <code>camera.captureVideo(maxSeconds?: number): Promise&lt;PickedFileInfo | null&gt;</code> | extensions/sdk/camera.ts:5 | verified-on-some-hosts |
-| `camera.available` | <code>camera.available(): Promise&lt;boolean&gt;</code> | extensions/sdk/camera.ts:9 | verified-ios-android-mac |
-| `camera.permissions` | <code>camera.permissions(): Promise&lt;PermissionStatus&gt;</code> | extensions/sdk/camera.ts:10 | verified-ios-android-mac |
-| `camera.scanQRCode` | <code>camera.scanQRCode(): Promise&lt;ScannedCode | null&gt;</code> | extensions/sdk/camera.ts:11 | verified-on-some-hosts |
-| `camera.scanBarcode` | <code>camera.scanBarcode(): Promise&lt;ScannedCode | null&gt;</code> | extensions/sdk/camera.ts:12 | verified-on-some-hosts |
-| `photos.pick` | <code>photos.pick(): Promise&lt;PickedFileInfo | null&gt;</code> | extensions/sdk/media.ts:14 | verified-ios-android-mac |
-| `photos.pickMultiple` | <code>photos.pickMultiple(): Promise&lt;PickedFileInfo[] | null&gt;</code> | extensions/sdk/media.ts:15 | verified-ios-android-mac |
-| `photos.save` | <code>photos.save(source: string): Promise&lt;boolean&gt;</code> | extensions/sdk/media.ts:13 | verified-on-some-hosts |
-| `photos.info` | <code>photos.info(source: string): Promise&lt;ImageInfo&gt;</code> | extensions/sdk/media.ts:16 | verified-on-some-hosts |
-| `image.resize` | <code>image.resize(input: ImageSource, name: string, width: number, height: number, options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code> | extensions/sdk/image.ts:33 | verified-ios-android-mac |
-| `image.crop` | <code>image.crop(input: ImageSource, name: string, rectangle: { x: number; y: number; width: number; height: number; }, options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code> | extensions/sdk/image.ts:34 | verified-ios-android-mac |
-| `image.rotate` | <code>image.rotate(input: ImageSource, name: string, degrees: 0 | 90 | 180 | 270, options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code> | extensions/sdk/image.ts:39 | verified-ios-android-mac |
-| `image.flip` | <code>image.flip(input: ImageSource, name: string, axis: "horizontal" | "vertical", options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code> | extensions/sdk/image.ts:43 | verified-ios-android-mac |
-| `image.compress` | <code>image.compress(input: ImageSource, name: string, quality?: number): Promise&lt;ImageResult&gt;</code> | extensions/sdk/image.ts:47 | verified-ios-android-mac |
-| `image.convert` | <code>image.convert(input: ImageSource, name: string, format: "jpeg" | "png", quality?: number): Promise&lt;ImageResult&gt;</code> | extensions/sdk/image.ts:48 | verified-ios-android-mac |
-| `image.thumbnail` | <code>image.thumbnail(input: ImageSource, name: string, maxDimension?: number): Promise&lt;ImageResult&gt;</code> | extensions/sdk/image.ts:49 | verified-ios-android-mac |
-| `image.removeMetadata` | <code>image.removeMetadata(input: ImageSource, name: string, options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code> | extensions/sdk/image.ts:50 | verified-ios-android-mac |
-| `image.scanDocument` | <code>image.scanDocument(options?: { name?: string | undefined; maxPages?: number | undefined; }): Promise&lt;ScannedDocumentInfo | null&gt;</code> | extensions/sdk/image.ts:28 | verified-on-some-hosts |
-| `audio.record` | <code>audio.record(maxSeconds?: number): Promise&lt;PickedFileInfo | null&gt;</code> | extensions/sdk/media.ts:28 | verified-on-some-hosts |
-| `audio.stopRecording` | <code>audio.stopRecording(): Promise&lt;boolean&gt;</code> | extensions/sdk/media.ts:32 | verified-on-some-hosts |
-| `audio.play` | <code>audio.play(source?: string | undefined): Promise&lt;void&gt;</code> | extensions/sdk/media.ts:33 | verified-on-some-hosts |
-| `audio.pause` | <code>audio.pause(): Promise&lt;void&gt;</code> | extensions/sdk/media.ts:34 | verified-on-some-hosts |
-| `audio.stop` | <code>audio.stop(): Promise&lt;void&gt;</code> | extensions/sdk/media.ts:35 | verified-on-some-hosts |
-| `audio.duration` | <code>audio.duration(): Promise&lt;number | null&gt;</code> | extensions/sdk/media.ts:36 | verified-on-some-hosts |
-| `audio.position` | <code>audio.position(): Promise&lt;number | null&gt;</code> | extensions/sdk/media.ts:37 | verified-on-some-hosts |
-| `video.play` | <code>video.play(source?: string | undefined): Promise&lt;void&gt;</code> | extensions/sdk/media.ts:19 | verified-on-some-hosts |
-| `video.pause` | <code>video.pause(): Promise&lt;void&gt;</code> | extensions/sdk/media.ts:20 | verified-on-some-hosts |
-| `video.thumbnail` | <code>video.thumbnail(source: string, name: string, seconds?: number, maxDimension?: number): Promise&lt;GeneratedThumbnail&gt;</code> | extensions/sdk/media.ts:22 | verified-on-some-hosts |
-| `video.info` | <code>video.info(source: string): Promise&lt;VideoInfo&gt;</code> | extensions/sdk/media.ts:21 | verified-on-some-hosts |
-| `code.generateQR` | <code>code.generateQR(text: string, name: string, size?: number): Promise&lt;{ name: string; size: number; mimeType: "image/png"; width: number; height: number; }&gt;</code> | extensions/sdk/camera.ts:18 | verified-ios-android-mac |
-| `code.scanQR` | <code>code.scanQR(): Promise&lt;ScannedCode | null&gt;</code> | extensions/sdk/camera.ts:17 | verified-on-some-hosts |
-| `code.scanBarcode` | <code>code.scanBarcode(): Promise&lt;ScannedCode | null&gt;</code> | extensions/sdk/camera.ts:18 | verified-on-some-hosts |
-| `location.current` | <code>location.current(): Promise&lt;LocationFix&gt;</code> | extensions/sdk/host.ts:65 | verified-on-some-hosts |
-| `location.permission` | <code>location.permission(): Promise&lt;PermissionStatus&gt;</code> | extensions/sdk/host.ts:63 | verified-ios-android-mac |
-| `location.openSettings` | <code>location.openSettings(): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:64 | verified-on-some-hosts |
-| `map.view` | <code>map.view(options?: MapViewOptions, overlays?: Node[]): Node</code> | extensions/sdk/maps.ts:22 | verified-ios-android-mac |
-| `map.marker` | <code>map.marker(location: MapCoordinate, options: MapMarkerOptions): Node</code> | extensions/sdk/maps.ts:31 | verified-ios-android-mac |
-| `map.polyline` | <code>map.polyline(path: MapCoordinate[], options?: MapShapeOptions): Node</code> | extensions/sdk/maps.ts:38 | verified-ios-android-mac |
-| `map.circle` | <code>map.circle(center: MapCoordinate, radiusMeters: number, options?: MapShapeOptions): Node</code> | extensions/sdk/maps.ts:44 | verified-ios-android-mac |
-| `map.fitBounds` | <code>map.fitBounds(bounds: MapCoordinate[], padding?: number): Node</code> | extensions/sdk/maps.ts:51 | verified-ios-android-mac |
-| `map.openDirections` | <code>map.openDirections(destination: MapCoordinate, options?: DirectionsOptions): Promise&lt;void&gt;</code> | extensions/sdk/maps.ts:55 | verified-ios-android-mac |
-| `geo.distance` | <code>geo.distance(from: Coordinate, to: Coordinate): number</code> | extensions/sdk/core.ts:187 | verified-ios-android-mac |
-| `geo.bearing` | <code>geo.bearing(from: Coordinate, to: Coordinate): number</code> | extensions/sdk/core.ts:193 | verified-ios-android-mac |
-| `geo.contains` | <code>geo.contains(point: Coordinate, circle: { center: Coordinate; radius: number; }): boolean</code> | extensions/sdk/core.ts:200 | verified-ios-android-mac |
-| `notification.permission` | <code>notification.permission(): Promise&lt;PermissionStatus&gt;</code> | extensions/sdk/host.ts:109 | verified-on-some-hosts |
-| `notification.schedule` | <code>notification.schedule(value: LocalNotificationInput): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:110 | verified-on-some-hosts |
-| `notification.cancel` | <code>notification.cancel(id: string): Promise&lt;boolean&gt;</code> | extensions/sdk/host.ts:115 | verified-on-some-hosts |
-| `notification.cancelAll` | <code>notification.cancelAll(): Promise&lt;number&gt;</code> | extensions/sdk/host.ts:116 | verified-on-some-hosts |
-| `notification.listScheduled` | <code>notification.listScheduled(): Promise&lt;ScheduledLocalNotification[]&gt;</code> | extensions/sdk/host.ts:117 | verified-on-some-hosts |
-| `notification.onOpen` | <code>notification.onOpen(callback: (notification: { id: string; data: Record&lt;string, string&gt;; action: string; }) =&gt; unknown): () =&gt; void</code> | extensions/sdk/host.ts:118 | verified-on-some-hosts |
-| `background.register` | <code>background.register(task: { id: string; intervalMinutes: number; networkRequired?: boolean | undefined; chargingRequired?: boolean | undefined; }): Promise&lt;{ id: string; accepted: boolean; }&gt;</code> | extensions/sdk/host.ts:48 | verified-on-some-hosts |
-| `background.unregister` | <code>background.unregister(id: string): Promise&lt;boolean&gt;</code> | extensions/sdk/host.ts:58 | verified-on-some-hosts |
-| `background.status` | <code>background.status(): Promise&lt;BackgroundStatus&gt;</code> | extensions/sdk/host.ts:47 | verified-ios-android-mac |
-| `network.fetch` | <code>network.fetch(url: string, options?: NetworkOptions): Promise&lt;NetworkResponse&gt;</code> | extensions/sdk/host.ts:147 | verified-on-some-hosts |
-| `network.get` | <code>network.get(url: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code> | extensions/sdk/host.ts:179 | verified-on-some-hosts |
-| `network.post` | <code>network.post(url: string, body: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code> | extensions/sdk/host.ts:180 | verified-on-some-hosts |
-| `network.put` | <code>network.put(url: string, body: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code> | extensions/sdk/host.ts:181 | verified-on-some-hosts |
-| `network.patch` | <code>network.patch(url: string, body: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code> | extensions/sdk/host.ts:182 | verified-on-some-hosts |
-| `network.delete` | <code>network.delete(url: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code> | extensions/sdk/host.ts:183 | verified-on-some-hosts |
-| `network.upload` | <code>network.upload(url: string, name: string, options?: { method?: "POST" | "PUT" | undefined; headers?: Record&lt;string, string&gt; | undefined; onProgress?: NetworkProgressHandler | undefined; }): Promise&lt;NetworkResponse&gt;</code> | extensions/sdk/host.ts:135 | verified-on-some-hosts |
-| `network.download` | <code>network.download(url: string, name: string, options?: Record&lt;string, string&gt; | { headers?: Record&lt;string, string&gt; | undefined; onProgress?: NetworkProgressHandler | undefined; }): Promise&lt;NetworkFileResponse&gt;</code> | extensions/sdk/host.ts:136 | verified-on-some-hosts |
-| `network.websocket.connect` | <code>network.websocket.connect(url: string): Promise&lt;ExtensionWebSocket&gt;</code> | extensions/sdk/host.ts:163 | verified-on-some-hosts |
-| `socket.send` | <code>socket.send(data: string): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:99 | verified-on-some-hosts |
-| `socket.onMessage` | <code>socket.onMessage(callback: (data: string) =&gt; unknown): () =&gt; void</code> | extensions/sdk/host.ts:96 | verified-on-some-hosts |
-| `socket.close` | <code>socket.close(code?: number | undefined, reason?: string | undefined): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:100 | verified-on-some-hosts |
-| `browser.open` | <code>browser.open(url: string): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:68 | verified-on-some-hosts |
-| `browser.openExternal` | <code>browser.openExternal(url: string): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:72 | verified-on-some-hosts |
-| `webView.open` | <code>webView.open(url: string): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:778 | verified-on-some-hosts |
-| `clipboard.write` | <code>clipboard.write(value: string): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:205 | verified-on-some-hosts |
-| `clipboard.read` | <code>clipboard.read(): Promise&lt;string | null&gt;</code> | extensions/sdk/host.ts:204 | verified-on-some-hosts |
-| `share.text` | <code>share.text(value: string): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:232 | verified-on-some-hosts |
-| `share.url` | <code>share.url(value: string): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:233 | verified-on-some-hosts |
-| `share.image` | <code>share.image(key: string): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:230 | verified-on-some-hosts |
-| `share.file` | <code>share.file(key: string): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:234 | verified-on-some-hosts |
-| `share.items` | <code>share.items(items: ShareItem[]): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:231 | verified-on-some-hosts |
-| `drag.source` | <code>drag.source(label: string, value: string): Node</code> | extensions/sdk/drag.ts:10 | verified-on-some-hosts |
-| `drop.target` | <code>drop.target(key: string, label: string): Node</code> | extensions/sdk/drag.ts:23 | verified-on-some-hosts |
-| `haptics.light` | <code>haptics.light(): Promise&lt;void&gt;</code> | extensions/sdk/haptics.ts:9 | verified-on-some-hosts |
-| `haptics.medium` | <code>haptics.medium(): Promise&lt;void&gt;</code> | extensions/sdk/haptics.ts:10 | verified-on-some-hosts |
-| `haptics.heavy` | <code>haptics.heavy(): Promise&lt;void&gt;</code> | extensions/sdk/haptics.ts:11 | verified-on-some-hosts |
-| `haptics.success` | <code>haptics.success(): Promise&lt;void&gt;</code> | extensions/sdk/haptics.ts:12 | verified-on-some-hosts |
-| `haptics.warning` | <code>haptics.warning(): Promise&lt;void&gt;</code> | extensions/sdk/haptics.ts:13 | verified-on-some-hosts |
-| `haptics.error` | <code>haptics.error(): Promise&lt;void&gt;</code> | extensions/sdk/haptics.ts:14 | verified-on-some-hosts |
-| `device.platform` | <code>device.platform(): Promise&lt;"ios" | "macos" | "android"&gt;</code> | extensions/sdk/device.ts:14 | verified-ios-android-mac |
-| `device.osVersion` | <code>device.osVersion(): Promise&lt;string&gt;</code> | extensions/sdk/device.ts:15 | verified-ios-android-mac |
-| `device.deviceClass` | <code>device.deviceClass(): Promise&lt;"phone" | "tablet" | "desktop"&gt;</code> | extensions/sdk/device.ts:16 | verified-ios-android-mac |
-| `device.screen` | <code>device.screen(): Promise&lt;DeviceScreen&gt;</code> | extensions/sdk/device.ts:17 | verified-ios-android-mac |
-| `device.locale` | <code>device.locale(): Promise&lt;string&gt;</code> | extensions/sdk/device.ts:18 | verified-ios-android-mac |
-| `device.timezone` | <code>device.timezone(): Promise&lt;string&gt;</code> | extensions/sdk/device.ts:19 | verified-ios-android-mac |
-| `device.appearance` | <code>device.appearance(): Promise&lt;"light" | "dark"&gt;</code> | extensions/sdk/device.ts:20 | verified-ios-android-mac |
-| `device.capabilities` | <code>device.capabilities(): Promise&lt;string[]&gt;</code> | extensions/sdk/device.ts:21 | verified-ios-android-mac |
-| `keyboard.dismiss` | <code>keyboard.dismiss(): Promise&lt;void&gt;</code> | extensions/sdk/keyboard.ts:9 | verified-on-some-hosts |
-| `keyboard.focus` | <code>keyboard.focus(key: string): Promise&lt;void&gt;</code> | extensions/sdk/keyboard.ts:3 | verified-on-some-hosts |
-| `accessibility.label` | <code>accessibility.label(node: Node, value: string): Node</code> | extensions/sdk/accessibility.ts:22 | verified-on-some-hosts |
-| `accessibility.hint` | <code>accessibility.hint(node: Node, value: string): Node</code> | extensions/sdk/accessibility.ts:23 | verified-on-some-hosts |
-| `accessibility.role` | <code>accessibility.role(node: Node, value: AccessibilityRole): Node</code> | extensions/sdk/accessibility.ts:24 | verified-on-some-hosts |
-| `accessibility.isReduceMotionEnabled` | <code>accessibility.isReduceMotionEnabled(): Promise&lt;boolean&gt;</code> | extensions/sdk/accessibility.ts:26 | verified-on-some-hosts |
-| `accessibility.isHighContrastEnabled` | <code>accessibility.isHighContrastEnabled(): Promise&lt;boolean&gt;</code> | extensions/sdk/accessibility.ts:27 | verified-on-some-hosts |
-| `animation.animate` | <code>animation.animate&lt;T&gt;(options: AnimationOptions, update: () =&gt; T | Promise&lt;T&gt;): Promise&lt;T&gt;</code> | extensions/sdk/index.ts:52 | verified-ios-android-mac |
-| `animation.spring` | <code>animation.spring&lt;T&gt;(update: () =&gt; T | Promise&lt;T&gt;, options?: Omit&lt;AnimationOptions, "curve"&gt;): Promise&lt;T&gt;</code> | extensions/sdk/index.ts:62 | verified-ios-android-mac |
-| `animation.transition` | <code>animation.transition&lt;T&gt;(update: () =&gt; T | Promise&lt;T&gt;, options?: AnimationOptions): Promise&lt;T&gt;</code> | extensions/sdk/index.ts:65 | verified-ios-android-mac |
-| `chart.line` | <code>chart.line(label: string, categories: string[], series: ChartSeries[]): Node</code> | extensions/sdk/charts.ts:52 | verified-ios-android-mac |
-| `chart.bar` | <code>chart.bar(label: string, categories: string[], series: ChartSeries[]): Node</code> | extensions/sdk/charts.ts:54 | verified-ios-android-mac |
-| `chart.area` | <code>chart.area(label: string, categories: string[], series: ChartSeries[]): Node</code> | extensions/sdk/charts.ts:53 | verified-ios-android-mac |
-| `chart.pie` | <code>chart.pie(label: string, categories: string[], values: number[]): Node</code> | extensions/sdk/charts.ts:55 | verified-ios-android-mac |
-| `chart.donut` | <code>chart.donut(label: string, categories: string[], values: number[]): Node</code> | extensions/sdk/charts.ts:56 | verified-ios-android-mac |
-| `chart.scatter` | <code>chart.scatter(label: string, series: ScatterSeries[]): Node</code> | extensions/sdk/charts.ts:57 | verified-ios-android-mac |
-| `canvas.create` | <code>canvas.create(width?: number, height?: number, label?: string): ExtensionCanvas</code> | extensions/sdk/canvas.ts:62 | verified-on-some-hosts |
-| `canvas.line` | <code>canvas.create().line(x1: number, y1: number, x2: number, y2: number, appearance?: DrawingStyle): ExtensionCanvas</code> | extensions/sdk/canvas.ts:27 | verified-on-some-hosts |
-| `canvas.rect` | <code>canvas.create().rect(x: number, y: number, width: number, height: number, appearance?: DrawingStyle): ExtensionCanvas</code> | extensions/sdk/canvas.ts:30 | verified-on-some-hosts |
-| `canvas.circle` | <code>canvas.create().circle(x: number, y: number, radius: number, appearance?: DrawingStyle): ExtensionCanvas</code> | extensions/sdk/canvas.ts:34 | verified-on-some-hosts |
-| `canvas.text` | <code>canvas.create().text(text: string, x: number, y: number, options?: { color?: DrawingColor | undefined; size?: number | undefined; align?: "leading" | "center" | "trailing" | undefined; }): ExtensionCanvas</code> | extensions/sdk/canvas.ts:38 | verified-on-some-hosts |
-| `canvas.image` | <code>canvas.create().image(url: string, x: number, y: number, width: number, height: number): ExtensionCanvas</code> | extensions/sdk/canvas.ts:43 | verified-on-some-hosts |
-| `canvas.path` | <code>canvas.create().path(segments: PathSegment[], appearance?: DrawingStyle): ExtensionCanvas</code> | extensions/sdk/canvas.ts:48 | verified-on-some-hosts |
-| `pdf.open` | <code>pdf.open(source: string): Promise&lt;void&gt;</code> | extensions/sdk/media.ts:41 | verified-on-some-hosts |
-| `pdf.pageCount` | <code>pdf.pageCount(source: string): Promise&lt;number&gt;</code> | extensions/sdk/media.ts:42 | verified-on-some-hosts |
-| `pdf.thumbnail` | <code>pdf.thumbnail(source: string, name: string, page?: number, maxDimension?: number): Promise&lt;GeneratedThumbnail&gt;</code> | extensions/sdk/media.ts:48 | verified-on-some-hosts |
-| `pdf.export` | <code>pdf.export(name: string, suggestedName?: string): Promise&lt;boolean&gt;</code> | extensions/sdk/media.ts:52 | verified-on-some-hosts |
-| `pdf.share` | <code>pdf.share(source: string): Promise&lt;void&gt;</code> | extensions/sdk/media.ts:43 | verified-on-some-hosts |
-| `pdf.create` | <code>pdf.create(name: string, pages: PDFPageInput[]): Promise&lt;PDFInfo&gt;</code> | extensions/sdk/media.ts:44 | verified-ios-android-mac |
-| `scanner.document` | <code>scanner.document(options?: { name?: string | undefined; maxPages?: number | undefined; }): Promise&lt;ScannedDocumentInfo | null&gt;</code> | extensions/sdk/host.ts:306 | verified-on-some-hosts |
-| `sensors.accelerometer` | <code>sensors.accelerometer(): Promise&lt;MotionVector&gt;</code> | extensions/sdk/sensors.ts:14 | verified-on-some-hosts |
-| `sensors.gyroscope` | <code>sensors.gyroscope(): Promise&lt;MotionVector&gt;</code> | extensions/sdk/sensors.ts:15 | verified-on-some-hosts |
-| `sensors.magnetometer` | <code>sensors.magnetometer(): Promise&lt;MotionVector&gt;</code> | extensions/sdk/sensors.ts:16 | verified-on-some-hosts |
-| `sensors.orientation` | <code>sensors.orientation(): Promise&lt;MotionOrientation&gt;</code> | extensions/sdk/sensors.ts:17 | verified-on-some-hosts |
-| `connectivity.status` | <code>connectivity.status(): Promise&lt;NetworkStatus&gt;</code> | extensions/sdk/host.ts:776 | verified-ios-android-mac |
-| `connectivity.onChange` | <code>connectivity.onChange(callback: (status: NetworkStatus) =&gt; unknown): Promise&lt;() =&gt; void&gt;</code> | extensions/sdk/host.ts:776 | verified-on-some-hosts |
-| `crypto.randomBytes` | <code>crypto.randomBytes(length: number): Uint8Array&lt;ArrayBufferLike&gt;</code> | extensions/sdk/crypto.ts:31 | verified-on-some-hosts |
-| `crypto.hash` | <code>crypto.hash(text: string, algorithm?: "SHA-256" | "SHA-512"): Promise&lt;string&gt;</code> | extensions/sdk/crypto.ts:35 | verified-on-some-hosts |
-| `crypto.hmac` | <code>crypto.hmac(text: string, key: string, algorithm?: "SHA-256" | "SHA-512"): Promise&lt;string&gt;</code> | extensions/sdk/crypto.ts:36 | verified-on-some-hosts |
-| `crypto.encrypt` | <code>crypto.encrypt(text: string, key: string, aad?: string): Promise&lt;EncryptedText&gt;</code> | extensions/sdk/crypto.ts:33 | verified-on-some-hosts |
-| `crypto.decrypt` | <code>crypto.decrypt(envelope: EncryptedText, key: string, aad?: string): Promise&lt;string&gt;</code> | extensions/sdk/crypto.ts:34 | verified-on-some-hosts |
-| `secureStorage.set` | <code>secureStorage.set(name: string, value: unknown): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:347 | verified-on-some-hosts |
-| `secureStorage.get` | <code>secureStorage.get&lt;T = unknown&gt;(name: string): Promise&lt;T | null&gt;</code> | extensions/sdk/host.ts:346 | verified-on-some-hosts |
-| `secureStorage.delete` | <code>secureStorage.delete(name: string): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:348 | verified-on-some-hosts |
-| `auth.oauth2` | <code>auth.oauth2(providerInput: OAuthProvider): Promise&lt;OAuthSession&gt;</code> | extensions/sdk/auth.ts:99 | verified-on-some-hosts |
-| `auth.openIDConnect` | <code>auth.openIDConnect(config: { issuer: string; clientId: string; scopes: string[]; }): Promise&lt;OIDCSession&gt;</code> | extensions/sdk/auth.ts:102 | verified-on-some-hosts |
-| `auth.logout` | <code>auth.logout(): Promise&lt;void&gt;</code> | extensions/sdk/auth.ts:119 | verified-ios-android-mac |
-| `auth.tokenStatus` | <code>auth.tokenStatus(): Promise&lt;{ connected: boolean; expiresAt: number | null; scopes: string[]; }&gt;</code> | extensions/sdk/auth.ts:114 | verified-ios-android-mac |
-| `link.create` | <code>link.create(id: string): Promise&lt;string&gt;</code> | extensions/sdk/integration.ts:23 | verified-on-some-hosts |
-| `link.open` | <code>link.open(url: string): Promise&lt;void&gt;</code> | extensions/sdk/integration.ts:24 | verified-on-some-hosts |
-| `app.onDeepLink` | <code>app.onDeepLink(callback: (payload: AppOpenURLPayload) =&gt; unknown): () =&gt; void</code> | extensions/sdk/host.ts:387 | verified-ios-android-mac |
-| `extensions.isInstalled` | <code>extensions.isInstalled(id: string): Promise&lt;boolean&gt;</code> | extensions/sdk/integration.ts:18 | verified-on-some-hosts |
-| `extensions.open` | <code>extensions.open(id: string): Promise&lt;void&gt;</code> | extensions/sdk/integration.ts:19 | verified-on-some-hosts |
-| `extensions.request` | <code>extensions.request(id: string): Promise&lt;void&gt;</code> | extensions/sdk/integration.ts:20 | verified-on-some-hosts |
-| `intent.register` | <code>intent.register&lt;T = unknown, R = unknown&gt;(name: string, handler: IntentHandler&lt;T, R&gt;): () =&gt; void</code> | extensions/sdk/intents.ts:21 | verified-on-some-hosts |
-| `intent.perform` | <code>intent.perform&lt;T = unknown, R = unknown&gt;(name: string, input?: T | undefined): Promise&lt;R[]&gt;</code> | extensions/sdk/intents.ts:35 | verified-on-some-hosts |
-| `search.registerItems` | <code>search.registerItems(items: SearchItem[]): Promise&lt;{ indexed: number; }&gt;</code> | extensions/sdk/platform.ts:47 | verified-on-some-hosts |
-| `search.removeItems` | <code>search.removeItems(ids: string[]): Promise&lt;{ removed: number; }&gt;</code> | extensions/sdk/platform.ts:55 | verified-on-some-hosts |
-| `host.registerShortcut` | <code>host.registerShortcut(value: HostAction): Promise&lt;{ registered: boolean; }&gt;</code> | extensions/sdk/platform.ts:68 | verified-ios-android-mac |
-| `host.registerAction` | <code>host.registerAction(value: HostAction): Promise&lt;{ registered: boolean; }&gt;</code> | extensions/sdk/platform.ts:72 | verified-on-some-hosts |
-| `widget.define` | <code>widget.define(value: WidgetDefinition): Promise&lt;{ registered: boolean; }&gt;</code> | extensions/sdk/platform.ts:79 | verified-ios-android-mac |
-| `widget.reload` | <code>widget.reload(id: string): Promise&lt;{ queued: boolean; }&gt;</code> | extensions/sdk/platform.ts:85 | verified-ios-android-mac |
-| `shortcuts.register` | <code>shortcuts.register(value: HostAction): Promise&lt;{ registered: boolean; }&gt;</code> | extensions/sdk/platform.ts:89 | verified-ios-android-mac |
-| `server.function` | <code>server.function&lt;T = unknown&gt;(name: string, input?: unknown): Promise&lt;T&gt;</code> | extensions/sdk/server.ts:73 | verified-on-some-hosts |
-| `server.kv.get` | <code>server.kv.get&lt;T = unknown&gt;(key: string): Promise&lt;{ value: T | null; revision: number; }&gt;</code> | extensions/sdk/server.ts:85 | verified-on-some-hosts |
-| `server.kv.set` | <code>server.kv.set(key: string, value: unknown, expectedRevision: number): Promise&lt;number&gt;</code> | extensions/sdk/server.ts:86 | verified-on-some-hosts |
-| `server.kv.delete` | <code>server.kv.delete(key: string, expectedRevision: number): Promise&lt;boolean&gt;</code> | extensions/sdk/server.ts:87 | verified-on-some-hosts |
-| `server.db.insert` | <code>server.db.insert&lt;T extends Record&lt;string, unknown&gt;&gt;(table: string, id: string, value: T): Promise&lt;ServerRecord&lt;T&gt;&gt;</code> | extensions/sdk/server.ts:100 | verified-on-some-hosts |
-| `server.db.query` | <code>server.db.query&lt;T extends Record&lt;string, unknown&gt; = Record&lt;string, unknown&gt;&gt;(table: string, options?: ServerQuery): Promise&lt;{ rows: ServerRecord&lt;T&gt;[]; nextCursor: string | null; }&gt;</code> | extensions/sdk/server.ts:101 | verified-on-some-hosts |
-| `server.db.update` | <code>server.db.update&lt;T extends Record&lt;string, unknown&gt;&gt;(table: string, id: string, value: T, expectedRevision: number): Promise&lt;ServerRecord&lt;T&gt;&gt;</code> | extensions/sdk/server.ts:102 | verified-on-some-hosts |
-| `server.db.delete` | <code>server.db.delete(table: string, id: string, expectedRevision: number): Promise&lt;{ deleted: boolean; }&gt;</code> | extensions/sdk/server.ts:103 | verified-on-some-hosts |
-| `server.db.transaction` | <code>server.db.transaction(operations: ServerOperation[]): Promise&lt;ServerResult[]&gt;</code> | extensions/sdk/server.ts:104 | verified-on-some-hosts |
-| `cloud.user.get` | <code>cloud.user.get&lt;T = unknown&gt;(name: string): Promise&lt;{ value: T | null; revision: number; }&gt;</code> | extensions/sdk/host.ts:326 | verified-on-some-hosts |
-| `cloud.user.set` | <code>cloud.user.set(name: string, expectedRevision: number, value: unknown): Promise&lt;number&gt;</code> | extensions/sdk/host.ts:330 | verified-on-some-hosts |
-| `cloud.shared.create` | <code>cloud.shared.create&lt;T&gt;(group: string, name: string, value: T): Promise&lt;SharedValue&lt;T&gt;&gt;</code> | extensions/sdk/collaboration.ts:30 | verified-on-some-hosts |
-| `cloud.shared.read` | <code>cloud.shared.read&lt;T = unknown&gt;(group: string, name: string): Promise&lt;SharedValue&lt;T&gt; | null&gt;</code> | extensions/sdk/collaboration.ts:31 | verified-on-some-hosts |
-| `cloud.shared.update` | <code>cloud.shared.update&lt;T&gt;(group: string, name: string, value: T, expectedRevision: number): Promise&lt;SharedValue&lt;T&gt;&gt;</code> | extensions/sdk/collaboration.ts:32 | verified-on-some-hosts |
-| `cloud.shared.delete` | <code>cloud.shared.delete(group: string, name: string, expectedRevision: number): Promise&lt;{ deleted: true; }&gt;</code> | extensions/sdk/collaboration.ts:33 | verified-on-some-hosts |
-| `groups.create` | <code>groups.create(name: string): Promise&lt;ExtensionGroup&gt;</code> | extensions/sdk/collaboration.ts:13 | verified-on-some-hosts |
-| `groups.join` | <code>groups.join(invitation: string): Promise&lt;ExtensionGroup | null&gt;</code> | extensions/sdk/collaboration.ts:17 | verified-on-some-hosts |
-| `groups.leave` | <code>groups.leave(id: string): Promise&lt;{ left: true; } | null&gt;</code> | extensions/sdk/collaboration.ts:21 | verified-on-some-hosts |
-| `groups.members` | <code>groups.members(id: string): Promise&lt;GroupMember[]&gt;</code> | extensions/sdk/collaboration.ts:22 | verified-on-some-hosts |
-| `groups.invite` | <code>groups.invite(id: string, options?: { expiresInHours?: number | undefined; maxUses?: number | undefined; }): Promise&lt;GroupInvitation&gt;</code> | extensions/sdk/collaboration.ts:23 | verified-on-some-hosts |
-| `realtime.subscribe` | <code>realtime.subscribe&lt;T&gt;(group: string, topic: string, onMessage: (message: RealtimeMessage&lt;T&gt;) =&gt; unknown, options?: RealtimeSubscribeOptions): () =&gt; void</code> | extensions/sdk/collaboration.ts:54 | verified-on-some-hosts |
-| `realtime.publish` | <code>realtime.publish&lt;T&gt;(group: string, topic: string, value: T): Promise&lt;RealtimeMessage&lt;T&gt;&gt;</code> | extensions/sdk/collaboration.ts:49 | verified-on-some-hosts |
-| `server.cron.register` | <code>server.cron.register(name: string, input?: unknown, intervalSeconds?: number): Promise&lt;CronRegistration&gt;</code> | extensions/sdk/server.ts:77 | verified-on-some-hosts |
-| `server.cron.status` | <code>server.cron.status(name: string): Promise&lt;CronStatus&gt;</code> | extensions/sdk/server.ts:82 | verified-on-some-hosts |
-| `push.sendToCurrentUser` | <code>push.sendToCurrentUser(value: { title: string; body: string; data?: Record&lt;string, string&gt; | undefined; }): Promise&lt;{ accepted: boolean; }&gt;</code> | extensions/sdk/platform.ts:96 | verified-on-some-hosts |
-| `console.log` | <code>console.log(...values: unknown[]): void</code> | extensions/sdk/debug.ts:14 | verified-on-some-hosts |
-| `console.warn` | <code>console.warn(...values: unknown[]): void</code> | extensions/sdk/debug.ts:15 | verified-on-some-hosts |
-| `console.error` | <code>console.error(...values: unknown[]): void</code> | extensions/sdk/debug.ts:16 | verified-on-some-hosts |
-| `debug.inspect` | <code>debug.inspect(value: unknown): string</code> | extensions/sdk/debug.ts:4 | verified-on-some-hosts |
-| `analytics.event` | <code>analytics.event(name: string): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:340 | verified-on-some-hosts |
-| `capabilities.has` | <code>capabilities.has(name: string): boolean</code> | extensions/sdk/host.ts:351 | verified-ios-android-mac |
-| `permissions.status` | <code>permissions.status(permission: Permission): Promise&lt;PermissionStatus&gt;</code> | extensions/sdk/host.ts:42 | verified-ios-android-mac |
-| `permissions.request` | <code>permissions.request(permission: Permission): Promise&lt;PermissionStatus&gt;</code> | extensions/sdk/host.ts:43 | verified-on-some-hosts |
-| `permissions.openSettings` | <code>permissions.openSettings(): Promise&lt;void&gt;</code> | extensions/sdk/host.ts:44 | verified-on-some-hosts |
+| API | SDK呼び出し署名 |
+| --- | --- |
+| `app.onLaunch` | <code>app.onLaunch(callback: () =&gt; unknown): () =&gt; void</code> |
+| `app.onAppear` | <code>app.onAppear(callback: () =&gt; unknown): () =&gt; void</code> |
+| `app.onDisappear` | <code>app.onDisappear(callback: () =&gt; unknown): () =&gt; void</code> |
+| `app.onResume` | <code>app.onResume(callback: () =&gt; unknown): () =&gt; void</code> |
+| `app.onSuspend` | <code>app.onSuspend(callback: () =&gt; unknown): () =&gt; void</code> |
+| `app.onOpenURL` | <code>app.onOpenURL(callback: (payload: AppOpenURLPayload) =&gt; unknown): () =&gt; void</code> |
+| `app.onNotification` | <code>app.onNotification(callback: (payload: { identifier?: string | undefined; action?: string | undefined; data?: Record&lt;string, string&gt; | undefined; }) =&gt; unknown): () =&gt; void</code> |
+| `app.onMemoryWarning` | <code>app.onMemoryWarning(callback: () =&gt; unknown): () =&gt; void</code> |
+| `app.version` | <code>app.version(): string</code> |
+| `app.extensionId` | <code>app.extensionId(): string</code> |
+| `app.environment` | <code>app.environment(): "development" | "production"</code> |
+| `app.hostVersion` | <code>app.hostVersion(): string</code> |
+| `app.capabilities` | <code>app.capabilities(): string[]</code> |
+| `ui.text` | <code>ui.text(text: string): Node</code> |
+| `ui.heading` | <code>ui.heading(text: string): Node</code> |
+| `ui.label` | <code>ui.label(text: string): Node</code> |
+| `ui.markdown` | <code>ui.markdown(text: string): Node</code> |
+| `ui.code` | <code>ui.code(text: string): Node</code> |
+| `ui.caption` | <code>ui.caption(text: string): Node</code> |
+| `ui.badge` | <code>ui.badge(text: string, tone?: "primary" | "secondary" | "accent" | undefined): Node</code> |
+| `ui.icon` | <code>ui.icon(name: string, accessibilityLabel: string): Node</code> |
+| `ui.vstack` | <code>ui.vstack(children: Node[]): Node</code> |
+| `ui.hstack` | <code>ui.hstack(children: Node[]): Node</code> |
+| `ui.zstack` | <code>ui.zstack(children: Node[]): Node</code> |
+| `ui.grid` | <code>ui.grid(columns: number, children: Node[]): Node</code> |
+| `ui.lazyGrid` | <code>ui.lazyGrid(columns: number, children: Node[]): Node</code> |
+| `ui.scroll` | <code>ui.scroll(children: Node[]): Node</code> |
+| `ui.horizontalScroll` | <code>ui.horizontalScroll(children: Node[]): Node</code> |
+| `ui.spacer` | <code>ui.spacer(size?: number): Node</code> |
+| `ui.divider` | <code>ui.divider(): Node</code> |
+| `ui.card` | <code>ui.card(children: Node[], label?: string | undefined): Node</code> |
+| `ui.group` | <code>ui.group(children: Node[]): Node</code> |
+| `ui.section` | <code>ui.section(label: string, children: Node[]): Node</code> |
+| `ui.container` | <code>ui.container(children: Node[]): Node</code> |
+| `ui.safeArea` | <code>ui.safeArea(children: Node[]): Node</code> |
+| `ui.textField` | <code>ui.textField(key: string, label: string, value: State&lt;string&gt;, events?: { onFocus?: (() =&gt; unknown) | undefined; onBlur?: (() =&gt; unknown) | undefined; onSubmit?: (() =&gt; unknown) | undefined; }): Node</code> |
+| `ui.textArea` | <code>ui.textArea(key: string, label: string, value?: State&lt;string&gt; | undefined): Node</code> |
+| `ui.secureField` | <code>ui.secureField(key: string, label: string, value?: State&lt;string&gt; | undefined): Node</code> |
+| `ui.number` | <code>ui.number(key: string, label: string, min?: number, max?: number, step?: number): Node</code> |
+| `ui.slider` | <code>ui.slider(key: string, label: string, min?: number, max?: number, step?: number): Node</code> |
+| `ui.stepper` | <code>ui.stepper(key: string, label: string, value: State&lt;number&gt;, min: number, max: number, step?: number): Node</code> |
+| `ui.toggle` | <code>ui.toggle(key: string, label: string, value?: State&lt;boolean&gt; | undefined): Node</code> |
+| `ui.checkbox` | <code>ui.checkbox(key: string, label: string, value: State&lt;boolean&gt;): Node</code> |
+| `ui.radio` | <code>ui.radio(key: string, label: string, options: string[], value: State&lt;string&gt;): Node</code> |
+| `ui.select` | <code>ui.select(key: string, label: string, options: string[]): Node</code> |
+| `ui.multiSelect` | <code>ui.multiSelect(key: string, label: string, options: string[], value: State&lt;string[]&gt;): Node</code> |
+| `ui.date` | <code>ui.date(key: string, label: string, value?: State&lt;number | null&gt; | undefined): Node</code> |
+| `ui.time` | <code>ui.time(key: string, label: string, value: State&lt;number | null&gt;): Node</code> |
+| `ui.dateTime` | <code>ui.dateTime(key: string, label: string, value: State&lt;number | null&gt;): Node</code> |
+| `ui.dateRange` | <code>ui.dateRange(key: string, label: string, value: State&lt;{ start: number | null; end: number | null; }&gt;): Node</code> |
+| `ui.coursePicker` | <code>ui.coursePicker(key: string, label: string): Node</code> |
+| `ui.filePicker` | <code>ui.filePicker(key: string, label: string, value: State&lt;string&gt;): Node</code> |
+| `ui.photoPicker` | <code>ui.photoPicker(key: string, label: string, value: State&lt;string&gt;): Node</code> |
+| `ui.searchField` | <code>ui.searchField(key: string, label: string, value: State&lt;string&gt;, events?: { onFocus?: (() =&gt; unknown) | undefined; onBlur?: (() =&gt; unknown) | undefined; onSubmit?: (() =&gt; unknown) | undefined; }): Node</code> |
+| `field.set` | <code>field.set(value: T): void</code> |
+| `field.reset` | <code>field.reset(): void</code> |
+| `field.focus` | <code>field.focus(): Promise&lt;void&gt;</code> |
+| `field.blur` | <code>field.blur(): Promise&lt;void&gt;</code> |
+| `ui.button` | <code>ui.button(label: string, action: "save" | "reset" | (() =&gt; unknown)): Node</code> |
+| `ui.iconButton` | <code>ui.iconButton(icon: string, label: string, onPress: () =&gt; unknown, events?: ButtonEvents): Node</code> |
+| `ui.linkButton` | <code>ui.linkButton(label: string, url: string): Node</code> |
+| `ui.menu` | <code>ui.menu(label: string, actions: Node[]): Node</code> |
+| `ui.contextMenu` | <code>ui.contextMenu(content: Node, actions: Node[]): Node</code> |
+| `ui.swipeActions` | <code>ui.swipeActions(content: Node, actions: Node[]): Node</code> |
+| `ui.toolbar` | <code>ui.toolbar(children: Node[]): Node</code> |
+| `ui.floatingButton` | <code>ui.floatingButton(label: string, onPress: () =&gt; unknown, content?: Node[]): Node</code> |
+| `navigation.push` | <code>navigation.push(name: string, parameters?: RouteParameters): void</code> |
+| `navigation.pop` | <code>navigation.pop(): boolean</code> |
+| `navigation.popToRoot` | <code>navigation.popToRoot(): void</code> |
+| `navigation.present` | <code>navigation.present(name: string, parameters?: RouteParameters, mode?: "sheet" | "fullScreen"): void</code> |
+| `navigation.dismiss` | <code>navigation.dismiss(): boolean</code> |
+| `navigation.sheet` | <code>navigation.sheet(name: string, parameters?: RouteParameters): void</code> |
+| `navigation.fullScreen` | <code>navigation.fullScreen(name: string, parameters?: RouteParameters): void</code> |
+| `navigation.tabs` | <code>navigation.tabs(tabs: { id: string; title: string; render: () =&gt; Node[]; }[], selected: State&lt;string&gt;): Node</code> |
+| `navigation.openExtension` | <code>navigation.openExtension(id: string): Promise&lt;void&gt;</code> |
+| `navigation.openHostPage` | <code>navigation.openHostPage(page: HostPage): Promise&lt;void&gt;</code> |
+| `ui.alert` | <code>ui.alert(title: string, message?: string): Promise&lt;void&gt;</code> |
+| `ui.confirm` | <code>ui.confirm(title: string, message?: string): Promise&lt;boolean&gt;</code> |
+| `ui.prompt` | <code>ui.prompt(title: string, message?: string, initialValue?: string): Promise&lt;string | null&gt;</code> |
+| `ui.actionSheet` | <code>ui.actionSheet(title: string, items: ActionSheetItem[], message?: string): Promise&lt;string | null&gt;</code> |
+| `ui.toast` | <code>ui.toast(text: string, duration?: number): void</code> |
+| `ui.banner` | <code>ui.banner(text: string, duration?: number): void</code> |
+| `ui.loading` | <code>ui.loading(label: string): Node</code> |
+| `ui.progress` | <code>ui.progress(label: string, value: number): Node</code> |
+| `ui.emptyState` | <code>ui.emptyState(title: string, message: string): Node</code> |
+| `ui.errorState` | <code>ui.errorState(title: string, message: string): Node</code> |
+| `ui.list` | <code>ui.list&lt;T&gt;(items: ExtensionList&lt;T&gt;): Node</code> |
+| `ui.lazyList` | <code>ui.lazyList&lt;T&gt;(items: ExtensionList&lt;T&gt;): Node</code> |
+| `ui.sectionedList` | <code>ui.sectionedList&lt;T&gt;(sections: { title: string; list: ExtensionList&lt;T&gt;; }[]): Node</code> |
+| `list.filter` | <code>list.filter(predicate: (item: T) =&gt; boolean): ExtensionList&lt;T&gt;</code> |
+| `list.sort` | <code>list.sort(compare: (a: T, b: T) =&gt; number): ExtensionList&lt;T&gt;</code> |
+| `list.search` | <code>list.search(query: string, stringify?: ((item: T) =&gt; string) | undefined): ExtensionList&lt;T&gt;</code> |
+| `list.select` | <code>list.select(key: string): void</code> |
+| `list.multiSelect` | <code>list.multiSelect(keys: string[]): void</code> |
+| `list.refresh` | <code>list.refresh(): Promise&lt;void&gt;</code> |
+| `list.loadMore` | <code>list.loadMore(): Promise&lt;void&gt;</code> |
+| `list.swipe` | <code>list.swipe(actions: { title: string; perform: (item: T) =&gt; unknown; }[]): ExtensionList&lt;T&gt;</code> |
+| `list.contextMenu` | <code>list.contextMenu(actions: { title: string; perform: (item: T) =&gt; unknown; }[]): ExtensionList&lt;T&gt;</code> |
+| `list.move` | <code>list.move(from: number, to: number): Promise&lt;void&gt;</code> |
+| `list.delete` | <code>list.delete(key: string): Promise&lt;boolean&gt;</code> |
+| `state.create` | <code>state.create&lt;T&gt;(initial: T): State&lt;T&gt;</code> |
+| `state.get` | <code>state.get&lt;T&gt;(value: State&lt;T&gt;): T</code> |
+| `state.set` | <code>state.set&lt;T&gt;(value: State&lt;T&gt;, next: T): void</code> |
+| `state.update` | <code>state.update&lt;T&gt;(value: State&lt;T&gt;, fn: (current: T) =&gt; T): void</code> |
+| `state.reset` | <code>state.reset&lt;T&gt;(value: State&lt;T&gt;): void</code> |
+| `state.watch` | <code>state.watch&lt;T&gt;(value: State&lt;T&gt;, fn: (next: T, previous: T) =&gt; void): () =&gt; void</code> |
+| `state.computed` | <code>state.computed&lt;T&gt;(dependencies: State&lt;unknown&gt;[], calculate: () =&gt; T): State&lt;T&gt; &amp; { dispose(): void; }</code> |
+| `date.now` | <code>date.now(): Date</code> |
+| `date.parse` | <code>date.parse(value: DateInput): Date</code> |
+| `date.format` | <code>date.format(value: DateInput, options?: DateTimeFormatOptions, locale?: string): string</code> |
+| `date.add` | <code>date.add(value: DateInput, milliseconds: number): Date</code> |
+| `date.subtract` | <code>date.subtract(value: DateInput, milliseconds: number): Date</code> |
+| `date.diff` | <code>date.diff(a: DateInput, b: DateInput): number</code> |
+| `date.startOfDay` | <code>date.startOfDay(value: DateInput): Date</code> |
+| `date.endOfDay` | <code>date.endOfDay(value: DateInput): Date</code> |
+| `date.startOfWeek` | <code>date.startOfWeek(value: DateInput, firstDay?: number): Date</code> |
+| `date.endOfWeek` | <code>date.endOfWeek(value: DateInput, firstDay?: number): Date</code> |
+| `date.isToday` | <code>date.isToday(value: DateInput): boolean</code> |
+| `date.isPast` | <code>date.isPast(value: DateInput): boolean</code> |
+| `date.isFuture` | <code>date.isFuture(value: DateInput): boolean</code> |
+| `date.timezone` | <code>date.timezone(): string</code> |
+| `cit.calendar.isClassDay` | <code>cit.calendar.isClassDay(date: Date): Promise&lt;boolean | null&gt;</code> |
+| `cit.calendar.currentSemester` | <code>cit.calendar.currentSemester(): Promise&lt;string | null&gt;</code> |
+| `cit.calendar.weekNumber` | <code>cit.calendar.weekNumber(date: Date): number</code> |
+| `math.round` | <code>math.round(x: number): number</code> |
+| `math.floor` | <code>math.floor(x: number): number</code> |
+| `math.ceil` | <code>math.ceil(x: number): number</code> |
+| `math.min` | <code>math.min(...values: number[]): number</code> |
+| `math.max` | <code>math.max(...values: number[]): number</code> |
+| `math.abs` | <code>math.abs(x: number): number</code> |
+| `math.random` | <code>math.random(): number</code> |
+| `math.clamp` | <code>math.clamp(value: number, min: number, max: number): number</code> |
+| `math.sum` | <code>math.sum(values: number[]): number</code> |
+| `math.average` | <code>math.average(values: number[]): number</code> |
+| `math.median` | <code>math.median(values: number[]): number</code> |
+| `utils.uuid` | <code>utils.uuid(): string</code> |
+| `utils.debounce` | <code>utils.debounce&lt;T extends unknown[]&gt;(callback: (...args: T) =&gt; void, milliseconds: number): ((...args: T) =&gt; void) &amp; { cancel(): void; }</code> |
+| `utils.throttle` | <code>utils.throttle&lt;T extends unknown[]&gt;(callback: (...args: T) =&gt; void, milliseconds: number): (...args: T) =&gt; void</code> |
+| `utils.sleep` | <code>utils.sleep(milliseconds: number, signal?: AbortSignal | undefined): Promise&lt;void&gt;</code> |
+| `text.format` | <code>text.format(template: string, values: Record&lt;string, string | number&gt;): string</code> |
+| `text.replace` | <code>text.replace(value: string, search: string, replacement: string): string</code> |
+| `text.split` | <code>text.split(value: string, separator: string): string[]</code> |
+| `text.join` | <code>text.join(values: string[], separator?: string): string</code> |
+| `text.contains` | <code>text.contains(value: string, search: string): boolean</code> |
+| `text.startsWith` | <code>text.startsWith(value: string, search: string): boolean</code> |
+| `text.endsWith` | <code>text.endsWith(value: string, search: string): boolean</code> |
+| `text.trim` | <code>text.trim(value: string): string</code> |
+| `text.lowercase` | <code>text.lowercase(value: string): string</code> |
+| `text.uppercase` | <code>text.uppercase(value: string): string</code> |
+| `text.regex` | <code>text.regex(pattern: string, flags?: string): RegExp</code> |
+| `json.parse` | <code>json.parse(value: string): unknown</code> |
+| `json.stringify` | <code>json.stringify(value: unknown): string</code> |
+| `cit.courses.list` | <code>cit.courses.list(): Promise&lt;Course[]&gt;</code> |
+| `cit.courses.get` | <code>cit.courses.get(id: string): Promise&lt;Course | null&gt;</code> |
+| `cit.courses.search` | <code>cit.courses.search(query: string): Promise&lt;Course[]&gt;</code> |
+| `cit.timetable.today` | <code>cit.timetable.today(at?: Date): Promise&lt;CourseOccurrence[]&gt;</code> |
+| `cit.timetable.tomorrow` | <code>cit.timetable.tomorrow(at?: Date): Promise&lt;CourseOccurrence[]&gt;</code> |
+| `cit.timetable.week` | <code>cit.timetable.week(at?: Date): Promise&lt;CourseOccurrence[]&gt;</code> |
+| `cit.timetable.current` | <code>cit.timetable.current(at?: Date): Promise&lt;CourseOccurrence[]&gt;</code> |
+| `cit.timetable.next` | <code>cit.timetable.next(at?: Date): Promise&lt;CourseOccurrence | null&gt;</code> |
+| `cit.timetable.at` | <code>cit.timetable.at(date: Date): Promise&lt;CourseOccurrence[]&gt;</code> |
+| `cit.timetable.freePeriods` | <code>cit.timetable.freePeriods(weekday?: number): Promise&lt;PeriodSlot[]&gt;</code> |
+| `cit.assignments.list` | <code>cit.assignments.list(): Promise&lt;Task[]&gt;</code> |
+| `cit.assignments.get` | <code>cit.assignments.get(id: string): Promise&lt;Task | null&gt;</code> |
+| `cit.assignments.pending` | <code>cit.assignments.pending(at?: Date): Promise&lt;Task[]&gt;</code> |
+| `cit.assignments.overdue` | <code>cit.assignments.overdue(at?: Date): Promise&lt;Task[]&gt;</code> |
+| `cit.assignments.dueSoon` | <code>cit.assignments.dueSoon(days?: number, at?: Date): Promise&lt;Task[]&gt;</code> |
+| `cit.assignments.search` | <code>cit.assignments.search(query: string): Promise&lt;Task[]&gt;</code> |
+| `cit.assignments.byCourse` | <code>cit.assignments.byCourse(course: string): Promise&lt;Task[]&gt;</code> |
+| `cit.assignments.between` | <code>cit.assignments.between(start: Date, end: Date): Promise&lt;Task[]&gt;</code> |
+| `cit.todo.list` | <code>cit.todo.list(): Promise&lt;PersonalTodo[]&gt;</code> |
+| `cit.todo.get` | <code>cit.todo.get(id: string): Promise&lt;PersonalTodo | null&gt;</code> |
+| `cit.todo.create` | <code>cit.todo.create(fields: TodoFields): Promise&lt;PersonalTodo&gt;</code> |
+| `cit.todo.update` | <code>cit.todo.update(expected: PersonalTodo, fields: TodoFields): Promise&lt;PersonalTodo&gt;</code> |
+| `cit.todo.complete` | <code>cit.todo.complete(id: string): Promise&lt;PersonalTodo | null&gt;</code> |
+| `cit.todo.uncomplete` | <code>cit.todo.uncomplete(id: string): Promise&lt;PersonalTodo | null&gt;</code> |
+| `cit.todo.delete` | <code>cit.todo.delete(expected: PersonalTodo): Promise&lt;null&gt;</code> |
+| `cit.todo.search` | <code>cit.todo.search(query: string): Promise&lt;PersonalTodo[]&gt;</code> |
+| `cit.todo.watch` | <code>cit.todo.watch(callback: (rows: PersonalTodo[]) =&gt; void, onError?: ((error: unknown) =&gt; void) | undefined): () =&gt; void</code> |
+| `cit.courseNotes.list` | <code>cit.courseNotes.list(): Promise&lt;{ id: string; courseKey: string; content: string; }[]&gt;</code> |
+| `cit.courseNotes.get` | <code>cit.courseNotes.get(id: string): Promise&lt;{ id: string; courseKey: string; content: string; } | null&gt;</code> |
+| `cit.courseNotes.create` | <code>cit.courseNotes.create(title: string, content: string): Promise&lt;{ id: string; courseKey: string; content: string; } | null&gt;</code> |
+| `cit.courseNotes.update` | <code>cit.courseNotes.update(id: string, content: string, expectedContent: string): Promise&lt;{ id: string; courseKey: string; content: string; } | null&gt;</code> |
+| `cit.courseNotes.delete` | <code>cit.courseNotes.delete(id: string, expectedContent: string): Promise&lt;null&gt;</code> |
+| `cit.semester.current` | <code>cit.semester.current(): Promise&lt;string | null&gt;</code> |
+| `cit.semester.list` | <code>cit.semester.list(): Promise&lt;string[]&gt;</code> |
+| `cit.calendar.events` | <code>cit.calendar.events(): Promise&lt;AcademicCalendarEvent[]&gt;</code> |
+| `cit.calendar.holidays` | <code>cit.calendar.holidays(start?: Date | undefined, end?: Date | undefined): Promise&lt;AcademicCalendarEvent[]&gt;</code> |
+| `cit.calendar.classDays` | <code>cit.calendar.classDays(start: Date, end: Date): Promise&lt;string[]&gt;</code> |
+| `cit.bus.routes` | <code>cit.bus.routes(): Promise&lt;BusRoute[]&gt;</code> |
+| `cit.bus.stops` | <code>cit.bus.stops(): Promise&lt;string[]&gt;</code> |
+| `cit.bus.timetable` | <code>cit.bus.timetable(at?: Date, routeFilter?: { from?: string | undefined; to?: string | undefined; } | undefined): Promise&lt;BusDeparture[]&gt;</code> |
+| `cit.bus.next` | <code>cit.bus.next(from?: string | undefined, to?: string | undefined, at?: Date): Promise&lt;BusDeparture | null&gt;</code> |
+| `cit.bus.between` | <code>cit.bus.between(start: Date, end: Date, routeFilter?: { from?: string | undefined; to?: string | undefined; } | undefined): Promise&lt;BusDeparture[]&gt;</code> |
+| `cit.bus.serviceStatus` | <code>cit.bus.serviceStatus(at?: Date): Promise&lt;BusServiceStatus&gt;</code> |
+| `cit.cafeteria.locations` | <code>cit.cafeteria.locations(): Promise&lt;CafeteriaLocation[]&gt;</code> |
+| `cit.cafeteria.menu` | <code>cit.cafeteria.menu(): Promise&lt;CafeteriaLocation[]&gt;</code> |
+| `cit.cafeteria.hours` | <code>cit.cafeteria.hours(): Promise&lt;CafeteriaHours[]&gt;</code> |
+| `cit.cafeteria.cameraStatus` | <code>cit.cafeteria.cameraStatus(): Promise&lt;CafeteriaCameraStatus[]&gt;</code> |
+| `cit.cafeteria.openCamera` | <code>cit.cafeteria.openCamera(): Promise&lt;void&gt;</code> |
+| `cit.campus.facilities` | <code>cit.campus.facilities(): Promise&lt;CampusRoom[]&gt;</code> |
+| `cit.campus.buildings` | <code>cit.campus.buildings(): Promise&lt;{ campus: "新習志野" | "津田沼" | "不明"; building: string; rooms: CampusRoom[]; }[]&gt;</code> |
+| `cit.campus.rooms` | <code>cit.campus.rooms(): Promise&lt;CampusRoom[]&gt;</code> |
+| `cit.campus.room` | <code>cit.campus.room(id: string): Promise&lt;CampusRoom | null&gt;</code> |
+| `cit.campus.search` | <code>cit.campus.search(query: string): Promise&lt;CampusRoom[]&gt;</code> |
+| `cit.campus.roomAvailability` | <code>cit.campus.roomAvailability(roomID: string, at?: Date): Promise&lt;RoomScheduleStatus&gt;</code> |
+| `cit.services.list` | <code>cit.services.list(): Promise&lt;CampusService[]&gt;</code> |
+| `cit.services.open` | <code>cit.services.open(service: HostService): Promise&lt;void&gt;</code> |
+| `cit.user.displayName` | <code>cit.user.displayName(): Promise&lt;string | null&gt;</code> |
+| `cit.user.preferences` | <code>cit.user.preferences(): Promise&lt;UserPreferences&gt;</code> |
+| `cit.settings.appearance` | <code>cit.settings.appearance(): Promise&lt;Pick&lt;UserPreferences, "accentColor"&gt;&gt;</code> |
+| `cit.settings.notifications` | <code>cit.settings.notifications(): Promise&lt;{ classStart: boolean; assignments: boolean; }&gt;</code> |
+| `cit.settings.language` | <code>cit.settings.language(): Promise&lt;string&gt;</code> |
+| `cit.settings.enabledServices` | <code>cit.settings.enabledServices(): Promise&lt;string[]&gt;</code> |
+| `storage.get` | <code>storage.get&lt;T = unknown&gt;(name: string): Promise&lt;T | null&gt;</code> |
+| `storage.set` | <code>storage.set(name: string, value: unknown): Promise&lt;void&gt;</code> |
+| `storage.has` | <code>storage.has(name: string): Promise&lt;boolean&gt;</code> |
+| `storage.remove` | <code>storage.remove(name: string): Promise&lt;void&gt;</code> |
+| `storage.clear` | <code>storage.clear(): Promise&lt;void&gt;</code> |
+| `storage.keys` | <code>storage.keys(): Promise&lt;string[]&gt;</code> |
+| `database.createTable` | <code>database.createTable(name: string): Promise&lt;void&gt;</code> |
+| `database.insert` | <code>database.insert(name: string, row: RecordValue): Promise&lt;void&gt;</code> |
+| `database.update` | <code>database.update(name: string, id: string, changes: Record&lt;string, unknown&gt;): Promise&lt;void&gt;</code> |
+| `database.delete` | <code>database.delete(name: string, id: string): Promise&lt;void&gt;</code> |
+| `database.get` | <code>database.get(name: string, id: string): Promise&lt;RecordValue | null&gt;</code> |
+| `database.query` | <code>database.query(name: string): Promise&lt;RecordValue[]&gt;</code> |
+| `database.transaction` | <code>database.transaction&lt;T&gt;(work: (transaction: Transaction) =&gt; T): Promise&lt;T&gt;</code> |
+| `database.watch` | <code>database.watch(name: string, callback: (rows: RecordValue[]) =&gt; void, onError?: ((error: unknown) =&gt; void) | undefined): () =&gt; void</code> |
+| `files.read` | <code>files.read(name: string): Promise&lt;Uint8Array&lt;ArrayBufferLike&gt; | null&gt;</code> |
+| `files.write` | <code>files.write(name: string, bytes: Uint8Array&lt;ArrayBufferLike&gt;): Promise&lt;void&gt;</code> |
+| `files.delete` | <code>files.delete(name: string): Promise&lt;boolean&gt;</code> |
+| `files.move` | <code>files.move(source: string, destination: string): Promise&lt;boolean&gt;</code> |
+| `files.copy` | <code>files.copy(source: string, destination: string): Promise&lt;boolean&gt;</code> |
+| `files.exists` | <code>files.exists(name: string): Promise&lt;boolean&gt;</code> |
+| `files.list` | <code>files.list(): Promise&lt;string[]&gt;</code> |
+| `files.info` | <code>files.info(name: string): Promise&lt;ExtensionFileInfo | null&gt;</code> |
+| `files.pick` | <code>files.pick(kind?: FilePickerKind): Promise&lt;PickedFileInfo | null&gt;</code> |
+| `files.pickMultiple` | <code>files.pickMultiple(kind?: FilePickerKind): Promise&lt;PickedFileInfo[] | null&gt;</code> |
+| `files.pickImage` | <code>files.pickImage(): Promise&lt;PickedFileInfo | null&gt;</code> |
+| `files.pickVideo` | <code>files.pickVideo(): Promise&lt;PickedFileInfo | null&gt;</code> |
+| `files.pickAudio` | <code>files.pickAudio(): Promise&lt;PickedFileInfo | null&gt;</code> |
+| `files.pickDocument` | <code>files.pickDocument(): Promise&lt;PickedFileInfo | null&gt;</code> |
+| `files.export` | <code>files.export(name: string, suggestedName?: string): Promise&lt;boolean&gt;</code> |
+| `files.saveAs` | <code>files.saveAs(name: string, suggestedName?: string): Promise&lt;boolean&gt;</code> |
+| `camera.capturePhoto` | <code>camera.capturePhoto(): Promise&lt;PickedFileInfo | null&gt;</code> |
+| `camera.captureVideo` | <code>camera.captureVideo(maxSeconds?: number): Promise&lt;PickedFileInfo | null&gt;</code> |
+| `camera.available` | <code>camera.available(): Promise&lt;boolean&gt;</code> |
+| `camera.permissions` | <code>camera.permissions(): Promise&lt;PermissionStatus&gt;</code> |
+| `camera.scanQRCode` | <code>camera.scanQRCode(): Promise&lt;ScannedCode | null&gt;</code> |
+| `camera.scanBarcode` | <code>camera.scanBarcode(): Promise&lt;ScannedCode | null&gt;</code> |
+| `photos.pick` | <code>photos.pick(): Promise&lt;PickedFileInfo | null&gt;</code> |
+| `photos.pickMultiple` | <code>photos.pickMultiple(): Promise&lt;PickedFileInfo[] | null&gt;</code> |
+| `photos.save` | <code>photos.save(source: string): Promise&lt;boolean&gt;</code> |
+| `photos.info` | <code>photos.info(source: string): Promise&lt;ImageInfo&gt;</code> |
+| `image.resize` | <code>image.resize(input: ImageSource, name: string, width: number, height: number, options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code> |
+| `image.crop` | <code>image.crop(input: ImageSource, name: string, rectangle: { x: number; y: number; width: number; height: number; }, options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code> |
+| `image.rotate` | <code>image.rotate(input: ImageSource, name: string, degrees: 0 | 90 | 180 | 270, options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code> |
+| `image.flip` | <code>image.flip(input: ImageSource, name: string, axis: "horizontal" | "vertical", options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code> |
+| `image.compress` | <code>image.compress(input: ImageSource, name: string, quality?: number): Promise&lt;ImageResult&gt;</code> |
+| `image.convert` | <code>image.convert(input: ImageSource, name: string, format: "jpeg" | "png", quality?: number): Promise&lt;ImageResult&gt;</code> |
+| `image.thumbnail` | <code>image.thumbnail(input: ImageSource, name: string, maxDimension?: number): Promise&lt;ImageResult&gt;</code> |
+| `image.removeMetadata` | <code>image.removeMetadata(input: ImageSource, name: string, options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code> |
+| `image.scanDocument` | <code>image.scanDocument(options?: { name?: string | undefined; maxPages?: number | undefined; }): Promise&lt;ScannedDocumentInfo | null&gt;</code> |
+| `audio.record` | <code>audio.record(maxSeconds?: number): Promise&lt;PickedFileInfo | null&gt;</code> |
+| `audio.stopRecording` | <code>audio.stopRecording(): Promise&lt;boolean&gt;</code> |
+| `audio.play` | <code>audio.play(source?: string | undefined): Promise&lt;void&gt;</code> |
+| `audio.pause` | <code>audio.pause(): Promise&lt;void&gt;</code> |
+| `audio.stop` | <code>audio.stop(): Promise&lt;void&gt;</code> |
+| `audio.duration` | <code>audio.duration(): Promise&lt;number | null&gt;</code> |
+| `audio.position` | <code>audio.position(): Promise&lt;number | null&gt;</code> |
+| `video.play` | <code>video.play(source?: string | undefined): Promise&lt;void&gt;</code> |
+| `video.pause` | <code>video.pause(): Promise&lt;void&gt;</code> |
+| `video.thumbnail` | <code>video.thumbnail(source: string, name: string, seconds?: number, maxDimension?: number): Promise&lt;GeneratedThumbnail&gt;</code> |
+| `video.info` | <code>video.info(source: string): Promise&lt;VideoInfo&gt;</code> |
+| `code.generateQR` | <code>code.generateQR(text: string, name: string, size?: number): Promise&lt;{ name: string; size: number; mimeType: "image/png"; width: number; height: number; }&gt;</code> |
+| `code.scanQR` | <code>code.scanQR(): Promise&lt;ScannedCode | null&gt;</code> |
+| `code.scanBarcode` | <code>code.scanBarcode(): Promise&lt;ScannedCode | null&gt;</code> |
+| `location.current` | <code>location.current(): Promise&lt;LocationFix&gt;</code> |
+| `location.permission` | <code>location.permission(): Promise&lt;PermissionStatus&gt;</code> |
+| `location.openSettings` | <code>location.openSettings(): Promise&lt;void&gt;</code> |
+| `map.view` | <code>map.view(options?: MapViewOptions, overlays?: Node[]): Node</code> |
+| `map.marker` | <code>map.marker(location: MapCoordinate, options: MapMarkerOptions): Node</code> |
+| `map.polyline` | <code>map.polyline(path: MapCoordinate[], options?: MapShapeOptions): Node</code> |
+| `map.circle` | <code>map.circle(center: MapCoordinate, radiusMeters: number, options?: MapShapeOptions): Node</code> |
+| `map.fitBounds` | <code>map.fitBounds(bounds: MapCoordinate[], padding?: number): Node</code> |
+| `map.openDirections` | <code>map.openDirections(destination: MapCoordinate, options?: DirectionsOptions): Promise&lt;void&gt;</code> |
+| `geo.distance` | <code>geo.distance(from: Coordinate, to: Coordinate): number</code> |
+| `geo.bearing` | <code>geo.bearing(from: Coordinate, to: Coordinate): number</code> |
+| `geo.contains` | <code>geo.contains(point: Coordinate, circle: { center: Coordinate; radius: number; }): boolean</code> |
+| `notification.permission` | <code>notification.permission(): Promise&lt;PermissionStatus&gt;</code> |
+| `notification.schedule` | <code>notification.schedule(value: LocalNotificationInput): Promise&lt;void&gt;</code> |
+| `notification.cancel` | <code>notification.cancel(id: string): Promise&lt;boolean&gt;</code> |
+| `notification.cancelAll` | <code>notification.cancelAll(): Promise&lt;number&gt;</code> |
+| `notification.listScheduled` | <code>notification.listScheduled(): Promise&lt;ScheduledLocalNotification[]&gt;</code> |
+| `notification.onOpen` | <code>notification.onOpen(callback: (notification: { id: string; data: Record&lt;string, string&gt;; action: string; }) =&gt; unknown): () =&gt; void</code> |
+| `background.register` | <code>background.register(task: { id: string; intervalMinutes: number; networkRequired?: boolean | undefined; chargingRequired?: boolean | undefined; }): Promise&lt;{ id: string; accepted: boolean; }&gt;</code> |
+| `background.unregister` | <code>background.unregister(id: string): Promise&lt;boolean&gt;</code> |
+| `background.status` | <code>background.status(): Promise&lt;BackgroundStatus&gt;</code> |
+| `network.fetch` | <code>network.fetch(url: string, options?: NetworkOptions): Promise&lt;NetworkResponse&gt;</code> |
+| `network.get` | <code>network.get(url: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code> |
+| `network.post` | <code>network.post(url: string, body: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code> |
+| `network.put` | <code>network.put(url: string, body: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code> |
+| `network.patch` | <code>network.patch(url: string, body: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code> |
+| `network.delete` | <code>network.delete(url: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code> |
+| `network.upload` | <code>network.upload(url: string, name: string, options?: { method?: "POST" | "PUT" | undefined; headers?: Record&lt;string, string&gt; | undefined; onProgress?: NetworkProgressHandler | undefined; }): Promise&lt;NetworkResponse&gt;</code> |
+| `network.download` | <code>network.download(url: string, name: string, options?: Record&lt;string, string&gt; | { headers?: Record&lt;string, string&gt; | undefined; onProgress?: NetworkProgressHandler | undefined; }): Promise&lt;NetworkFileResponse&gt;</code> |
+| `network.websocket.connect` | <code>network.websocket.connect(url: string): Promise&lt;ExtensionWebSocket&gt;</code> |
+| `socket.send` | <code>socket.send(data: string): Promise&lt;void&gt;</code> |
+| `socket.onMessage` | <code>socket.onMessage(callback: (data: string) =&gt; unknown): () =&gt; void</code> |
+| `socket.close` | <code>socket.close(code?: number | undefined, reason?: string | undefined): Promise&lt;void&gt;</code> |
+| `browser.open` | <code>browser.open(url: string): Promise&lt;void&gt;</code> |
+| `browser.openExternal` | <code>browser.openExternal(url: string): Promise&lt;void&gt;</code> |
+| `webView.open` | <code>webView.open(url: string): Promise&lt;void&gt;</code> |
+| `clipboard.write` | <code>clipboard.write(value: string): Promise&lt;void&gt;</code> |
+| `clipboard.read` | <code>clipboard.read(): Promise&lt;string | null&gt;</code> |
+| `share.text` | <code>share.text(value: string): Promise&lt;void&gt;</code> |
+| `share.url` | <code>share.url(value: string): Promise&lt;void&gt;</code> |
+| `share.image` | <code>share.image(key: string): Promise&lt;void&gt;</code> |
+| `share.file` | <code>share.file(key: string): Promise&lt;void&gt;</code> |
+| `share.items` | <code>share.items(items: ShareItem[]): Promise&lt;void&gt;</code> |
+| `drag.source` | <code>drag.source(label: string, value: string): Node</code> |
+| `drop.target` | <code>drop.target(key: string, label: string): Node</code> |
+| `haptics.light` | <code>haptics.light(): Promise&lt;void&gt;</code> |
+| `haptics.medium` | <code>haptics.medium(): Promise&lt;void&gt;</code> |
+| `haptics.heavy` | <code>haptics.heavy(): Promise&lt;void&gt;</code> |
+| `haptics.success` | <code>haptics.success(): Promise&lt;void&gt;</code> |
+| `haptics.warning` | <code>haptics.warning(): Promise&lt;void&gt;</code> |
+| `haptics.error` | <code>haptics.error(): Promise&lt;void&gt;</code> |
+| `device.platform` | <code>device.platform(): Promise&lt;"ios" | "macos" | "android"&gt;</code> |
+| `device.osVersion` | <code>device.osVersion(): Promise&lt;string&gt;</code> |
+| `device.deviceClass` | <code>device.deviceClass(): Promise&lt;"phone" | "tablet" | "desktop"&gt;</code> |
+| `device.screen` | <code>device.screen(): Promise&lt;DeviceScreen&gt;</code> |
+| `device.locale` | <code>device.locale(): Promise&lt;string&gt;</code> |
+| `device.timezone` | <code>device.timezone(): Promise&lt;string&gt;</code> |
+| `device.appearance` | <code>device.appearance(): Promise&lt;"light" | "dark"&gt;</code> |
+| `device.capabilities` | <code>device.capabilities(): Promise&lt;string[]&gt;</code> |
+| `keyboard.dismiss` | <code>keyboard.dismiss(): Promise&lt;void&gt;</code> |
+| `keyboard.focus` | <code>keyboard.focus(key: string): Promise&lt;void&gt;</code> |
+| `accessibility.label` | <code>accessibility.label(node: Node, value: string): Node</code> |
+| `accessibility.hint` | <code>accessibility.hint(node: Node, value: string): Node</code> |
+| `accessibility.role` | <code>accessibility.role(node: Node, value: AccessibilityRole): Node</code> |
+| `accessibility.isReduceMotionEnabled` | <code>accessibility.isReduceMotionEnabled(): Promise&lt;boolean&gt;</code> |
+| `accessibility.isHighContrastEnabled` | <code>accessibility.isHighContrastEnabled(): Promise&lt;boolean&gt;</code> |
+| `animation.animate` | <code>animation.animate&lt;T&gt;(options: AnimationOptions, update: () =&gt; T | Promise&lt;T&gt;): Promise&lt;T&gt;</code> |
+| `animation.spring` | <code>animation.spring&lt;T&gt;(update: () =&gt; T | Promise&lt;T&gt;, options?: Omit&lt;AnimationOptions, "curve"&gt;): Promise&lt;T&gt;</code> |
+| `animation.transition` | <code>animation.transition&lt;T&gt;(update: () =&gt; T | Promise&lt;T&gt;, options?: AnimationOptions): Promise&lt;T&gt;</code> |
+| `chart.line` | <code>chart.line(label: string, categories: string[], series: ChartSeries[]): Node</code> |
+| `chart.bar` | <code>chart.bar(label: string, categories: string[], series: ChartSeries[]): Node</code> |
+| `chart.area` | <code>chart.area(label: string, categories: string[], series: ChartSeries[]): Node</code> |
+| `chart.pie` | <code>chart.pie(label: string, categories: string[], values: number[]): Node</code> |
+| `chart.donut` | <code>chart.donut(label: string, categories: string[], values: number[]): Node</code> |
+| `chart.scatter` | <code>chart.scatter(label: string, series: ScatterSeries[]): Node</code> |
+| `canvas.create` | <code>canvas.create(width?: number, height?: number, label?: string): ExtensionCanvas</code> |
+| `canvas.line` | <code>canvas.create().line(x1: number, y1: number, x2: number, y2: number, appearance?: DrawingStyle): ExtensionCanvas</code> |
+| `canvas.rect` | <code>canvas.create().rect(x: number, y: number, width: number, height: number, appearance?: DrawingStyle): ExtensionCanvas</code> |
+| `canvas.circle` | <code>canvas.create().circle(x: number, y: number, radius: number, appearance?: DrawingStyle): ExtensionCanvas</code> |
+| `canvas.text` | <code>canvas.create().text(text: string, x: number, y: number, options?: { color?: DrawingColor | undefined; size?: number | undefined; align?: "leading" | "center" | "trailing" | undefined; }): ExtensionCanvas</code> |
+| `canvas.image` | <code>canvas.create().image(url: string, x: number, y: number, width: number, height: number): ExtensionCanvas</code> |
+| `canvas.path` | <code>canvas.create().path(segments: PathSegment[], appearance?: DrawingStyle): ExtensionCanvas</code> |
+| `pdf.open` | <code>pdf.open(source: string): Promise&lt;void&gt;</code> |
+| `pdf.pageCount` | <code>pdf.pageCount(source: string): Promise&lt;number&gt;</code> |
+| `pdf.thumbnail` | <code>pdf.thumbnail(source: string, name: string, page?: number, maxDimension?: number): Promise&lt;GeneratedThumbnail&gt;</code> |
+| `pdf.export` | <code>pdf.export(name: string, suggestedName?: string): Promise&lt;boolean&gt;</code> |
+| `pdf.share` | <code>pdf.share(source: string): Promise&lt;void&gt;</code> |
+| `pdf.create` | <code>pdf.create(name: string, pages: PDFPageInput[]): Promise&lt;PDFInfo&gt;</code> |
+| `scanner.document` | <code>scanner.document(options?: { name?: string | undefined; maxPages?: number | undefined; }): Promise&lt;ScannedDocumentInfo | null&gt;</code> |
+| `sensors.accelerometer` | <code>sensors.accelerometer(): Promise&lt;MotionVector&gt;</code> |
+| `sensors.gyroscope` | <code>sensors.gyroscope(): Promise&lt;MotionVector&gt;</code> |
+| `sensors.magnetometer` | <code>sensors.magnetometer(): Promise&lt;MotionVector&gt;</code> |
+| `sensors.orientation` | <code>sensors.orientation(): Promise&lt;MotionOrientation&gt;</code> |
+| `connectivity.status` | <code>connectivity.status(): Promise&lt;NetworkStatus&gt;</code> |
+| `connectivity.onChange` | <code>connectivity.onChange(callback: (status: NetworkStatus) =&gt; unknown): Promise&lt;() =&gt; void&gt;</code> |
+| `crypto.randomBytes` | <code>crypto.randomBytes(length: number): Uint8Array&lt;ArrayBufferLike&gt;</code> |
+| `crypto.hash` | <code>crypto.hash(text: string, algorithm?: "SHA-256" | "SHA-512"): Promise&lt;string&gt;</code> |
+| `crypto.hmac` | <code>crypto.hmac(text: string, key: string, algorithm?: "SHA-256" | "SHA-512"): Promise&lt;string&gt;</code> |
+| `crypto.encrypt` | <code>crypto.encrypt(text: string, key: string, aad?: string): Promise&lt;EncryptedText&gt;</code> |
+| `crypto.decrypt` | <code>crypto.decrypt(envelope: EncryptedText, key: string, aad?: string): Promise&lt;string&gt;</code> |
+| `secureStorage.set` | <code>secureStorage.set(name: string, value: unknown): Promise&lt;void&gt;</code> |
+| `secureStorage.get` | <code>secureStorage.get&lt;T = unknown&gt;(name: string): Promise&lt;T | null&gt;</code> |
+| `secureStorage.delete` | <code>secureStorage.delete(name: string): Promise&lt;void&gt;</code> |
+| `auth.oauth2` | <code>auth.oauth2(providerInput: OAuthProvider): Promise&lt;OAuthSession&gt;</code> |
+| `auth.openIDConnect` | <code>auth.openIDConnect(config: { issuer: string; clientId: string; scopes: string[]; }): Promise&lt;OIDCSession&gt;</code> |
+| `auth.logout` | <code>auth.logout(): Promise&lt;void&gt;</code> |
+| `auth.tokenStatus` | <code>auth.tokenStatus(): Promise&lt;{ connected: boolean; expiresAt: number | null; scopes: string[]; }&gt;</code> |
+| `link.create` | <code>link.create(id: string): Promise&lt;string&gt;</code> |
+| `link.open` | <code>link.open(url: string): Promise&lt;void&gt;</code> |
+| `app.onDeepLink` | <code>app.onDeepLink(callback: (payload: AppOpenURLPayload) =&gt; unknown): () =&gt; void</code> |
+| `extensions.isInstalled` | <code>extensions.isInstalled(id: string): Promise&lt;boolean&gt;</code> |
+| `extensions.open` | <code>extensions.open(id: string): Promise&lt;void&gt;</code> |
+| `extensions.request` | <code>extensions.request(id: string): Promise&lt;void&gt;</code> |
+| `intent.register` | <code>intent.register&lt;T = unknown, R = unknown&gt;(name: string, handler: IntentHandler&lt;T, R&gt;): () =&gt; void</code> |
+| `intent.perform` | <code>intent.perform&lt;T = unknown, R = unknown&gt;(name: string, input?: T | undefined): Promise&lt;R[]&gt;</code> |
+| `search.registerItems` | <code>search.registerItems(items: SearchItem[]): Promise&lt;{ indexed: number; }&gt;</code> |
+| `search.removeItems` | <code>search.removeItems(ids: string[]): Promise&lt;{ removed: number; }&gt;</code> |
+| `host.registerShortcut` | <code>host.registerShortcut(value: HostAction): Promise&lt;{ registered: boolean; }&gt;</code> |
+| `host.registerAction` | <code>host.registerAction(value: HostAction): Promise&lt;{ registered: boolean; }&gt;</code> |
+| `widget.define` | <code>widget.define(value: WidgetDefinition): Promise&lt;{ registered: boolean; }&gt;</code> |
+| `widget.reload` | <code>widget.reload(id: string): Promise&lt;{ queued: boolean; }&gt;</code> |
+| `shortcuts.register` | <code>shortcuts.register(value: HostAction): Promise&lt;{ registered: boolean; }&gt;</code> |
+| `server.function` | <code>server.function&lt;T = unknown&gt;(name: string, input?: unknown): Promise&lt;T&gt;</code> |
+| `server.kv.get` | <code>server.kv.get&lt;T = unknown&gt;(key: string): Promise&lt;{ value: T | null; revision: number; }&gt;</code> |
+| `server.kv.set` | <code>server.kv.set(key: string, value: unknown, expectedRevision: number): Promise&lt;number&gt;</code> |
+| `server.kv.delete` | <code>server.kv.delete(key: string, expectedRevision: number): Promise&lt;boolean&gt;</code> |
+| `server.db.insert` | <code>server.db.insert&lt;T extends Record&lt;string, unknown&gt;&gt;(table: string, id: string, value: T): Promise&lt;ServerRecord&lt;T&gt;&gt;</code> |
+| `server.db.query` | <code>server.db.query&lt;T extends Record&lt;string, unknown&gt; = Record&lt;string, unknown&gt;&gt;(table: string, options?: ServerQuery): Promise&lt;{ rows: ServerRecord&lt;T&gt;[]; nextCursor: string | null; }&gt;</code> |
+| `server.db.update` | <code>server.db.update&lt;T extends Record&lt;string, unknown&gt;&gt;(table: string, id: string, value: T, expectedRevision: number): Promise&lt;ServerRecord&lt;T&gt;&gt;</code> |
+| `server.db.delete` | <code>server.db.delete(table: string, id: string, expectedRevision: number): Promise&lt;{ deleted: boolean; }&gt;</code> |
+| `server.db.transaction` | <code>server.db.transaction(operations: ServerOperation[]): Promise&lt;ServerResult[]&gt;</code> |
+| `cloud.user.get` | <code>cloud.user.get&lt;T = unknown&gt;(name: string): Promise&lt;{ value: T | null; revision: number; }&gt;</code> |
+| `cloud.user.set` | <code>cloud.user.set(name: string, expectedRevision: number, value: unknown): Promise&lt;number&gt;</code> |
+| `cloud.shared.create` | <code>cloud.shared.create&lt;T&gt;(group: string, name: string, value: T): Promise&lt;SharedValue&lt;T&gt;&gt;</code> |
+| `cloud.shared.read` | <code>cloud.shared.read&lt;T = unknown&gt;(group: string, name: string): Promise&lt;SharedValue&lt;T&gt; | null&gt;</code> |
+| `cloud.shared.update` | <code>cloud.shared.update&lt;T&gt;(group: string, name: string, value: T, expectedRevision: number): Promise&lt;SharedValue&lt;T&gt;&gt;</code> |
+| `cloud.shared.delete` | <code>cloud.shared.delete(group: string, name: string, expectedRevision: number): Promise&lt;{ deleted: true; }&gt;</code> |
+| `groups.create` | <code>groups.create(name: string): Promise&lt;ExtensionGroup&gt;</code> |
+| `groups.join` | <code>groups.join(invitation: string): Promise&lt;ExtensionGroup | null&gt;</code> |
+| `groups.leave` | <code>groups.leave(id: string): Promise&lt;{ left: true; } | null&gt;</code> |
+| `groups.members` | <code>groups.members(id: string): Promise&lt;GroupMember[]&gt;</code> |
+| `groups.invite` | <code>groups.invite(id: string, options?: { expiresInHours?: number | undefined; maxUses?: number | undefined; }): Promise&lt;GroupInvitation&gt;</code> |
+| `realtime.subscribe` | <code>realtime.subscribe&lt;T&gt;(group: string, topic: string, onMessage: (message: RealtimeMessage&lt;T&gt;) =&gt; unknown, options?: RealtimeSubscribeOptions): () =&gt; void</code> |
+| `realtime.publish` | <code>realtime.publish&lt;T&gt;(group: string, topic: string, value: T): Promise&lt;RealtimeMessage&lt;T&gt;&gt;</code> |
+| `server.cron.register` | <code>server.cron.register(name: string, input?: unknown, intervalSeconds?: number): Promise&lt;CronRegistration&gt;</code> |
+| `server.cron.status` | <code>server.cron.status(name: string): Promise&lt;CronStatus&gt;</code> |
+| `push.sendToCurrentUser` | <code>push.sendToCurrentUser(value: { title: string; body: string; data?: Record&lt;string, string&gt; | undefined; }): Promise&lt;{ accepted: boolean; }&gt;</code> |
+| `console.log` | <code>console.log(...values: unknown[]): void</code> |
+| `console.warn` | <code>console.warn(...values: unknown[]): void</code> |
+| `console.error` | <code>console.error(...values: unknown[]): void</code> |
+| `debug.inspect` | <code>debug.inspect(value: unknown): string</code> |
+| `analytics.event` | <code>analytics.event(name: string): Promise&lt;void&gt;</code> |
+| `capabilities.has` | <code>capabilities.has(name: string): boolean</code> |
+| `permissions.status` | <code>permissions.status(permission: Permission): Promise&lt;PermissionStatus&gt;</code> |
+| `permissions.request` | <code>permissions.request(permission: Permission): Promise&lt;PermissionStatus&gt;</code> |
+| `permissions.openSettings` | <code>permissions.openSettings(): Promise&lt;void&gt;</code> |
 
 <!-- GENERATED PUBLIC API INDEX END -->

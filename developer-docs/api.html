@@ -31,7 +31,7 @@
       <p class="lead">TypeScript SDKから利用できる機能、必要な権限、データの範囲、互換性をまとめています。実装例から読み始め、APIの詳細へ進めます。</p>
       <div class="doc-actions"><a class="doc-button primary" href="guide.html">開発を始める</a><a class="doc-button" href="assets/cithub-extension-kit.zip?v=80.0" download>SDKをダウンロード <span>v0.80.0</span></a><a class="doc-button quiet" href="api.md" download>Markdown仕様書</a></div>
       <div class="meta"><span><strong>Host API</strong>  v80</span><span><strong>SDK</strong> v0.80.0</span><span><strong>Runtime</strong> QuickJS / TypeScript</span><span><strong>対象</strong> iOS・iPadOS・macOS・Android</span></div>
-      <div class="callout"><strong>互換性と検証状況</strong><br>Host API v80です。2026年10月29日時点でiOS 27.1 Simulator XCTest 32件（29件はフル実行で成功、署名が必要な3件は署名付き再実行で成功）、Android API 33 AVD 116計装テスト、Mac Catalyst 14スモーク系統を実施しました。監査一覧ではSDK 433/433、Node focused suite 405要件行、iOS 276行、Android 433行、Catalyst 255行、三環境共通250行に通過証拠があります。対応付けはAPIごとの独立E2Eを意味しません。<a href="api-inventory.md">監査一覧</a>をご確認ください。物理端末は使用していません。拡張機能サーバー本番サーバーはrelease v87.1で稼働し、開発者登録は認証済みモードです。実ユーザーによる新規登録E2Eは未確認です。</div>
+      <div class="callout"><strong>互換性</strong><br>Host API v80に対応しています。利用できる機能は、アプリのバージョン、OS、権限、端末のCapabilityによって異なります。必要に応じて <code>capabilities.has()</code> と各APIの制約を確認してください。</div>
       <div class="doc-intro-grid">
         <a class="doc-intro-card" href="#quickstart"><span class="card-index">01</span><strong>まず動かす</strong><span>TypeScriptで作成し、アプリ上で試すまで。</span><span class="card-arrow" aria-hidden="true">→</span></a>
         <a class="doc-intro-card" href="#campus-data"><span class="card-index">02</span><strong>アプリのデータを使う</strong><span>本人の時間割、課題、ToDoなど。</span><span class="card-arrow" aria-hidden="true">→</span></a>
@@ -63,7 +63,7 @@ console.log({ host, nextClass });</code></pre></div>
 
       <section id="availability" data-title="対応状況の見方" data-group="概要">
         <h2>対応状況の見方</h2>
-        <p>SDKに型があることと、すべてのOSで実機検証済みであることは同じではありません。次の区分を確認し、必要に応じて実行時Capabilityとエラーを扱ってください。</p>
+        <p>APIの利用可否はOSや端末の機能により異なります。必要に応じて実行時Capabilityとエラーを扱ってください。</p>
         <div class="status-list">
           <div><span class="status-mark available">●</span><strong>実装済みAPI</strong><p>本ページで説明する範囲。個別のOS制約・権限・データ取得条件は各節に記載しています。</p></div>
           <div><span class="status-mark limited">●</span><strong>制約・部分対応あり</strong><p>OSや元データの制約を受けます。例: 端末内キャッシュがない場合のデータAPI、OSに任される通知時刻。</p></div>
@@ -393,7 +393,7 @@ await extensions.isInstalled(id)
 await extensions.open(id)           // navigation.openExtension(id)も同じ
 await extensions.request(id)        // 追加内容の確認。自動追加ではありません
 const url = await link.create(id)
-await link.open(url)</code></pre><p>画面移動にhost.navigate、追加状況・リンク確認にextensions.read、食堂カメラにはcafeteria.readを宣言します。移動は直接のボタン操作が必要です。非表示サービスはservice_unavailable、未追加拡張機能はextension_not_installed。共有リンクは公開中の拡張機能だけが対象です。別の拡張機能の保存情報や、他ユーザーの追加状況は取得できません。返却は移動受付であり、遷移先の読み込み完了ではありません。</p><p>リンク先にはCIT Hubで追加するボタンとアプリのストア導線があります。未インストールなら、インストール後に同じリンクを再度開きます。例: <code>examples/host-navigation.ts</code>。実機検証・本番配備は保留しています。</p></section>
+await link.open(url)</code></pre><p>画面移動にhost.navigate、追加状況・リンク確認にextensions.read、食堂カメラにはcafeteria.readを宣言します。移動は直接のボタン操作が必要です。非表示サービスはservice_unavailable、未追加拡張機能はextension_not_installed。共有リンクは公開中の拡張機能だけが対象です。別の拡張機能の保存情報や、他ユーザーの追加状況は取得できません。返却は移動受付であり、遷移先の読み込み完了ではありません。</p><p>リンク先にはCIT Hubで追加するボタンとアプリのストア導線があります。未インストールなら、インストール後に同じリンクを再度開きます。例: <code>examples/host-navigation.ts</code>。</p></section>
 <section id="capture-recording" data-title="撮影・録音・写真保存・QR生成" data-group="端末機能"><h2>撮影・録音・写真保存・QR生成</h2><p>Host API v61で追加した撮影・録音・写真保存・QR生成APIです。公開配備と実端末の検証は別途必要です。ユーザー操作とOS権限に従い端末内で処理し、自動アップロードはしません.</p><div class="table-wrap"><table><thead><tr><th>API</th><th>動作</th><th>権限</th></tr></thead><tbody><tr><td><code>camera.capturePhoto()</code><br><code>camera.captureVideo(seconds)</code></td><td>OS撮影画面から選択ファイルを返却。動画1〜60秒・10MiB以内。Macは撮影非対応。</td><td>camera.use, files.selection.read<br>動画はmicrophone.useも必要</td></tr><tr><td><code>audio.record(seconds)</code><br><code>audio.stopRecording()</code></td><td>専用画面で明示して開始。録音1〜300秒、AAC、画面離脱でも終了。</td><td>microphone.use, files.selection.read</td></tr><tr><td><code>photos.save(key)</code></td><td>選択したJPEG/PNGを確認後に端末の写真ライブラリへ追加。</td><td>photos.user, files.selection.read</td></tr><tr><td><code>code.generateQR(text,name,size)</code></td><td>UTF-8 1000バイト以内のQRを専用ファイル領域へPNG保存。外部通信不要。</td><td>files.storage</td></tr></tbody></table></div><p>キャンセル・権限拒否・非対応端末は成功扱いにしません。<a href="api.md">返却型・制約・エラー</a>とSDKの<code>examples/capture-and-record.ts</code>を参照してください。録音・撮影は事前にCapabilityを確認します。</p></section>
 <section id="motion-directions" data-title="Sensors directions language" data-group="端末とファイル">
         <h2>センサー・経路・表示言語 <small>v60</small></h2>
@@ -498,9 +498,9 @@ const text = debug.inspect({screen:'notes', count:3});</code></pre></div>
           <tr><td>v51</td><td>OS標準の保存画面へ書き出す <code>files.export()</code> / <code>files.saveAs()</code>（専用領域内のファイル）</td></tr>
           <tr><td>v52</td><td>OS標準の共有シート <code>share.text()</code> / <code>share.url()</code> / <code>share.items()</code>（利用者操作、テキスト・HTTPS URL）</td></tr>
           <tr><td>v53</td><td>利用者が選択したファイルをOS共有画面へ渡す <code>share.file()</code>（直接操作、ファイル権限）</td></tr>
-          <tr><td>v60</td><td>センサー単発取得・経路表示・言語・招待制グループと共有データ。参加確認、期限、ACL、匿名ID、暗号化、競合検知。実機確認・本番配備は別途必要。</td></tr>
-          <tr><td>v59</td><td>本人専用サーバーKV・DBと一括処理、PDF生成・書き出し、PDF／動画サムネイル、QR／バーコード、音声／動画操作、本人プレビューの開発ログ。本番配備と端末操作確認は別途必要。</td></tr>
-          <tr><td>v58</td><td>状態連動入力、リスト、画面遷移、ダイアログ、画像加工、Canvas・6種類のグラフ、選択メディア情報、PDFプレビュー・ページ数、カメラ搭載・許可状態。端末での動作確認と本番配備は未実施。</td></tr>
+          <tr><td>v60</td><td>センサー単発取得・経路表示・言語・招待制グループと共有データ。参加確認、期限、ACL、匿名ID、暗号化、競合検知。</td></tr>
+          <tr><td>v59</td><td>本人専用サーバーKV・DBと一括処理、PDF生成・書き出し、PDF／動画サムネイル、QR／バーコード、音声／動画操作、本人プレビューの開発ログ。</td></tr>
+          <tr><td>v58</td><td>状態連動入力、リスト、画面遷移、ダイアログ、画像加工、Canvas・6種類のグラフ、選択メディア情報、PDFプレビュー・ページ数、カメラ搭載・許可状態。</td></tr>
           <tr><td>v57</td><td><code>analytics.event(name)</code>。analytics.collect権限と直接操作が必要な匿名集計（イベント名・日付・件数のみ、90日保持）</td></tr>
           <tr><td>v64</td><td><code>scanner.document()</code> / <code>image.scanDocument()</code>。camera.use + files.storage。PDFを端末内の拡張機能領域に最大5 MiBで保存。iOS/Androidのみ</td></tr>
           <tr><td>v65</td><td><code>cit.cafeteria.hours()</code>。cafeteria.read。公式掲載の通常期・休暇期営業時間と参照URL。臨時休業・特別日程を保証しない</td></tr>
@@ -664,447 +664,451 @@ export default defineProgram({
       </section>
       <section id="not-available" data-title="未提供APIとセキュリティ境界" data-group="公開と互換性">
         <h2>公開していないAPI</h2>
-        <p>API定義の存在とOS上の実行確認は区別しています。2026年10月29日の監査ではiOS 27.1 Simulator XCTest 32件（29件はフル実行で成功、署名が必要な3件は署名付き再実行で成功）、Android API 33 AVDの計装テスト116件、Mac Catalystのスモーク14系統を確認しました。API要件433行のうち、通過fixtureの対応があるのはiOS 276行、Android 433行、Mac Catalyst 255行で、3環境すべてに対応があるのは250行です。要件行はテスト群との対応数であり、個々のAPIの独立したE2E網羅ではありません。物理端末のハードウェア動作は確認していません。サーバーFunctions/Cronは拡張機能サーバー稼働中のベストエフォート実行、Realtimeはグループ内HTTPSポーリング、Pushは要求元の登録端末宛です。OAuth/OIDCは実プロバイダー連携を別途確認する必要があります。CIT Hub内ウィジェットはiOS/iPadOS/Mac Catalyst/Androidに定義を登録できますが、カードの画面描画・更新連携は未検証で、OSホーム画面ウィジェットには対応しません。ShortcutsはiOS Simulator/Mac CatalystビルドとApp Intentsメタデータ生成を確認済みですが、Shortcutsアプリからの候補追加・起動は未検証です。学内施設・空き教室は信頼できる提供データがないため利用できません。その他のAPI別の検証状況は詳細API仕様と実装一覧を参照してください。</p>
+        <p>サーバーFunctions/Cronは拡張機能サーバー稼働中のベストエフォート実行、Realtimeはグループ内HTTPSポーリング、Pushは要求元の登録端末宛です。OAuth/OIDCはプロバイダー側の設定を必要とします。CIT Hub内ウィジェットはアプリ内に定義を登録する機能で、OSホーム画面ウィジェットには対応しません。Shortcutsは対応OSのショートカット機能から登録項目を実行できます。学内施設・空き教室は信頼できる提供データがないため利用できません。その他の詳細は<a href="api.md">API仕様</a>を参照してください。</p>
         <p>これらは使用できるAPIや権限として公開していません。APIの詳しい型・挙動・制限は<a href="api.md">詳細API仕様（Markdown）</a>を確認してください。</p>
         <div class="callout">Portalパスワード、OTP秘密鍵、認証Cookie、CIT Hubセッショントークン、他ユーザーの個人データ、別拡張機能のprivate storage、端末固有識別子、無音撮影、無制限ファイルアクセス、任意ネイティブコード、無制限バックグラウンド実行はAPIとして提供しません。</div>
       </section>
 
 
 
+
+
+
+
   <!-- GENERATED PUBLIC API INDEX START -->
-<section id="complete-api-index" data-title="全API署名索引" data-group="API索引"><details><summary><h2>全API署名索引（433件）</h2></summary><p>API要件433件のSDK呼び出し署名、実装位置、監査済みOSを示します。権限・データ範囲・制約は上記の機能別説明を参照してください。検証状態は個別APIの網羅的E2Eを意味しません。<code>canvas.*</code>の描画操作は<code>canvas.create()</code>が返すインスタンスメソッドです。</p><div class="tablewrap"><table><thead><tr><th>API</th><th>SDK呼び出し署名</th><th>実装位置</th><th>実行監査状態</th></tr></thead><tbody><tr><td><code>app.onLaunch</code></td><td><code>app.onLaunch(callback: () =&gt; unknown): () =&gt; void</code></td><td><code>extensions/sdk/host.ts:388</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>app.onAppear</code></td><td><code>app.onAppear(callback: () =&gt; unknown): () =&gt; void</code></td><td><code>extensions/sdk/host.ts:389</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>app.onDisappear</code></td><td><code>app.onDisappear(callback: () =&gt; unknown): () =&gt; void</code></td><td><code>extensions/sdk/host.ts:390</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>app.onResume</code></td><td><code>app.onResume(callback: () =&gt; unknown): () =&gt; void</code></td><td><code>extensions/sdk/host.ts:391</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>app.onSuspend</code></td><td><code>app.onSuspend(callback: () =&gt; unknown): () =&gt; void</code></td><td><code>extensions/sdk/host.ts:392</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>app.onOpenURL</code></td><td><code>app.onOpenURL(callback: (payload: AppOpenURLPayload) =&gt; unknown): () =&gt; void</code></td><td><code>extensions/sdk/host.ts:393</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>app.onNotification</code></td><td><code>app.onNotification(callback: (payload: { identifier?: string | undefined; action?: string | undefined; data?: Record&lt;string, string&gt; | undefined; }) =&gt; unknown): () =&gt; void</code></td><td><code>extensions/sdk/host.ts:394</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>app.onMemoryWarning</code></td><td><code>app.onMemoryWarning(callback: () =&gt; unknown): () =&gt; void</code></td><td><code>extensions/sdk/host.ts:395</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>app.version</code></td><td><code>app.version(): string</code></td><td><code>extensions/sdk/host.ts:397</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>app.extensionId</code></td><td><code>app.extensionId(): string</code></td><td><code>extensions/sdk/host.ts:398</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>app.environment</code></td><td><code>app.environment(): "development" | "production"</code></td><td><code>extensions/sdk/host.ts:398</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>app.hostVersion</code></td><td><code>app.hostVersion(): string</code></td><td><code>extensions/sdk/host.ts:399</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>app.capabilities</code></td><td><code>app.capabilities(): string[]</code></td><td><code>extensions/sdk/host.ts:399</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.text</code></td><td><code>ui.text(text: string): Node</code></td><td><code>extensions/sdk/index.ts:137</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.heading</code></td><td><code>ui.heading(text: string): Node</code></td><td><code>extensions/sdk/index.ts:131</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.label</code></td><td><code>ui.label(text: string): Node</code></td><td><code>extensions/sdk/index.ts:98</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.markdown</code></td><td><code>ui.markdown(text: string): Node</code></td><td><code>extensions/sdk/index.ts:99</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.code</code></td><td><code>ui.code(text: string): Node</code></td><td><code>extensions/sdk/index.ts:100</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.caption</code></td><td><code>ui.caption(text: string): Node</code></td><td><code>extensions/sdk/index.ts:101</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.badge</code></td><td><code>ui.badge(text: string, tone?: "primary" | "secondary" | "accent" | undefined): Node</code></td><td><code>extensions/sdk/index.ts:102</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.icon</code></td><td><code>ui.icon(name: string, accessibilityLabel: string): Node</code></td><td><code>extensions/sdk/index.ts:103</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.vstack</code></td><td><code>ui.vstack(children: Node[]): Node</code></td><td><code>extensions/sdk/index.ts:147</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.hstack</code></td><td><code>ui.hstack(children: Node[]): Node</code></td><td><code>extensions/sdk/index.ts:148</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.zstack</code></td><td><code>ui.zstack(children: Node[]): Node</code></td><td><code>extensions/sdk/index.ts:149</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.grid</code></td><td><code>ui.grid(columns: number, children: Node[]): Node</code></td><td><code>extensions/sdk/index.ts:112</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.lazyGrid</code></td><td><code>ui.lazyGrid(columns: number, children: Node[]): Node</code></td><td><code>extensions/sdk/index.ts:94</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.scroll</code></td><td><code>ui.scroll(children: Node[]): Node</code></td><td><code>extensions/sdk/index.ts:110</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.horizontalScroll</code></td><td><code>ui.horizontalScroll(children: Node[]): Node</code></td><td><code>extensions/sdk/index.ts:111</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.spacer</code></td><td><code>ui.spacer(size?: number): Node</code></td><td><code>extensions/sdk/index.ts:150</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.divider</code></td><td><code>ui.divider(): Node</code></td><td><code>extensions/sdk/index.ts:132</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.card</code></td><td><code>ui.card(children: Node[], label?: string | undefined): Node</code></td><td><code>extensions/sdk/index.ts:140</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.group</code></td><td><code>ui.group(children: Node[]): Node</code></td><td><code>extensions/sdk/index.ts:141</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.section</code></td><td><code>ui.section(label: string, children: Node[]): Node</code></td><td><code>extensions/sdk/index.ts:139</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.container</code></td><td><code>ui.container(children: Node[]): Node</code></td><td><code>extensions/sdk/index.ts:142</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.safeArea</code></td><td><code>ui.safeArea(children: Node[]): Node</code></td><td><code>extensions/sdk/index.ts:143</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.textField</code></td><td><code>ui.textField(key: string, label: string, value: State&lt;string&gt;, events?: { onFocus?: (() =&gt; unknown) | undefined; onBlur?: (() =&gt; unknown) | undefined; onSubmit?: (() =&gt; unknown) | undefined; }): Node</code></td><td><code>extensions/sdk/index.ts:70</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.textArea</code></td><td><code>ui.textArea(key: string, label: string, value?: State&lt;string&gt; | undefined): Node</code></td><td><code>extensions/sdk/index.ts:81</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.secureField</code></td><td><code>ui.secureField(key: string, label: string, value?: State&lt;string&gt; | undefined): Node</code></td><td><code>extensions/sdk/index.ts:157</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.number</code></td><td><code>ui.number(key: string, label: string, min?: number, max?: number, step?: number): Node</code></td><td><code>extensions/sdk/index.ts:104</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.slider</code></td><td><code>ui.slider(key: string, label: string, min?: number, max?: number, step?: number): Node</code></td><td><code>extensions/sdk/index.ts:105</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.stepper</code></td><td><code>ui.stepper(key: string, label: string, value: State&lt;number&gt;, min: number, max: number, step?: number): Node</code></td><td><code>extensions/sdk/index.ts:72</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.toggle</code></td><td><code>ui.toggle(key: string, label: string, value?: State&lt;boolean&gt; | undefined): Node</code></td><td><code>extensions/sdk/index.ts:158</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.checkbox</code></td><td><code>ui.checkbox(key: string, label: string, value: State&lt;boolean&gt;): Node</code></td><td><code>extensions/sdk/index.ts:73</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.radio</code></td><td><code>ui.radio(key: string, label: string, options: string[], value: State&lt;string&gt;): Node</code></td><td><code>extensions/sdk/index.ts:74</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.select</code></td><td><code>ui.select(key: string, label: string, options: string[]): Node</code></td><td><code>extensions/sdk/index.ts:133</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.multiSelect</code></td><td><code>ui.multiSelect(key: string, label: string, options: string[], value: State&lt;string[]&gt;): Node</code></td><td><code>extensions/sdk/index.ts:75</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.date</code></td><td><code>ui.date(key: string, label: string, value?: State&lt;number | null&gt; | undefined): Node</code></td><td><code>extensions/sdk/index.ts:129</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.time</code></td><td><code>ui.time(key: string, label: string, value: State&lt;number | null&gt;): Node</code></td><td><code>extensions/sdk/index.ts:78</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.dateTime</code></td><td><code>ui.dateTime(key: string, label: string, value: State&lt;number | null&gt;): Node</code></td><td><code>extensions/sdk/index.ts:76</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.dateRange</code></td><td><code>ui.dateRange(key: string, label: string, value: State&lt;{ start: number | null; end: number | null; }&gt;): Node</code></td><td><code>extensions/sdk/index.ts:77</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.coursePicker</code></td><td><code>ui.coursePicker(key: string, label: string): Node</code></td><td><code>extensions/sdk/index.ts:116</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.filePicker</code></td><td><code>ui.filePicker(key: string, label: string, value: State&lt;string&gt;): Node</code></td><td><code>extensions/sdk/index.ts:79</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.photoPicker</code></td><td><code>ui.photoPicker(key: string, label: string, value: State&lt;string&gt;): Node</code></td><td><code>extensions/sdk/index.ts:80</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.searchField</code></td><td><code>ui.searchField(key: string, label: string, value: State&lt;string&gt;, events?: { onFocus?: (() =&gt; unknown) | undefined; onBlur?: (() =&gt; unknown) | undefined; onSubmit?: (() =&gt; unknown) | undefined; }): Node</code></td><td><code>extensions/sdk/index.ts:71</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>field.set</code></td><td><code>field.set(value: T): void</code></td><td><code>extensions/sdk/core.ts:67</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>field.reset</code></td><td><code>field.reset(): void</code></td><td><code>extensions/sdk/core.ts:67</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>field.focus</code></td><td><code>field.focus(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/fields.ts:3</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>field.blur</code></td><td><code>field.blur(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/fields.ts:3</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>ui.button</code></td><td><code>ui.button(label: string, action: "save" | "reset" | (() =&gt; unknown)): Node</code></td><td><code>extensions/sdk/index.ts:159</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.iconButton</code></td><td><code>ui.iconButton(icon: string, label: string, onPress: () =&gt; unknown, events?: ButtonEvents): Node</code></td><td><code>extensions/sdk/index.ts:82</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.linkButton</code></td><td><code>ui.linkButton(label: string, url: string): Node</code></td><td><code>extensions/sdk/index.ts:136</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.menu</code></td><td><code>ui.menu(label: string, actions: Node[]): Node</code></td><td><code>extensions/sdk/index.ts:89</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.contextMenu</code></td><td><code>ui.contextMenu(content: Node, actions: Node[]): Node</code></td><td><code>extensions/sdk/index.ts:90</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.swipeActions</code></td><td><code>ui.swipeActions(content: Node, actions: Node[]): Node</code></td><td><code>extensions/sdk/index.ts:91</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.toolbar</code></td><td><code>ui.toolbar(children: Node[]): Node</code></td><td><code>extensions/sdk/index.ts:92</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.floatingButton</code></td><td><code>ui.floatingButton(label: string, onPress: () =&gt; unknown, content?: Node[]): Node</code></td><td><code>extensions/sdk/index.ts:93</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>navigation.push</code></td><td><code>navigation.push(name: string, parameters?: RouteParameters): void</code></td><td><code>extensions/sdk/navigation.ts:35</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>navigation.pop</code></td><td><code>navigation.pop(): boolean</code></td><td><code>extensions/sdk/navigation.ts:39</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>navigation.popToRoot</code></td><td><code>navigation.popToRoot(): void</code></td><td><code>extensions/sdk/navigation.ts:44</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>navigation.present</code></td><td><code>navigation.present(name: string, parameters?: RouteParameters, mode?: "sheet" | "fullScreen"): void</code></td><td><code>extensions/sdk/navigation.ts:48</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>navigation.dismiss</code></td><td><code>navigation.dismiss(): boolean</code></td><td><code>extensions/sdk/navigation.ts:57</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>navigation.sheet</code></td><td><code>navigation.sheet(name: string, parameters?: RouteParameters): void</code></td><td><code>extensions/sdk/navigation.ts:55</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>navigation.fullScreen</code></td><td><code>navigation.fullScreen(name: string, parameters?: RouteParameters): void</code></td><td><code>extensions/sdk/navigation.ts:56</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>navigation.tabs</code></td><td><code>navigation.tabs(tabs: { id: string; title: string; render: () =&gt; Node[]; }[], selected: State&lt;string&gt;): Node</code></td><td><code>extensions/sdk/navigation.ts:62</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>navigation.openExtension</code></td><td><code>navigation.openExtension(id: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/navigation.ts:26</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>navigation.openHostPage</code></td><td><code>navigation.openHostPage(page: HostPage): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/navigation.ts:27</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>ui.alert</code></td><td><code>ui.alert(title: string, message?: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/index.ts:83</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>ui.confirm</code></td><td><code>ui.confirm(title: string, message?: string): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/index.ts:84</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>ui.prompt</code></td><td><code>ui.prompt(title: string, message?: string, initialValue?: string): Promise&lt;string | null&gt;</code></td><td><code>extensions/sdk/index.ts:85</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>ui.actionSheet</code></td><td><code>ui.actionSheet(title: string, items: ActionSheetItem[], message?: string): Promise&lt;string | null&gt;</code></td><td><code>extensions/sdk/index.ts:86</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>ui.toast</code></td><td><code>ui.toast(text: string, duration?: number): void</code></td><td><code>extensions/sdk/index.ts:87</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>ui.banner</code></td><td><code>ui.banner(text: string, duration?: number): void</code></td><td><code>extensions/sdk/index.ts:88</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>ui.loading</code></td><td><code>ui.loading(label: string): Node</code></td><td><code>extensions/sdk/index.ts:153</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.progress</code></td><td><code>ui.progress(label: string, value: number): Node</code></td><td><code>extensions/sdk/index.ts:151</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.emptyState</code></td><td><code>ui.emptyState(title: string, message: string): Node</code></td><td><code>extensions/sdk/index.ts:154</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.errorState</code></td><td><code>ui.errorState(title: string, message: string): Node</code></td><td><code>extensions/sdk/index.ts:155</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>ui.list</code></td><td><code>ui.list&lt;T&gt;(items: ExtensionList&lt;T&gt;): Node</code></td><td><code>extensions/sdk/index.ts:95</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>ui.lazyList</code></td><td><code>ui.lazyList&lt;T&gt;(items: ExtensionList&lt;T&gt;): Node</code></td><td><code>extensions/sdk/index.ts:96</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>ui.sectionedList</code></td><td><code>ui.sectionedList&lt;T&gt;(sections: { title: string; list: ExtensionList&lt;T&gt;; }[]): Node</code></td><td><code>extensions/sdk/index.ts:97</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>list.filter</code></td><td><code>list.filter(predicate: (item: T) =&gt; boolean): ExtensionList&lt;T&gt;</code></td><td><code>extensions/sdk/lists.ts:39</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>list.sort</code></td><td><code>list.sort(compare: (a: T, b: T) =&gt; number): ExtensionList&lt;T&gt;</code></td><td><code>extensions/sdk/lists.ts:40</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>list.search</code></td><td><code>list.search(query: string, stringify?: ((item: T) =&gt; string) | undefined): ExtensionList&lt;T&gt;</code></td><td><code>extensions/sdk/lists.ts:41</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>list.select</code></td><td><code>list.select(key: string): void</code></td><td><code>extensions/sdk/lists.ts:47</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>list.multiSelect</code></td><td><code>list.multiSelect(keys: string[]): void</code></td><td><code>extensions/sdk/lists.ts:48</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>list.refresh</code></td><td><code>list.refresh(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/lists.ts:53</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>list.loadMore</code></td><td><code>list.loadMore(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/lists.ts:59</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>list.swipe</code></td><td><code>list.swipe(actions: { title: string; perform: (item: T) =&gt; unknown; }[]): ExtensionList&lt;T&gt;</code></td><td><code>extensions/sdk/lists.ts:80</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>list.contextMenu</code></td><td><code>list.contextMenu(actions: { title: string; perform: (item: T) =&gt; unknown; }[]): ExtensionList&lt;T&gt;</code></td><td><code>extensions/sdk/lists.ts:81</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>list.move</code></td><td><code>list.move(from: number, to: number): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/lists.ts:67</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>list.delete</code></td><td><code>list.delete(key: string): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/lists.ts:73</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>state.create</code></td><td><code>state.create&lt;T&gt;(initial: T): State&lt;T&gt;</code></td><td><code>extensions/sdk/core.ts:68</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>state.get</code></td><td><code>state.get&lt;T&gt;(value: State&lt;T&gt;): T</code></td><td><code>extensions/sdk/core.ts:89</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>state.set</code></td><td><code>state.set&lt;T&gt;(value: State&lt;T&gt;, next: T): void</code></td><td><code>extensions/sdk/core.ts:90</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>state.update</code></td><td><code>state.update&lt;T&gt;(value: State&lt;T&gt;, fn: (current: T) =&gt; T): void</code></td><td><code>extensions/sdk/core.ts:91</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>state.reset</code></td><td><code>state.reset&lt;T&gt;(value: State&lt;T&gt;): void</code></td><td><code>extensions/sdk/core.ts:92</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>state.watch</code></td><td><code>state.watch&lt;T&gt;(value: State&lt;T&gt;, fn: (next: T, previous: T) =&gt; void): () =&gt; void</code></td><td><code>extensions/sdk/core.ts:93</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>state.computed</code></td><td><code>state.computed&lt;T&gt;(dependencies: State&lt;unknown&gt;[], calculate: () =&gt; T): State&lt;T&gt; &amp; { dispose(): void; }</code></td><td><code>extensions/sdk/core.ts:80</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>date.now</code></td><td><code>date.now(): Date</code></td><td><code>extensions/sdk/core.ts:123</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>date.parse</code></td><td><code>date.parse(value: DateInput): Date</code></td><td><code>extensions/sdk/core.ts:124</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>date.format</code></td><td><code>date.format(value: DateInput, options?: DateTimeFormatOptions, locale?: string): string</code></td><td><code>extensions/sdk/core.ts:124</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>date.add</code></td><td><code>date.add(value: DateInput, milliseconds: number): Date</code></td><td><code>extensions/sdk/core.ts:130</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>date.subtract</code></td><td><code>date.subtract(value: DateInput, milliseconds: number): Date</code></td><td><code>extensions/sdk/core.ts:131</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>date.diff</code></td><td><code>date.diff(a: DateInput, b: DateInput): number</code></td><td><code>extensions/sdk/core.ts:132</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>date.startOfDay</code></td><td><code>date.startOfDay(value: DateInput): Date</code></td><td><code>extensions/sdk/core.ts:133</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>date.endOfDay</code></td><td><code>date.endOfDay(value: DateInput): Date</code></td><td><code>extensions/sdk/core.ts:134</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>date.startOfWeek</code></td><td><code>date.startOfWeek(value: DateInput, firstDay?: number): Date</code></td><td><code>extensions/sdk/core.ts:135</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>date.endOfWeek</code></td><td><code>date.endOfWeek(value: DateInput, firstDay?: number): Date</code></td><td><code>extensions/sdk/core.ts:136</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>date.isToday</code></td><td><code>date.isToday(value: DateInput): boolean</code></td><td><code>extensions/sdk/core.ts:137</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>date.isPast</code></td><td><code>date.isPast(value: DateInput): boolean</code></td><td><code>extensions/sdk/core.ts:138</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>date.isFuture</code></td><td><code>date.isFuture(value: DateInput): boolean</code></td><td><code>extensions/sdk/core.ts:139</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>date.timezone</code></td><td><code>date.timezone(): string</code></td><td><code>extensions/sdk/core.ts:139</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.calendar.isClassDay</code></td><td><code>cit.calendar.isClassDay(date: Date): Promise&lt;boolean | null&gt;</code></td><td><code>extensions/sdk/host.ts:756</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.calendar.currentSemester</code></td><td><code>cit.calendar.currentSemester(): Promise&lt;string | null&gt;</code></td><td><code>extensions/sdk/host.ts:733</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.calendar.weekNumber</code></td><td><code>cit.calendar.weekNumber(date: Date): number</code></td><td><code>extensions/sdk/host.ts:757</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>math.round</code></td><td><code>math.round(x: number): number</code></td><td><code>extensions/sdk/core.ts:97</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>math.floor</code></td><td><code>math.floor(x: number): number</code></td><td><code>extensions/sdk/core.ts:98</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>math.ceil</code></td><td><code>math.ceil(x: number): number</code></td><td><code>extensions/sdk/core.ts:98</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>math.min</code></td><td><code>math.min(...values: number[]): number</code></td><td><code>extensions/sdk/core.ts:98</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>math.max</code></td><td><code>math.max(...values: number[]): number</code></td><td><code>extensions/sdk/core.ts:98</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>math.abs</code></td><td><code>math.abs(x: number): number</code></td><td><code>extensions/sdk/core.ts:98</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>math.random</code></td><td><code>math.random(): number</code></td><td><code>extensions/sdk/core.ts:98</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>math.clamp</code></td><td><code>math.clamp(value: number, min: number, max: number): number</code></td><td><code>extensions/sdk/core.ts:98</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>math.sum</code></td><td><code>math.sum(values: number[]): number</code></td><td><code>extensions/sdk/core.ts:99</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>math.average</code></td><td><code>math.average(values: number[]): number</code></td><td><code>extensions/sdk/core.ts:100</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>math.median</code></td><td><code>math.median(values: number[]): number</code></td><td><code>extensions/sdk/core.ts:101</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>utils.uuid</code></td><td><code>utils.uuid(): string</code></td><td><code>extensions/sdk/core.ts:147</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>utils.debounce</code></td><td><code>utils.debounce&lt;T extends unknown[]&gt;(callback: (...args: T) =&gt; void, milliseconds: number): ((...args: T) =&gt; void) &amp; { cancel(): void; }</code></td><td><code>extensions/sdk/core.ts:167</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>utils.throttle</code></td><td><code>utils.throttle&lt;T extends unknown[]&gt;(callback: (...args: T) =&gt; void, milliseconds: number): (...args: T) =&gt; void</code></td><td><code>extensions/sdk/core.ts:173</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>utils.sleep</code></td><td><code>utils.sleep(milliseconds: number, signal?: AbortSignal | undefined): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/core.ts:158</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>text.format</code></td><td><code>text.format(template: string, values: Record&lt;string, string | number&gt;): string</code></td><td><code>extensions/sdk/core.ts:104</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>text.replace</code></td><td><code>text.replace(value: string, search: string, replacement: string): string</code></td><td><code>extensions/sdk/core.ts:105</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>text.split</code></td><td><code>text.split(value: string, separator: string): string[]</code></td><td><code>extensions/sdk/core.ts:106</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>text.join</code></td><td><code>text.join(values: string[], separator?: string): string</code></td><td><code>extensions/sdk/core.ts:107</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>text.contains</code></td><td><code>text.contains(value: string, search: string): boolean</code></td><td><code>extensions/sdk/core.ts:107</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>text.startsWith</code></td><td><code>text.startsWith(value: string, search: string): boolean</code></td><td><code>extensions/sdk/core.ts:108</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>text.endsWith</code></td><td><code>text.endsWith(value: string, search: string): boolean</code></td><td><code>extensions/sdk/core.ts:108</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>text.trim</code></td><td><code>text.trim(value: string): string</code></td><td><code>extensions/sdk/core.ts:108</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>text.lowercase</code></td><td><code>text.lowercase(value: string): string</code></td><td><code>extensions/sdk/core.ts:109</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>text.uppercase</code></td><td><code>text.uppercase(value: string): string</code></td><td><code>extensions/sdk/core.ts:109</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>text.regex</code></td><td><code>text.regex(pattern: string, flags?: string): RegExp</code></td><td><code>extensions/sdk/core.ts:109</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>json.parse</code></td><td><code>json.parse(value: string): unknown</code></td><td><code>extensions/sdk/core.ts:118</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>json.stringify</code></td><td><code>json.stringify(value: unknown): string</code></td><td><code>extensions/sdk/core.ts:118</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.courses.list</code></td><td><code>cit.courses.list(): Promise&lt;Course[]&gt;</code></td><td><code>extensions/sdk/host.ts:591</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.courses.get</code></td><td><code>cit.courses.get(id: string): Promise&lt;Course | null&gt;</code></td><td><code>extensions/sdk/host.ts:592</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.courses.search</code></td><td><code>cit.courses.search(query: string): Promise&lt;Course[]&gt;</code></td><td><code>extensions/sdk/host.ts:596</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.timetable.today</code></td><td><code>cit.timetable.today(at?: Date): Promise&lt;CourseOccurrence[]&gt;</code></td><td><code>extensions/sdk/host.ts:619</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.timetable.tomorrow</code></td><td><code>cit.timetable.tomorrow(at?: Date): Promise&lt;CourseOccurrence[]&gt;</code></td><td><code>extensions/sdk/host.ts:620</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.timetable.week</code></td><td><code>cit.timetable.week(at?: Date): Promise&lt;CourseOccurrence[]&gt;</code></td><td><code>extensions/sdk/host.ts:622</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.timetable.current</code></td><td><code>cit.timetable.current(at?: Date): Promise&lt;CourseOccurrence[]&gt;</code></td><td><code>extensions/sdk/host.ts:633</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.timetable.next</code></td><td><code>cit.timetable.next(at?: Date): Promise&lt;CourseOccurrence | null&gt;</code></td><td><code>extensions/sdk/host.ts:637</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.timetable.at</code></td><td><code>cit.timetable.at(date: Date): Promise&lt;CourseOccurrence[]&gt;</code></td><td><code>extensions/sdk/host.ts:621</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.timetable.freePeriods</code></td><td><code>cit.timetable.freePeriods(weekday?: number): Promise&lt;PeriodSlot[]&gt;</code></td><td><code>extensions/sdk/host.ts:647</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.assignments.list</code></td><td><code>cit.assignments.list(): Promise&lt;Task[]&gt;</code></td><td><code>extensions/sdk/host.ts:655</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.assignments.get</code></td><td><code>cit.assignments.get(id: string): Promise&lt;Task | null&gt;</code></td><td><code>extensions/sdk/host.ts:656</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.assignments.pending</code></td><td><code>cit.assignments.pending(at?: Date): Promise&lt;Task[]&gt;</code></td><td><code>extensions/sdk/host.ts:657</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.assignments.overdue</code></td><td><code>cit.assignments.overdue(at?: Date): Promise&lt;Task[]&gt;</code></td><td><code>extensions/sdk/host.ts:661</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.assignments.dueSoon</code></td><td><code>cit.assignments.dueSoon(days?: number, at?: Date): Promise&lt;Task[]&gt;</code></td><td><code>extensions/sdk/host.ts:662</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.assignments.search</code></td><td><code>cit.assignments.search(query: string): Promise&lt;Task[]&gt;</code></td><td><code>extensions/sdk/host.ts:658</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.assignments.byCourse</code></td><td><code>cit.assignments.byCourse(course: string): Promise&lt;Task[]&gt;</code></td><td><code>extensions/sdk/host.ts:659</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.assignments.between</code></td><td><code>cit.assignments.between(start: Date, end: Date): Promise&lt;Task[]&gt;</code></td><td><code>extensions/sdk/host.ts:660</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.todo.list</code></td><td><code>cit.todo.list(): Promise&lt;PersonalTodo[]&gt;</code></td><td><code>extensions/sdk/host.ts:668</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.todo.get</code></td><td><code>cit.todo.get(id: string): Promise&lt;PersonalTodo | null&gt;</code></td><td><code>extensions/sdk/host.ts:674</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.todo.create</code></td><td><code>cit.todo.create(fields: TodoFields): Promise&lt;PersonalTodo&gt;</code></td><td><code>extensions/sdk/host.ts:669</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.todo.update</code></td><td><code>cit.todo.update(expected: PersonalTodo, fields: TodoFields): Promise&lt;PersonalTodo&gt;</code></td><td><code>extensions/sdk/host.ts:670</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.todo.complete</code></td><td><code>cit.todo.complete(id: string): Promise&lt;PersonalTodo | null&gt;</code></td><td><code>extensions/sdk/host.ts:671</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.todo.uncomplete</code></td><td><code>cit.todo.uncomplete(id: string): Promise&lt;PersonalTodo | null&gt;</code></td><td><code>extensions/sdk/host.ts:672</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.todo.delete</code></td><td><code>cit.todo.delete(expected: PersonalTodo): Promise&lt;null&gt;</code></td><td><code>extensions/sdk/host.ts:673</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.todo.search</code></td><td><code>cit.todo.search(query: string): Promise&lt;PersonalTodo[]&gt;</code></td><td><code>extensions/sdk/host.ts:678</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.todo.watch</code></td><td><code>cit.todo.watch(callback: (rows: PersonalTodo[]) =&gt; void, onError?: ((error: unknown) =&gt; void) | undefined): () =&gt; void</code></td><td><code>extensions/sdk/host.ts:683</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>cit.courseNotes.list</code></td><td><code>cit.courseNotes.list(): Promise&lt;{ id: string; courseKey: string; content: string; }[]&gt;</code></td><td><code>extensions/sdk/host.ts:584</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.courseNotes.get</code></td><td><code>cit.courseNotes.get(id: string): Promise&lt;{ id: string; courseKey: string; content: string; } | null&gt;</code></td><td><code>extensions/sdk/host.ts:585</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.courseNotes.create</code></td><td><code>cit.courseNotes.create(title: string, content: string): Promise&lt;{ id: string; courseKey: string; content: string; } | null&gt;</code></td><td><code>extensions/sdk/host.ts:581</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>cit.courseNotes.update</code></td><td><code>cit.courseNotes.update(id: string, content: string, expectedContent: string): Promise&lt;{ id: string; courseKey: string; content: string; } | null&gt;</code></td><td><code>extensions/sdk/host.ts:582</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>cit.courseNotes.delete</code></td><td><code>cit.courseNotes.delete(id: string, expectedContent: string): Promise&lt;null&gt;</code></td><td><code>extensions/sdk/host.ts:583</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>cit.semester.current</code></td><td><code>cit.semester.current(): Promise&lt;string | null&gt;</code></td><td><code>extensions/sdk/host.ts:770</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.semester.list</code></td><td><code>cit.semester.list(): Promise&lt;string[]&gt;</code></td><td><code>extensions/sdk/host.ts:767</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.calendar.events</code></td><td><code>cit.calendar.events(): Promise&lt;AcademicCalendarEvent[]&gt;</code></td><td><code>extensions/sdk/host.ts:734</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.calendar.holidays</code></td><td><code>cit.calendar.holidays(start?: Date | undefined, end?: Date | undefined): Promise&lt;AcademicCalendarEvent[]&gt;</code></td><td><code>extensions/sdk/host.ts:735</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.calendar.classDays</code></td><td><code>cit.calendar.classDays(start: Date, end: Date): Promise&lt;string[]&gt;</code></td><td><code>extensions/sdk/host.ts:740</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.bus.routes</code></td><td><code>cit.bus.routes(): Promise&lt;BusRoute[]&gt;</code></td><td><code>extensions/sdk/host.ts:545</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.bus.stops</code></td><td><code>cit.bus.stops(): Promise&lt;string[]&gt;</code></td><td><code>extensions/sdk/host.ts:546</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.bus.timetable</code></td><td><code>cit.bus.timetable(at?: Date, routeFilter?: { from?: string | undefined; to?: string | undefined; } | undefined): Promise&lt;BusDeparture[]&gt;</code></td><td><code>extensions/sdk/host.ts:547</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.bus.next</code></td><td><code>cit.bus.next(from?: string | undefined, to?: string | undefined, at?: Date): Promise&lt;BusDeparture | null&gt;</code></td><td><code>extensions/sdk/host.ts:552</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.bus.between</code></td><td><code>cit.bus.between(start: Date, end: Date, routeFilter?: { from?: string | undefined; to?: string | undefined; } | undefined): Promise&lt;BusDeparture[]&gt;</code></td><td><code>extensions/sdk/host.ts:563</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.bus.serviceStatus</code></td><td><code>cit.bus.serviceStatus(at?: Date): Promise&lt;BusServiceStatus&gt;</code></td><td><code>extensions/sdk/host.ts:574</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.cafeteria.locations</code></td><td><code>cit.cafeteria.locations(): Promise&lt;CafeteriaLocation[]&gt;</code></td><td><code>extensions/sdk/host.ts:539</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.cafeteria.menu</code></td><td><code>cit.cafeteria.menu(): Promise&lt;CafeteriaLocation[]&gt;</code></td><td><code>extensions/sdk/host.ts:540</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.cafeteria.hours</code></td><td><code>cit.cafeteria.hours(): Promise&lt;CafeteriaHours[]&gt;</code></td><td><code>extensions/sdk/host.ts:542</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.cafeteria.cameraStatus</code></td><td><code>cit.cafeteria.cameraStatus(): Promise&lt;CafeteriaCameraStatus[]&gt;</code></td><td><code>extensions/sdk/host.ts:541</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.cafeteria.openCamera</code></td><td><code>cit.cafeteria.openCamera(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:538</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>cit.campus.facilities</code></td><td><code>cit.campus.facilities(): Promise&lt;CampusRoom[]&gt;</code></td><td><code>extensions/sdk/host.ts:503</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.campus.buildings</code></td><td><code>cit.campus.buildings(): Promise&lt;{ campus: "新習志野" | "津田沼" | "不明"; building: string; rooms: CampusRoom[]; }[]&gt;</code></td><td><code>extensions/sdk/host.ts:504</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.campus.rooms</code></td><td><code>cit.campus.rooms(): Promise&lt;CampusRoom[]&gt;</code></td><td><code>extensions/sdk/host.ts:509</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.campus.room</code></td><td><code>cit.campus.room(id: string): Promise&lt;CampusRoom | null&gt;</code></td><td><code>extensions/sdk/host.ts:510</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.campus.search</code></td><td><code>cit.campus.search(query: string): Promise&lt;CampusRoom[]&gt;</code></td><td><code>extensions/sdk/host.ts:514</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.campus.roomAvailability</code></td><td><code>cit.campus.roomAvailability(roomID: string, at?: Date): Promise&lt;RoomScheduleStatus&gt;</code></td><td><code>extensions/sdk/host.ts:519</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.services.list</code></td><td><code>cit.services.list(): Promise&lt;CampusService[]&gt;</code></td><td><code>extensions/sdk/host.ts:530</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.services.open</code></td><td><code>cit.services.open(service: HostService): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:529</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>cit.user.displayName</code></td><td><code>cit.user.displayName(): Promise&lt;string | null&gt;</code></td><td><code>extensions/sdk/host.ts:711</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.user.preferences</code></td><td><code>cit.user.preferences(): Promise&lt;UserPreferences&gt;</code></td><td><code>extensions/sdk/host.ts:710</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.settings.appearance</code></td><td><code>cit.settings.appearance(): Promise&lt;Pick&lt;UserPreferences, "accentColor"&gt;&gt;</code></td><td><code>extensions/sdk/host.ts:705</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.settings.notifications</code></td><td><code>cit.settings.notifications(): Promise&lt;{ classStart: boolean; assignments: boolean; }&gt;</code></td><td><code>extensions/sdk/host.ts:706</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.settings.language</code></td><td><code>cit.settings.language(): Promise&lt;string&gt;</code></td><td><code>extensions/sdk/host.ts:704</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>cit.settings.enabledServices</code></td><td><code>cit.settings.enabledServices(): Promise&lt;string[]&gt;</code></td><td><code>extensions/sdk/host.ts:707</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>storage.get</code></td><td><code>storage.get&lt;T = unknown&gt;(name: string): Promise&lt;T | null&gt;</code></td><td><code>extensions/sdk/host.ts:316</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>storage.set</code></td><td><code>storage.set(name: string, value: unknown): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:317</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>storage.has</code></td><td><code>storage.has(name: string): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/host.ts:318</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>storage.remove</code></td><td><code>storage.remove(name: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:319</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>storage.clear</code></td><td><code>storage.clear(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:320</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>storage.keys</code></td><td><code>storage.keys(): Promise&lt;string[]&gt;</code></td><td><code>extensions/sdk/host.ts:321</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>database.createTable</code></td><td><code>database.createTable(name: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/database.ts:130</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>database.insert</code></td><td><code>database.insert(name: string, row: RecordValue): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/database.ts:131</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>database.update</code></td><td><code>database.update(name: string, id: string, changes: Record&lt;string, unknown&gt;): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/database.ts:132</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>database.delete</code></td><td><code>database.delete(name: string, id: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/database.ts:133</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>database.get</code></td><td><code>database.get(name: string, id: string): Promise&lt;RecordValue | null&gt;</code></td><td><code>extensions/sdk/database.ts:134</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>database.query</code></td><td><code>database.query(name: string): Promise&lt;RecordValue[]&gt;</code></td><td><code>extensions/sdk/database.ts:135</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>database.transaction</code></td><td><code>database.transaction&lt;T&gt;(work: (transaction: Transaction) =&gt; T): Promise&lt;T&gt;</code></td><td><code>extensions/sdk/database.ts:120</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>database.watch</code></td><td><code>database.watch(name: string, callback: (rows: RecordValue[]) =&gt; void, onError?: ((error: unknown) =&gt; void) | undefined): () =&gt; void</code></td><td><code>extensions/sdk/database.ts:136</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>files.read</code></td><td><code>files.read(name: string): Promise&lt;Uint8Array&lt;ArrayBufferLike&gt; | null&gt;</code></td><td><code>extensions/sdk/host.ts:281</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>files.write</code></td><td><code>files.write(name: string, bytes: Uint8Array&lt;ArrayBufferLike&gt;): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:282</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>files.delete</code></td><td><code>files.delete(name: string): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/host.ts:285</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>files.move</code></td><td><code>files.move(source: string, destination: string): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/host.ts:284</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>files.copy</code></td><td><code>files.copy(source: string, destination: string): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/host.ts:283</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>files.exists</code></td><td><code>files.exists(name: string): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/host.ts:286</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>files.list</code></td><td><code>files.list(): Promise&lt;string[]&gt;</code></td><td><code>extensions/sdk/host.ts:287</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>files.info</code></td><td><code>files.info(name: string): Promise&lt;ExtensionFileInfo | null&gt;</code></td><td><code>extensions/sdk/host.ts:288</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>files.pick</code></td><td><code>files.pick(kind?: FilePickerKind): Promise&lt;PickedFileInfo | null&gt;</code></td><td><code>extensions/sdk/host.ts:260</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>files.pickMultiple</code></td><td><code>files.pickMultiple(kind?: FilePickerKind): Promise&lt;PickedFileInfo[] | null&gt;</code></td><td><code>extensions/sdk/host.ts:270</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>files.pickImage</code></td><td><code>files.pickImage(): Promise&lt;PickedFileInfo | null&gt;</code></td><td><code>extensions/sdk/host.ts:266</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>files.pickVideo</code></td><td><code>files.pickVideo(): Promise&lt;PickedFileInfo | null&gt;</code></td><td><code>extensions/sdk/host.ts:267</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>files.pickAudio</code></td><td><code>files.pickAudio(): Promise&lt;PickedFileInfo | null&gt;</code></td><td><code>extensions/sdk/host.ts:268</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>files.pickDocument</code></td><td><code>files.pickDocument(): Promise&lt;PickedFileInfo | null&gt;</code></td><td><code>extensions/sdk/host.ts:269</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>files.export</code></td><td><code>files.export(name: string, suggestedName?: string): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/host.ts:275</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>files.saveAs</code></td><td><code>files.saveAs(name: string, suggestedName?: string): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/host.ts:280</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>camera.capturePhoto</code></td><td><code>camera.capturePhoto(): Promise&lt;PickedFileInfo | null&gt;</code></td><td><code>extensions/sdk/camera.ts:4</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>camera.captureVideo</code></td><td><code>camera.captureVideo(maxSeconds?: number): Promise&lt;PickedFileInfo | null&gt;</code></td><td><code>extensions/sdk/camera.ts:5</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>camera.available</code></td><td><code>camera.available(): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/camera.ts:9</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>camera.permissions</code></td><td><code>camera.permissions(): Promise&lt;PermissionStatus&gt;</code></td><td><code>extensions/sdk/camera.ts:10</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>camera.scanQRCode</code></td><td><code>camera.scanQRCode(): Promise&lt;ScannedCode | null&gt;</code></td><td><code>extensions/sdk/camera.ts:11</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>camera.scanBarcode</code></td><td><code>camera.scanBarcode(): Promise&lt;ScannedCode | null&gt;</code></td><td><code>extensions/sdk/camera.ts:12</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>photos.pick</code></td><td><code>photos.pick(): Promise&lt;PickedFileInfo | null&gt;</code></td><td><code>extensions/sdk/media.ts:14</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>photos.pickMultiple</code></td><td><code>photos.pickMultiple(): Promise&lt;PickedFileInfo[] | null&gt;</code></td><td><code>extensions/sdk/media.ts:15</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>photos.save</code></td><td><code>photos.save(source: string): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/media.ts:13</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>photos.info</code></td><td><code>photos.info(source: string): Promise&lt;ImageInfo&gt;</code></td><td><code>extensions/sdk/media.ts:16</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>image.resize</code></td><td><code>image.resize(input: ImageSource, name: string, width: number, height: number, options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code></td><td><code>extensions/sdk/image.ts:33</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>image.crop</code></td><td><code>image.crop(input: ImageSource, name: string, rectangle: { x: number; y: number; width: number; height: number; }, options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code></td><td><code>extensions/sdk/image.ts:34</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>image.rotate</code></td><td><code>image.rotate(input: ImageSource, name: string, degrees: 0 | 90 | 180 | 270, options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code></td><td><code>extensions/sdk/image.ts:39</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>image.flip</code></td><td><code>image.flip(input: ImageSource, name: string, axis: "horizontal" | "vertical", options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code></td><td><code>extensions/sdk/image.ts:43</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>image.compress</code></td><td><code>image.compress(input: ImageSource, name: string, quality?: number): Promise&lt;ImageResult&gt;</code></td><td><code>extensions/sdk/image.ts:47</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>image.convert</code></td><td><code>image.convert(input: ImageSource, name: string, format: "jpeg" | "png", quality?: number): Promise&lt;ImageResult&gt;</code></td><td><code>extensions/sdk/image.ts:48</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>image.thumbnail</code></td><td><code>image.thumbnail(input: ImageSource, name: string, maxDimension?: number): Promise&lt;ImageResult&gt;</code></td><td><code>extensions/sdk/image.ts:49</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>image.removeMetadata</code></td><td><code>image.removeMetadata(input: ImageSource, name: string, options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code></td><td><code>extensions/sdk/image.ts:50</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>image.scanDocument</code></td><td><code>image.scanDocument(options?: { name?: string | undefined; maxPages?: number | undefined; }): Promise&lt;ScannedDocumentInfo | null&gt;</code></td><td><code>extensions/sdk/image.ts:28</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>audio.record</code></td><td><code>audio.record(maxSeconds?: number): Promise&lt;PickedFileInfo | null&gt;</code></td><td><code>extensions/sdk/media.ts:28</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>audio.stopRecording</code></td><td><code>audio.stopRecording(): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/media.ts:32</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>audio.play</code></td><td><code>audio.play(source?: string | undefined): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/media.ts:33</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>audio.pause</code></td><td><code>audio.pause(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/media.ts:34</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>audio.stop</code></td><td><code>audio.stop(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/media.ts:35</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>audio.duration</code></td><td><code>audio.duration(): Promise&lt;number | null&gt;</code></td><td><code>extensions/sdk/media.ts:36</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>audio.position</code></td><td><code>audio.position(): Promise&lt;number | null&gt;</code></td><td><code>extensions/sdk/media.ts:37</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>video.play</code></td><td><code>video.play(source?: string | undefined): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/media.ts:19</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>video.pause</code></td><td><code>video.pause(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/media.ts:20</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>video.thumbnail</code></td><td><code>video.thumbnail(source: string, name: string, seconds?: number, maxDimension?: number): Promise&lt;GeneratedThumbnail&gt;</code></td><td><code>extensions/sdk/media.ts:22</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>video.info</code></td><td><code>video.info(source: string): Promise&lt;VideoInfo&gt;</code></td><td><code>extensions/sdk/media.ts:21</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>code.generateQR</code></td><td><code>code.generateQR(text: string, name: string, size?: number): Promise&lt;{ name: string; size: number; mimeType: "image/png"; width: number; height: number; }&gt;</code></td><td><code>extensions/sdk/camera.ts:18</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>code.scanQR</code></td><td><code>code.scanQR(): Promise&lt;ScannedCode | null&gt;</code></td><td><code>extensions/sdk/camera.ts:17</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>code.scanBarcode</code></td><td><code>code.scanBarcode(): Promise&lt;ScannedCode | null&gt;</code></td><td><code>extensions/sdk/camera.ts:18</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>location.current</code></td><td><code>location.current(): Promise&lt;LocationFix&gt;</code></td><td><code>extensions/sdk/host.ts:65</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>location.permission</code></td><td><code>location.permission(): Promise&lt;PermissionStatus&gt;</code></td><td><code>extensions/sdk/host.ts:63</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>location.openSettings</code></td><td><code>location.openSettings(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:64</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>map.view</code></td><td><code>map.view(options?: MapViewOptions, overlays?: Node[]): Node</code></td><td><code>extensions/sdk/maps.ts:22</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>map.marker</code></td><td><code>map.marker(location: MapCoordinate, options: MapMarkerOptions): Node</code></td><td><code>extensions/sdk/maps.ts:31</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>map.polyline</code></td><td><code>map.polyline(path: MapCoordinate[], options?: MapShapeOptions): Node</code></td><td><code>extensions/sdk/maps.ts:38</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>map.circle</code></td><td><code>map.circle(center: MapCoordinate, radiusMeters: number, options?: MapShapeOptions): Node</code></td><td><code>extensions/sdk/maps.ts:44</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>map.fitBounds</code></td><td><code>map.fitBounds(bounds: MapCoordinate[], padding?: number): Node</code></td><td><code>extensions/sdk/maps.ts:51</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>map.openDirections</code></td><td><code>map.openDirections(destination: MapCoordinate, options?: DirectionsOptions): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/maps.ts:55</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>geo.distance</code></td><td><code>geo.distance(from: Coordinate, to: Coordinate): number</code></td><td><code>extensions/sdk/core.ts:187</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>geo.bearing</code></td><td><code>geo.bearing(from: Coordinate, to: Coordinate): number</code></td><td><code>extensions/sdk/core.ts:193</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>geo.contains</code></td><td><code>geo.contains(point: Coordinate, circle: { center: Coordinate; radius: number; }): boolean</code></td><td><code>extensions/sdk/core.ts:200</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>notification.permission</code></td><td><code>notification.permission(): Promise&lt;PermissionStatus&gt;</code></td><td><code>extensions/sdk/host.ts:109</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>notification.schedule</code></td><td><code>notification.schedule(value: LocalNotificationInput): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:110</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>notification.cancel</code></td><td><code>notification.cancel(id: string): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/host.ts:115</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>notification.cancelAll</code></td><td><code>notification.cancelAll(): Promise&lt;number&gt;</code></td><td><code>extensions/sdk/host.ts:116</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>notification.listScheduled</code></td><td><code>notification.listScheduled(): Promise&lt;ScheduledLocalNotification[]&gt;</code></td><td><code>extensions/sdk/host.ts:117</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>notification.onOpen</code></td><td><code>notification.onOpen(callback: (notification: { id: string; data: Record&lt;string, string&gt;; action: string; }) =&gt; unknown): () =&gt; void</code></td><td><code>extensions/sdk/host.ts:118</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>background.register</code></td><td><code>background.register(task: { id: string; intervalMinutes: number; networkRequired?: boolean | undefined; chargingRequired?: boolean | undefined; }): Promise&lt;{ id: string; accepted: boolean; }&gt;</code></td><td><code>extensions/sdk/host.ts:48</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>background.unregister</code></td><td><code>background.unregister(id: string): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/host.ts:58</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>background.status</code></td><td><code>background.status(): Promise&lt;BackgroundStatus&gt;</code></td><td><code>extensions/sdk/host.ts:47</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>network.fetch</code></td><td><code>network.fetch(url: string, options?: NetworkOptions): Promise&lt;NetworkResponse&gt;</code></td><td><code>extensions/sdk/host.ts:147</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>network.get</code></td><td><code>network.get(url: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code></td><td><code>extensions/sdk/host.ts:179</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>network.post</code></td><td><code>network.post(url: string, body: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code></td><td><code>extensions/sdk/host.ts:180</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>network.put</code></td><td><code>network.put(url: string, body: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code></td><td><code>extensions/sdk/host.ts:181</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>network.patch</code></td><td><code>network.patch(url: string, body: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code></td><td><code>extensions/sdk/host.ts:182</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>network.delete</code></td><td><code>network.delete(url: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code></td><td><code>extensions/sdk/host.ts:183</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>network.upload</code></td><td><code>network.upload(url: string, name: string, options?: { method?: "POST" | "PUT" | undefined; headers?: Record&lt;string, string&gt; | undefined; onProgress?: NetworkProgressHandler | undefined; }): Promise&lt;NetworkResponse&gt;</code></td><td><code>extensions/sdk/host.ts:135</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>network.download</code></td><td><code>network.download(url: string, name: string, options?: Record&lt;string, string&gt; | { headers?: Record&lt;string, string&gt; | undefined; onProgress?: NetworkProgressHandler | undefined; }): Promise&lt;NetworkFileResponse&gt;</code></td><td><code>extensions/sdk/host.ts:136</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>network.websocket.connect</code></td><td><code>network.websocket.connect(url: string): Promise&lt;ExtensionWebSocket&gt;</code></td><td><code>extensions/sdk/host.ts:163</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>socket.send</code></td><td><code>socket.send(data: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:99</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>socket.onMessage</code></td><td><code>socket.onMessage(callback: (data: string) =&gt; unknown): () =&gt; void</code></td><td><code>extensions/sdk/host.ts:96</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>socket.close</code></td><td><code>socket.close(code?: number | undefined, reason?: string | undefined): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:100</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>browser.open</code></td><td><code>browser.open(url: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:68</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>browser.openExternal</code></td><td><code>browser.openExternal(url: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:72</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>webView.open</code></td><td><code>webView.open(url: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:778</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>clipboard.write</code></td><td><code>clipboard.write(value: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:205</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>clipboard.read</code></td><td><code>clipboard.read(): Promise&lt;string | null&gt;</code></td><td><code>extensions/sdk/host.ts:204</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>share.text</code></td><td><code>share.text(value: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:232</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>share.url</code></td><td><code>share.url(value: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:233</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>share.image</code></td><td><code>share.image(key: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:230</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>share.file</code></td><td><code>share.file(key: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:234</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>share.items</code></td><td><code>share.items(items: ShareItem[]): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:231</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>drag.source</code></td><td><code>drag.source(label: string, value: string): Node</code></td><td><code>extensions/sdk/drag.ts:10</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>drop.target</code></td><td><code>drop.target(key: string, label: string): Node</code></td><td><code>extensions/sdk/drag.ts:23</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>haptics.light</code></td><td><code>haptics.light(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/haptics.ts:9</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>haptics.medium</code></td><td><code>haptics.medium(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/haptics.ts:10</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>haptics.heavy</code></td><td><code>haptics.heavy(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/haptics.ts:11</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>haptics.success</code></td><td><code>haptics.success(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/haptics.ts:12</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>haptics.warning</code></td><td><code>haptics.warning(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/haptics.ts:13</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>haptics.error</code></td><td><code>haptics.error(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/haptics.ts:14</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>device.platform</code></td><td><code>device.platform(): Promise&lt;"ios" | "macos" | "android"&gt;</code></td><td><code>extensions/sdk/device.ts:14</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>device.osVersion</code></td><td><code>device.osVersion(): Promise&lt;string&gt;</code></td><td><code>extensions/sdk/device.ts:15</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>device.deviceClass</code></td><td><code>device.deviceClass(): Promise&lt;"phone" | "tablet" | "desktop"&gt;</code></td><td><code>extensions/sdk/device.ts:16</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>device.screen</code></td><td><code>device.screen(): Promise&lt;DeviceScreen&gt;</code></td><td><code>extensions/sdk/device.ts:17</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>device.locale</code></td><td><code>device.locale(): Promise&lt;string&gt;</code></td><td><code>extensions/sdk/device.ts:18</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>device.timezone</code></td><td><code>device.timezone(): Promise&lt;string&gt;</code></td><td><code>extensions/sdk/device.ts:19</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>device.appearance</code></td><td><code>device.appearance(): Promise&lt;"light" | "dark"&gt;</code></td><td><code>extensions/sdk/device.ts:20</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>device.capabilities</code></td><td><code>device.capabilities(): Promise&lt;string[]&gt;</code></td><td><code>extensions/sdk/device.ts:21</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>keyboard.dismiss</code></td><td><code>keyboard.dismiss(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/keyboard.ts:9</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>keyboard.focus</code></td><td><code>keyboard.focus(key: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/keyboard.ts:3</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>accessibility.label</code></td><td><code>accessibility.label(node: Node, value: string): Node</code></td><td><code>extensions/sdk/accessibility.ts:22</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>accessibility.hint</code></td><td><code>accessibility.hint(node: Node, value: string): Node</code></td><td><code>extensions/sdk/accessibility.ts:23</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>accessibility.role</code></td><td><code>accessibility.role(node: Node, value: AccessibilityRole): Node</code></td><td><code>extensions/sdk/accessibility.ts:24</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>accessibility.isReduceMotionEnabled</code></td><td><code>accessibility.isReduceMotionEnabled(): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/accessibility.ts:26</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>accessibility.isHighContrastEnabled</code></td><td><code>accessibility.isHighContrastEnabled(): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/accessibility.ts:27</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>animation.animate</code></td><td><code>animation.animate&lt;T&gt;(options: AnimationOptions, update: () =&gt; T | Promise&lt;T&gt;): Promise&lt;T&gt;</code></td><td><code>extensions/sdk/index.ts:52</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>animation.spring</code></td><td><code>animation.spring&lt;T&gt;(update: () =&gt; T | Promise&lt;T&gt;, options?: Omit&lt;AnimationOptions, "curve"&gt;): Promise&lt;T&gt;</code></td><td><code>extensions/sdk/index.ts:62</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>animation.transition</code></td><td><code>animation.transition&lt;T&gt;(update: () =&gt; T | Promise&lt;T&gt;, options?: AnimationOptions): Promise&lt;T&gt;</code></td><td><code>extensions/sdk/index.ts:65</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>chart.line</code></td><td><code>chart.line(label: string, categories: string[], series: ChartSeries[]): Node</code></td><td><code>extensions/sdk/charts.ts:52</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>chart.bar</code></td><td><code>chart.bar(label: string, categories: string[], series: ChartSeries[]): Node</code></td><td><code>extensions/sdk/charts.ts:54</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>chart.area</code></td><td><code>chart.area(label: string, categories: string[], series: ChartSeries[]): Node</code></td><td><code>extensions/sdk/charts.ts:53</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>chart.pie</code></td><td><code>chart.pie(label: string, categories: string[], values: number[]): Node</code></td><td><code>extensions/sdk/charts.ts:55</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>chart.donut</code></td><td><code>chart.donut(label: string, categories: string[], values: number[]): Node</code></td><td><code>extensions/sdk/charts.ts:56</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>chart.scatter</code></td><td><code>chart.scatter(label: string, series: ScatterSeries[]): Node</code></td><td><code>extensions/sdk/charts.ts:57</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>canvas.create</code></td><td><code>canvas.create(width?: number, height?: number, label?: string): ExtensionCanvas</code></td><td><code>extensions/sdk/canvas.ts:62</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>canvas.line</code></td><td><code>canvas.create().line(x1: number, y1: number, x2: number, y2: number, appearance?: DrawingStyle): ExtensionCanvas</code></td><td><code>extensions/sdk/canvas.ts:27</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>canvas.rect</code></td><td><code>canvas.create().rect(x: number, y: number, width: number, height: number, appearance?: DrawingStyle): ExtensionCanvas</code></td><td><code>extensions/sdk/canvas.ts:30</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>canvas.circle</code></td><td><code>canvas.create().circle(x: number, y: number, radius: number, appearance?: DrawingStyle): ExtensionCanvas</code></td><td><code>extensions/sdk/canvas.ts:34</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>canvas.text</code></td><td><code>canvas.create().text(text: string, x: number, y: number, options?: { color?: DrawingColor | undefined; size?: number | undefined; align?: "leading" | "center" | "trailing" | undefined; }): ExtensionCanvas</code></td><td><code>extensions/sdk/canvas.ts:38</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>canvas.image</code></td><td><code>canvas.create().image(url: string, x: number, y: number, width: number, height: number): ExtensionCanvas</code></td><td><code>extensions/sdk/canvas.ts:43</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>canvas.path</code></td><td><code>canvas.create().path(segments: PathSegment[], appearance?: DrawingStyle): ExtensionCanvas</code></td><td><code>extensions/sdk/canvas.ts:48</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>pdf.open</code></td><td><code>pdf.open(source: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/media.ts:41</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>pdf.pageCount</code></td><td><code>pdf.pageCount(source: string): Promise&lt;number&gt;</code></td><td><code>extensions/sdk/media.ts:42</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>pdf.thumbnail</code></td><td><code>pdf.thumbnail(source: string, name: string, page?: number, maxDimension?: number): Promise&lt;GeneratedThumbnail&gt;</code></td><td><code>extensions/sdk/media.ts:48</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>pdf.export</code></td><td><code>pdf.export(name: string, suggestedName?: string): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/media.ts:52</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>pdf.share</code></td><td><code>pdf.share(source: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/media.ts:43</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>pdf.create</code></td><td><code>pdf.create(name: string, pages: PDFPageInput[]): Promise&lt;PDFInfo&gt;</code></td><td><code>extensions/sdk/media.ts:44</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>scanner.document</code></td><td><code>scanner.document(options?: { name?: string | undefined; maxPages?: number | undefined; }): Promise&lt;ScannedDocumentInfo | null&gt;</code></td><td><code>extensions/sdk/host.ts:306</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>sensors.accelerometer</code></td><td><code>sensors.accelerometer(): Promise&lt;MotionVector&gt;</code></td><td><code>extensions/sdk/sensors.ts:14</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>sensors.gyroscope</code></td><td><code>sensors.gyroscope(): Promise&lt;MotionVector&gt;</code></td><td><code>extensions/sdk/sensors.ts:15</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>sensors.magnetometer</code></td><td><code>sensors.magnetometer(): Promise&lt;MotionVector&gt;</code></td><td><code>extensions/sdk/sensors.ts:16</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>sensors.orientation</code></td><td><code>sensors.orientation(): Promise&lt;MotionOrientation&gt;</code></td><td><code>extensions/sdk/sensors.ts:17</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>connectivity.status</code></td><td><code>connectivity.status(): Promise&lt;NetworkStatus&gt;</code></td><td><code>extensions/sdk/host.ts:776</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>connectivity.onChange</code></td><td><code>connectivity.onChange(callback: (status: NetworkStatus) =&gt; unknown): Promise&lt;() =&gt; void&gt;</code></td><td><code>extensions/sdk/host.ts:776</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>crypto.randomBytes</code></td><td><code>crypto.randomBytes(length: number): Uint8Array&lt;ArrayBufferLike&gt;</code></td><td><code>extensions/sdk/crypto.ts:31</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>crypto.hash</code></td><td><code>crypto.hash(text: string, algorithm?: "SHA-256" | "SHA-512"): Promise&lt;string&gt;</code></td><td><code>extensions/sdk/crypto.ts:35</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>crypto.hmac</code></td><td><code>crypto.hmac(text: string, key: string, algorithm?: "SHA-256" | "SHA-512"): Promise&lt;string&gt;</code></td><td><code>extensions/sdk/crypto.ts:36</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>crypto.encrypt</code></td><td><code>crypto.encrypt(text: string, key: string, aad?: string): Promise&lt;EncryptedText&gt;</code></td><td><code>extensions/sdk/crypto.ts:33</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>crypto.decrypt</code></td><td><code>crypto.decrypt(envelope: EncryptedText, key: string, aad?: string): Promise&lt;string&gt;</code></td><td><code>extensions/sdk/crypto.ts:34</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>secureStorage.set</code></td><td><code>secureStorage.set(name: string, value: unknown): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:347</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>secureStorage.get</code></td><td><code>secureStorage.get&lt;T = unknown&gt;(name: string): Promise&lt;T | null&gt;</code></td><td><code>extensions/sdk/host.ts:346</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>secureStorage.delete</code></td><td><code>secureStorage.delete(name: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:348</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>auth.oauth2</code></td><td><code>auth.oauth2(providerInput: OAuthProvider): Promise&lt;OAuthSession&gt;</code></td><td><code>extensions/sdk/auth.ts:99</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>auth.openIDConnect</code></td><td><code>auth.openIDConnect(config: { issuer: string; clientId: string; scopes: string[]; }): Promise&lt;OIDCSession&gt;</code></td><td><code>extensions/sdk/auth.ts:102</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>auth.logout</code></td><td><code>auth.logout(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/auth.ts:119</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>auth.tokenStatus</code></td><td><code>auth.tokenStatus(): Promise&lt;{ connected: boolean; expiresAt: number | null; scopes: string[]; }&gt;</code></td><td><code>extensions/sdk/auth.ts:114</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>link.create</code></td><td><code>link.create(id: string): Promise&lt;string&gt;</code></td><td><code>extensions/sdk/integration.ts:23</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>link.open</code></td><td><code>link.open(url: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/integration.ts:24</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>app.onDeepLink</code></td><td><code>app.onDeepLink(callback: (payload: AppOpenURLPayload) =&gt; unknown): () =&gt; void</code></td><td><code>extensions/sdk/host.ts:387</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>extensions.isInstalled</code></td><td><code>extensions.isInstalled(id: string): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/integration.ts:18</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>extensions.open</code></td><td><code>extensions.open(id: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/integration.ts:19</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>extensions.request</code></td><td><code>extensions.request(id: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/integration.ts:20</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>intent.register</code></td><td><code>intent.register&lt;T = unknown, R = unknown&gt;(name: string, handler: IntentHandler&lt;T, R&gt;): () =&gt; void</code></td><td><code>extensions/sdk/intents.ts:21</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>intent.perform</code></td><td><code>intent.perform&lt;T = unknown, R = unknown&gt;(name: string, input?: T | undefined): Promise&lt;R[]&gt;</code></td><td><code>extensions/sdk/intents.ts:35</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>search.registerItems</code></td><td><code>search.registerItems(items: SearchItem[]): Promise&lt;{ indexed: number; }&gt;</code></td><td><code>extensions/sdk/platform.ts:47</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>search.removeItems</code></td><td><code>search.removeItems(ids: string[]): Promise&lt;{ removed: number; }&gt;</code></td><td><code>extensions/sdk/platform.ts:55</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>host.registerShortcut</code></td><td><code>host.registerShortcut(value: HostAction): Promise&lt;{ registered: boolean; }&gt;</code></td><td><code>extensions/sdk/platform.ts:68</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>host.registerAction</code></td><td><code>host.registerAction(value: HostAction): Promise&lt;{ registered: boolean; }&gt;</code></td><td><code>extensions/sdk/platform.ts:72</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>widget.define</code></td><td><code>widget.define(value: WidgetDefinition): Promise&lt;{ registered: boolean; }&gt;</code></td><td><code>extensions/sdk/platform.ts:79</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>widget.reload</code></td><td><code>widget.reload(id: string): Promise&lt;{ queued: boolean; }&gt;</code></td><td><code>extensions/sdk/platform.ts:85</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>shortcuts.register</code></td><td><code>shortcuts.register(value: HostAction): Promise&lt;{ registered: boolean; }&gt;</code></td><td><code>extensions/sdk/platform.ts:89</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>server.function</code></td><td><code>server.function&lt;T = unknown&gt;(name: string, input?: unknown): Promise&lt;T&gt;</code></td><td><code>extensions/sdk/server.ts:73</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>server.kv.get</code></td><td><code>server.kv.get&lt;T = unknown&gt;(key: string): Promise&lt;{ value: T | null; revision: number; }&gt;</code></td><td><code>extensions/sdk/server.ts:85</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>server.kv.set</code></td><td><code>server.kv.set(key: string, value: unknown, expectedRevision: number): Promise&lt;number&gt;</code></td><td><code>extensions/sdk/server.ts:86</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>server.kv.delete</code></td><td><code>server.kv.delete(key: string, expectedRevision: number): Promise&lt;boolean&gt;</code></td><td><code>extensions/sdk/server.ts:87</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>server.db.insert</code></td><td><code>server.db.insert&lt;T extends Record&lt;string, unknown&gt;&gt;(table: string, id: string, value: T): Promise&lt;ServerRecord&lt;T&gt;&gt;</code></td><td><code>extensions/sdk/server.ts:100</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>server.db.query</code></td><td><code>server.db.query&lt;T extends Record&lt;string, unknown&gt; = Record&lt;string, unknown&gt;&gt;(table: string, options?: ServerQuery): Promise&lt;{ rows: ServerRecord&lt;T&gt;[]; nextCursor: string | null; }&gt;</code></td><td><code>extensions/sdk/server.ts:101</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>server.db.update</code></td><td><code>server.db.update&lt;T extends Record&lt;string, unknown&gt;&gt;(table: string, id: string, value: T, expectedRevision: number): Promise&lt;ServerRecord&lt;T&gt;&gt;</code></td><td><code>extensions/sdk/server.ts:102</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>server.db.delete</code></td><td><code>server.db.delete(table: string, id: string, expectedRevision: number): Promise&lt;{ deleted: boolean; }&gt;</code></td><td><code>extensions/sdk/server.ts:103</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>server.db.transaction</code></td><td><code>server.db.transaction(operations: ServerOperation[]): Promise&lt;ServerResult[]&gt;</code></td><td><code>extensions/sdk/server.ts:104</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>cloud.user.get</code></td><td><code>cloud.user.get&lt;T = unknown&gt;(name: string): Promise&lt;{ value: T | null; revision: number; }&gt;</code></td><td><code>extensions/sdk/host.ts:326</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>cloud.user.set</code></td><td><code>cloud.user.set(name: string, expectedRevision: number, value: unknown): Promise&lt;number&gt;</code></td><td><code>extensions/sdk/host.ts:330</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>cloud.shared.create</code></td><td><code>cloud.shared.create&lt;T&gt;(group: string, name: string, value: T): Promise&lt;SharedValue&lt;T&gt;&gt;</code></td><td><code>extensions/sdk/collaboration.ts:30</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>cloud.shared.read</code></td><td><code>cloud.shared.read&lt;T = unknown&gt;(group: string, name: string): Promise&lt;SharedValue&lt;T&gt; | null&gt;</code></td><td><code>extensions/sdk/collaboration.ts:31</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>cloud.shared.update</code></td><td><code>cloud.shared.update&lt;T&gt;(group: string, name: string, value: T, expectedRevision: number): Promise&lt;SharedValue&lt;T&gt;&gt;</code></td><td><code>extensions/sdk/collaboration.ts:32</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>cloud.shared.delete</code></td><td><code>cloud.shared.delete(group: string, name: string, expectedRevision: number): Promise&lt;{ deleted: true; }&gt;</code></td><td><code>extensions/sdk/collaboration.ts:33</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>groups.create</code></td><td><code>groups.create(name: string): Promise&lt;ExtensionGroup&gt;</code></td><td><code>extensions/sdk/collaboration.ts:13</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>groups.join</code></td><td><code>groups.join(invitation: string): Promise&lt;ExtensionGroup | null&gt;</code></td><td><code>extensions/sdk/collaboration.ts:17</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>groups.leave</code></td><td><code>groups.leave(id: string): Promise&lt;{ left: true; } | null&gt;</code></td><td><code>extensions/sdk/collaboration.ts:21</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>groups.members</code></td><td><code>groups.members(id: string): Promise&lt;GroupMember[]&gt;</code></td><td><code>extensions/sdk/collaboration.ts:22</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>groups.invite</code></td><td><code>groups.invite(id: string, options?: { expiresInHours?: number | undefined; maxUses?: number | undefined; }): Promise&lt;GroupInvitation&gt;</code></td><td><code>extensions/sdk/collaboration.ts:23</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>realtime.subscribe</code></td><td><code>realtime.subscribe&lt;T&gt;(group: string, topic: string, onMessage: (message: RealtimeMessage&lt;T&gt;) =&gt; unknown, options?: RealtimeSubscribeOptions): () =&gt; void</code></td><td><code>extensions/sdk/collaboration.ts:54</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>realtime.publish</code></td><td><code>realtime.publish&lt;T&gt;(group: string, topic: string, value: T): Promise&lt;RealtimeMessage&lt;T&gt;&gt;</code></td><td><code>extensions/sdk/collaboration.ts:49</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>server.cron.register</code></td><td><code>server.cron.register(name: string, input?: unknown, intervalSeconds?: number): Promise&lt;CronRegistration&gt;</code></td><td><code>extensions/sdk/server.ts:77</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>server.cron.status</code></td><td><code>server.cron.status(name: string): Promise&lt;CronStatus&gt;</code></td><td><code>extensions/sdk/server.ts:82</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>push.sendToCurrentUser</code></td><td><code>push.sendToCurrentUser(value: { title: string; body: string; data?: Record&lt;string, string&gt; | undefined; }): Promise&lt;{ accepted: boolean; }&gt;</code></td><td><code>extensions/sdk/platform.ts:96</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>console.log</code></td><td><code>console.log(...values: unknown[]): void</code></td><td><code>extensions/sdk/debug.ts:14</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>console.warn</code></td><td><code>console.warn(...values: unknown[]): void</code></td><td><code>extensions/sdk/debug.ts:15</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>console.error</code></td><td><code>console.error(...values: unknown[]): void</code></td><td><code>extensions/sdk/debug.ts:16</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>debug.inspect</code></td><td><code>debug.inspect(value: unknown): string</code></td><td><code>extensions/sdk/debug.ts:4</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>analytics.event</code></td><td><code>analytics.event(name: string): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:340</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>capabilities.has</code></td><td><code>capabilities.has(name: string): boolean</code></td><td><code>extensions/sdk/host.ts:351</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>permissions.status</code></td><td><code>permissions.status(permission: Permission): Promise&lt;PermissionStatus&gt;</code></td><td><code>extensions/sdk/host.ts:42</code></td><td>verified-ios-android-mac</td></tr>
-<tr><td><code>permissions.request</code></td><td><code>permissions.request(permission: Permission): Promise&lt;PermissionStatus&gt;</code></td><td><code>extensions/sdk/host.ts:43</code></td><td>verified-on-some-hosts</td></tr>
-<tr><td><code>permissions.openSettings</code></td><td><code>permissions.openSettings(): Promise&lt;void&gt;</code></td><td><code>extensions/sdk/host.ts:44</code></td><td>verified-on-some-hosts</td></tr></tbody></table></div></details></section>
+<section id="complete-api-index" data-title="全API署名索引" data-group="API索引"><details><summary><h2>全API署名索引</h2></summary><p>TypeScript SDKで利用できるAPI名と呼び出し署名です。必要な権限、データ範囲、利用条件は各機能の説明を参照してください。<code>canvas.*</code>の描画操作は<code>canvas.create()</code>が返すインスタンスメソッドです。</p><div class="tablewrap"><table><thead><tr><th>API</th><th>SDK呼び出し署名</th></tr></thead><tbody><tr><td><code>app.onLaunch</code></td><td><code>app.onLaunch(callback: () =&gt; unknown): () =&gt; void</code></td></tr>
+<tr><td><code>app.onAppear</code></td><td><code>app.onAppear(callback: () =&gt; unknown): () =&gt; void</code></td></tr>
+<tr><td><code>app.onDisappear</code></td><td><code>app.onDisappear(callback: () =&gt; unknown): () =&gt; void</code></td></tr>
+<tr><td><code>app.onResume</code></td><td><code>app.onResume(callback: () =&gt; unknown): () =&gt; void</code></td></tr>
+<tr><td><code>app.onSuspend</code></td><td><code>app.onSuspend(callback: () =&gt; unknown): () =&gt; void</code></td></tr>
+<tr><td><code>app.onOpenURL</code></td><td><code>app.onOpenURL(callback: (payload: AppOpenURLPayload) =&gt; unknown): () =&gt; void</code></td></tr>
+<tr><td><code>app.onNotification</code></td><td><code>app.onNotification(callback: (payload: { identifier?: string | undefined; action?: string | undefined; data?: Record&lt;string, string&gt; | undefined; }) =&gt; unknown): () =&gt; void</code></td></tr>
+<tr><td><code>app.onMemoryWarning</code></td><td><code>app.onMemoryWarning(callback: () =&gt; unknown): () =&gt; void</code></td></tr>
+<tr><td><code>app.version</code></td><td><code>app.version(): string</code></td></tr>
+<tr><td><code>app.extensionId</code></td><td><code>app.extensionId(): string</code></td></tr>
+<tr><td><code>app.environment</code></td><td><code>app.environment(): "development" | "production"</code></td></tr>
+<tr><td><code>app.hostVersion</code></td><td><code>app.hostVersion(): string</code></td></tr>
+<tr><td><code>app.capabilities</code></td><td><code>app.capabilities(): string[]</code></td></tr>
+<tr><td><code>ui.text</code></td><td><code>ui.text(text: string): Node</code></td></tr>
+<tr><td><code>ui.heading</code></td><td><code>ui.heading(text: string): Node</code></td></tr>
+<tr><td><code>ui.label</code></td><td><code>ui.label(text: string): Node</code></td></tr>
+<tr><td><code>ui.markdown</code></td><td><code>ui.markdown(text: string): Node</code></td></tr>
+<tr><td><code>ui.code</code></td><td><code>ui.code(text: string): Node</code></td></tr>
+<tr><td><code>ui.caption</code></td><td><code>ui.caption(text: string): Node</code></td></tr>
+<tr><td><code>ui.badge</code></td><td><code>ui.badge(text: string, tone?: "primary" | "secondary" | "accent" | undefined): Node</code></td></tr>
+<tr><td><code>ui.icon</code></td><td><code>ui.icon(name: string, accessibilityLabel: string): Node</code></td></tr>
+<tr><td><code>ui.vstack</code></td><td><code>ui.vstack(children: Node[]): Node</code></td></tr>
+<tr><td><code>ui.hstack</code></td><td><code>ui.hstack(children: Node[]): Node</code></td></tr>
+<tr><td><code>ui.zstack</code></td><td><code>ui.zstack(children: Node[]): Node</code></td></tr>
+<tr><td><code>ui.grid</code></td><td><code>ui.grid(columns: number, children: Node[]): Node</code></td></tr>
+<tr><td><code>ui.lazyGrid</code></td><td><code>ui.lazyGrid(columns: number, children: Node[]): Node</code></td></tr>
+<tr><td><code>ui.scroll</code></td><td><code>ui.scroll(children: Node[]): Node</code></td></tr>
+<tr><td><code>ui.horizontalScroll</code></td><td><code>ui.horizontalScroll(children: Node[]): Node</code></td></tr>
+<tr><td><code>ui.spacer</code></td><td><code>ui.spacer(size?: number): Node</code></td></tr>
+<tr><td><code>ui.divider</code></td><td><code>ui.divider(): Node</code></td></tr>
+<tr><td><code>ui.card</code></td><td><code>ui.card(children: Node[], label?: string | undefined): Node</code></td></tr>
+<tr><td><code>ui.group</code></td><td><code>ui.group(children: Node[]): Node</code></td></tr>
+<tr><td><code>ui.section</code></td><td><code>ui.section(label: string, children: Node[]): Node</code></td></tr>
+<tr><td><code>ui.container</code></td><td><code>ui.container(children: Node[]): Node</code></td></tr>
+<tr><td><code>ui.safeArea</code></td><td><code>ui.safeArea(children: Node[]): Node</code></td></tr>
+<tr><td><code>ui.textField</code></td><td><code>ui.textField(key: string, label: string, value: State&lt;string&gt;, events?: { onFocus?: (() =&gt; unknown) | undefined; onBlur?: (() =&gt; unknown) | undefined; onSubmit?: (() =&gt; unknown) | undefined; }): Node</code></td></tr>
+<tr><td><code>ui.textArea</code></td><td><code>ui.textArea(key: string, label: string, value?: State&lt;string&gt; | undefined): Node</code></td></tr>
+<tr><td><code>ui.secureField</code></td><td><code>ui.secureField(key: string, label: string, value?: State&lt;string&gt; | undefined): Node</code></td></tr>
+<tr><td><code>ui.number</code></td><td><code>ui.number(key: string, label: string, min?: number, max?: number, step?: number): Node</code></td></tr>
+<tr><td><code>ui.slider</code></td><td><code>ui.slider(key: string, label: string, min?: number, max?: number, step?: number): Node</code></td></tr>
+<tr><td><code>ui.stepper</code></td><td><code>ui.stepper(key: string, label: string, value: State&lt;number&gt;, min: number, max: number, step?: number): Node</code></td></tr>
+<tr><td><code>ui.toggle</code></td><td><code>ui.toggle(key: string, label: string, value?: State&lt;boolean&gt; | undefined): Node</code></td></tr>
+<tr><td><code>ui.checkbox</code></td><td><code>ui.checkbox(key: string, label: string, value: State&lt;boolean&gt;): Node</code></td></tr>
+<tr><td><code>ui.radio</code></td><td><code>ui.radio(key: string, label: string, options: string[], value: State&lt;string&gt;): Node</code></td></tr>
+<tr><td><code>ui.select</code></td><td><code>ui.select(key: string, label: string, options: string[]): Node</code></td></tr>
+<tr><td><code>ui.multiSelect</code></td><td><code>ui.multiSelect(key: string, label: string, options: string[], value: State&lt;string[]&gt;): Node</code></td></tr>
+<tr><td><code>ui.date</code></td><td><code>ui.date(key: string, label: string, value?: State&lt;number | null&gt; | undefined): Node</code></td></tr>
+<tr><td><code>ui.time</code></td><td><code>ui.time(key: string, label: string, value: State&lt;number | null&gt;): Node</code></td></tr>
+<tr><td><code>ui.dateTime</code></td><td><code>ui.dateTime(key: string, label: string, value: State&lt;number | null&gt;): Node</code></td></tr>
+<tr><td><code>ui.dateRange</code></td><td><code>ui.dateRange(key: string, label: string, value: State&lt;{ start: number | null; end: number | null; }&gt;): Node</code></td></tr>
+<tr><td><code>ui.coursePicker</code></td><td><code>ui.coursePicker(key: string, label: string): Node</code></td></tr>
+<tr><td><code>ui.filePicker</code></td><td><code>ui.filePicker(key: string, label: string, value: State&lt;string&gt;): Node</code></td></tr>
+<tr><td><code>ui.photoPicker</code></td><td><code>ui.photoPicker(key: string, label: string, value: State&lt;string&gt;): Node</code></td></tr>
+<tr><td><code>ui.searchField</code></td><td><code>ui.searchField(key: string, label: string, value: State&lt;string&gt;, events?: { onFocus?: (() =&gt; unknown) | undefined; onBlur?: (() =&gt; unknown) | undefined; onSubmit?: (() =&gt; unknown) | undefined; }): Node</code></td></tr>
+<tr><td><code>field.set</code></td><td><code>field.set(value: T): void</code></td></tr>
+<tr><td><code>field.reset</code></td><td><code>field.reset(): void</code></td></tr>
+<tr><td><code>field.focus</code></td><td><code>field.focus(): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>field.blur</code></td><td><code>field.blur(): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>ui.button</code></td><td><code>ui.button(label: string, action: "save" | "reset" | (() =&gt; unknown)): Node</code></td></tr>
+<tr><td><code>ui.iconButton</code></td><td><code>ui.iconButton(icon: string, label: string, onPress: () =&gt; unknown, events?: ButtonEvents): Node</code></td></tr>
+<tr><td><code>ui.linkButton</code></td><td><code>ui.linkButton(label: string, url: string): Node</code></td></tr>
+<tr><td><code>ui.menu</code></td><td><code>ui.menu(label: string, actions: Node[]): Node</code></td></tr>
+<tr><td><code>ui.contextMenu</code></td><td><code>ui.contextMenu(content: Node, actions: Node[]): Node</code></td></tr>
+<tr><td><code>ui.swipeActions</code></td><td><code>ui.swipeActions(content: Node, actions: Node[]): Node</code></td></tr>
+<tr><td><code>ui.toolbar</code></td><td><code>ui.toolbar(children: Node[]): Node</code></td></tr>
+<tr><td><code>ui.floatingButton</code></td><td><code>ui.floatingButton(label: string, onPress: () =&gt; unknown, content?: Node[]): Node</code></td></tr>
+<tr><td><code>navigation.push</code></td><td><code>navigation.push(name: string, parameters?: RouteParameters): void</code></td></tr>
+<tr><td><code>navigation.pop</code></td><td><code>navigation.pop(): boolean</code></td></tr>
+<tr><td><code>navigation.popToRoot</code></td><td><code>navigation.popToRoot(): void</code></td></tr>
+<tr><td><code>navigation.present</code></td><td><code>navigation.present(name: string, parameters?: RouteParameters, mode?: "sheet" | "fullScreen"): void</code></td></tr>
+<tr><td><code>navigation.dismiss</code></td><td><code>navigation.dismiss(): boolean</code></td></tr>
+<tr><td><code>navigation.sheet</code></td><td><code>navigation.sheet(name: string, parameters?: RouteParameters): void</code></td></tr>
+<tr><td><code>navigation.fullScreen</code></td><td><code>navigation.fullScreen(name: string, parameters?: RouteParameters): void</code></td></tr>
+<tr><td><code>navigation.tabs</code></td><td><code>navigation.tabs(tabs: { id: string; title: string; render: () =&gt; Node[]; }[], selected: State&lt;string&gt;): Node</code></td></tr>
+<tr><td><code>navigation.openExtension</code></td><td><code>navigation.openExtension(id: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>navigation.openHostPage</code></td><td><code>navigation.openHostPage(page: HostPage): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>ui.alert</code></td><td><code>ui.alert(title: string, message?: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>ui.confirm</code></td><td><code>ui.confirm(title: string, message?: string): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>ui.prompt</code></td><td><code>ui.prompt(title: string, message?: string, initialValue?: string): Promise&lt;string | null&gt;</code></td></tr>
+<tr><td><code>ui.actionSheet</code></td><td><code>ui.actionSheet(title: string, items: ActionSheetItem[], message?: string): Promise&lt;string | null&gt;</code></td></tr>
+<tr><td><code>ui.toast</code></td><td><code>ui.toast(text: string, duration?: number): void</code></td></tr>
+<tr><td><code>ui.banner</code></td><td><code>ui.banner(text: string, duration?: number): void</code></td></tr>
+<tr><td><code>ui.loading</code></td><td><code>ui.loading(label: string): Node</code></td></tr>
+<tr><td><code>ui.progress</code></td><td><code>ui.progress(label: string, value: number): Node</code></td></tr>
+<tr><td><code>ui.emptyState</code></td><td><code>ui.emptyState(title: string, message: string): Node</code></td></tr>
+<tr><td><code>ui.errorState</code></td><td><code>ui.errorState(title: string, message: string): Node</code></td></tr>
+<tr><td><code>ui.list</code></td><td><code>ui.list&lt;T&gt;(items: ExtensionList&lt;T&gt;): Node</code></td></tr>
+<tr><td><code>ui.lazyList</code></td><td><code>ui.lazyList&lt;T&gt;(items: ExtensionList&lt;T&gt;): Node</code></td></tr>
+<tr><td><code>ui.sectionedList</code></td><td><code>ui.sectionedList&lt;T&gt;(sections: { title: string; list: ExtensionList&lt;T&gt;; }[]): Node</code></td></tr>
+<tr><td><code>list.filter</code></td><td><code>list.filter(predicate: (item: T) =&gt; boolean): ExtensionList&lt;T&gt;</code></td></tr>
+<tr><td><code>list.sort</code></td><td><code>list.sort(compare: (a: T, b: T) =&gt; number): ExtensionList&lt;T&gt;</code></td></tr>
+<tr><td><code>list.search</code></td><td><code>list.search(query: string, stringify?: ((item: T) =&gt; string) | undefined): ExtensionList&lt;T&gt;</code></td></tr>
+<tr><td><code>list.select</code></td><td><code>list.select(key: string): void</code></td></tr>
+<tr><td><code>list.multiSelect</code></td><td><code>list.multiSelect(keys: string[]): void</code></td></tr>
+<tr><td><code>list.refresh</code></td><td><code>list.refresh(): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>list.loadMore</code></td><td><code>list.loadMore(): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>list.swipe</code></td><td><code>list.swipe(actions: { title: string; perform: (item: T) =&gt; unknown; }[]): ExtensionList&lt;T&gt;</code></td></tr>
+<tr><td><code>list.contextMenu</code></td><td><code>list.contextMenu(actions: { title: string; perform: (item: T) =&gt; unknown; }[]): ExtensionList&lt;T&gt;</code></td></tr>
+<tr><td><code>list.move</code></td><td><code>list.move(from: number, to: number): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>list.delete</code></td><td><code>list.delete(key: string): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>state.create</code></td><td><code>state.create&lt;T&gt;(initial: T): State&lt;T&gt;</code></td></tr>
+<tr><td><code>state.get</code></td><td><code>state.get&lt;T&gt;(value: State&lt;T&gt;): T</code></td></tr>
+<tr><td><code>state.set</code></td><td><code>state.set&lt;T&gt;(value: State&lt;T&gt;, next: T): void</code></td></tr>
+<tr><td><code>state.update</code></td><td><code>state.update&lt;T&gt;(value: State&lt;T&gt;, fn: (current: T) =&gt; T): void</code></td></tr>
+<tr><td><code>state.reset</code></td><td><code>state.reset&lt;T&gt;(value: State&lt;T&gt;): void</code></td></tr>
+<tr><td><code>state.watch</code></td><td><code>state.watch&lt;T&gt;(value: State&lt;T&gt;, fn: (next: T, previous: T) =&gt; void): () =&gt; void</code></td></tr>
+<tr><td><code>state.computed</code></td><td><code>state.computed&lt;T&gt;(dependencies: State&lt;unknown&gt;[], calculate: () =&gt; T): State&lt;T&gt; &amp; { dispose(): void; }</code></td></tr>
+<tr><td><code>date.now</code></td><td><code>date.now(): Date</code></td></tr>
+<tr><td><code>date.parse</code></td><td><code>date.parse(value: DateInput): Date</code></td></tr>
+<tr><td><code>date.format</code></td><td><code>date.format(value: DateInput, options?: DateTimeFormatOptions, locale?: string): string</code></td></tr>
+<tr><td><code>date.add</code></td><td><code>date.add(value: DateInput, milliseconds: number): Date</code></td></tr>
+<tr><td><code>date.subtract</code></td><td><code>date.subtract(value: DateInput, milliseconds: number): Date</code></td></tr>
+<tr><td><code>date.diff</code></td><td><code>date.diff(a: DateInput, b: DateInput): number</code></td></tr>
+<tr><td><code>date.startOfDay</code></td><td><code>date.startOfDay(value: DateInput): Date</code></td></tr>
+<tr><td><code>date.endOfDay</code></td><td><code>date.endOfDay(value: DateInput): Date</code></td></tr>
+<tr><td><code>date.startOfWeek</code></td><td><code>date.startOfWeek(value: DateInput, firstDay?: number): Date</code></td></tr>
+<tr><td><code>date.endOfWeek</code></td><td><code>date.endOfWeek(value: DateInput, firstDay?: number): Date</code></td></tr>
+<tr><td><code>date.isToday</code></td><td><code>date.isToday(value: DateInput): boolean</code></td></tr>
+<tr><td><code>date.isPast</code></td><td><code>date.isPast(value: DateInput): boolean</code></td></tr>
+<tr><td><code>date.isFuture</code></td><td><code>date.isFuture(value: DateInput): boolean</code></td></tr>
+<tr><td><code>date.timezone</code></td><td><code>date.timezone(): string</code></td></tr>
+<tr><td><code>cit.calendar.isClassDay</code></td><td><code>cit.calendar.isClassDay(date: Date): Promise&lt;boolean | null&gt;</code></td></tr>
+<tr><td><code>cit.calendar.currentSemester</code></td><td><code>cit.calendar.currentSemester(): Promise&lt;string | null&gt;</code></td></tr>
+<tr><td><code>cit.calendar.weekNumber</code></td><td><code>cit.calendar.weekNumber(date: Date): number</code></td></tr>
+<tr><td><code>math.round</code></td><td><code>math.round(x: number): number</code></td></tr>
+<tr><td><code>math.floor</code></td><td><code>math.floor(x: number): number</code></td></tr>
+<tr><td><code>math.ceil</code></td><td><code>math.ceil(x: number): number</code></td></tr>
+<tr><td><code>math.min</code></td><td><code>math.min(...values: number[]): number</code></td></tr>
+<tr><td><code>math.max</code></td><td><code>math.max(...values: number[]): number</code></td></tr>
+<tr><td><code>math.abs</code></td><td><code>math.abs(x: number): number</code></td></tr>
+<tr><td><code>math.random</code></td><td><code>math.random(): number</code></td></tr>
+<tr><td><code>math.clamp</code></td><td><code>math.clamp(value: number, min: number, max: number): number</code></td></tr>
+<tr><td><code>math.sum</code></td><td><code>math.sum(values: number[]): number</code></td></tr>
+<tr><td><code>math.average</code></td><td><code>math.average(values: number[]): number</code></td></tr>
+<tr><td><code>math.median</code></td><td><code>math.median(values: number[]): number</code></td></tr>
+<tr><td><code>utils.uuid</code></td><td><code>utils.uuid(): string</code></td></tr>
+<tr><td><code>utils.debounce</code></td><td><code>utils.debounce&lt;T extends unknown[]&gt;(callback: (...args: T) =&gt; void, milliseconds: number): ((...args: T) =&gt; void) &amp; { cancel(): void; }</code></td></tr>
+<tr><td><code>utils.throttle</code></td><td><code>utils.throttle&lt;T extends unknown[]&gt;(callback: (...args: T) =&gt; void, milliseconds: number): (...args: T) =&gt; void</code></td></tr>
+<tr><td><code>utils.sleep</code></td><td><code>utils.sleep(milliseconds: number, signal?: AbortSignal | undefined): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>text.format</code></td><td><code>text.format(template: string, values: Record&lt;string, string | number&gt;): string</code></td></tr>
+<tr><td><code>text.replace</code></td><td><code>text.replace(value: string, search: string, replacement: string): string</code></td></tr>
+<tr><td><code>text.split</code></td><td><code>text.split(value: string, separator: string): string[]</code></td></tr>
+<tr><td><code>text.join</code></td><td><code>text.join(values: string[], separator?: string): string</code></td></tr>
+<tr><td><code>text.contains</code></td><td><code>text.contains(value: string, search: string): boolean</code></td></tr>
+<tr><td><code>text.startsWith</code></td><td><code>text.startsWith(value: string, search: string): boolean</code></td></tr>
+<tr><td><code>text.endsWith</code></td><td><code>text.endsWith(value: string, search: string): boolean</code></td></tr>
+<tr><td><code>text.trim</code></td><td><code>text.trim(value: string): string</code></td></tr>
+<tr><td><code>text.lowercase</code></td><td><code>text.lowercase(value: string): string</code></td></tr>
+<tr><td><code>text.uppercase</code></td><td><code>text.uppercase(value: string): string</code></td></tr>
+<tr><td><code>text.regex</code></td><td><code>text.regex(pattern: string, flags?: string): RegExp</code></td></tr>
+<tr><td><code>json.parse</code></td><td><code>json.parse(value: string): unknown</code></td></tr>
+<tr><td><code>json.stringify</code></td><td><code>json.stringify(value: unknown): string</code></td></tr>
+<tr><td><code>cit.courses.list</code></td><td><code>cit.courses.list(): Promise&lt;Course[]&gt;</code></td></tr>
+<tr><td><code>cit.courses.get</code></td><td><code>cit.courses.get(id: string): Promise&lt;Course | null&gt;</code></td></tr>
+<tr><td><code>cit.courses.search</code></td><td><code>cit.courses.search(query: string): Promise&lt;Course[]&gt;</code></td></tr>
+<tr><td><code>cit.timetable.today</code></td><td><code>cit.timetable.today(at?: Date): Promise&lt;CourseOccurrence[]&gt;</code></td></tr>
+<tr><td><code>cit.timetable.tomorrow</code></td><td><code>cit.timetable.tomorrow(at?: Date): Promise&lt;CourseOccurrence[]&gt;</code></td></tr>
+<tr><td><code>cit.timetable.week</code></td><td><code>cit.timetable.week(at?: Date): Promise&lt;CourseOccurrence[]&gt;</code></td></tr>
+<tr><td><code>cit.timetable.current</code></td><td><code>cit.timetable.current(at?: Date): Promise&lt;CourseOccurrence[]&gt;</code></td></tr>
+<tr><td><code>cit.timetable.next</code></td><td><code>cit.timetable.next(at?: Date): Promise&lt;CourseOccurrence | null&gt;</code></td></tr>
+<tr><td><code>cit.timetable.at</code></td><td><code>cit.timetable.at(date: Date): Promise&lt;CourseOccurrence[]&gt;</code></td></tr>
+<tr><td><code>cit.timetable.freePeriods</code></td><td><code>cit.timetable.freePeriods(weekday?: number): Promise&lt;PeriodSlot[]&gt;</code></td></tr>
+<tr><td><code>cit.assignments.list</code></td><td><code>cit.assignments.list(): Promise&lt;Task[]&gt;</code></td></tr>
+<tr><td><code>cit.assignments.get</code></td><td><code>cit.assignments.get(id: string): Promise&lt;Task | null&gt;</code></td></tr>
+<tr><td><code>cit.assignments.pending</code></td><td><code>cit.assignments.pending(at?: Date): Promise&lt;Task[]&gt;</code></td></tr>
+<tr><td><code>cit.assignments.overdue</code></td><td><code>cit.assignments.overdue(at?: Date): Promise&lt;Task[]&gt;</code></td></tr>
+<tr><td><code>cit.assignments.dueSoon</code></td><td><code>cit.assignments.dueSoon(days?: number, at?: Date): Promise&lt;Task[]&gt;</code></td></tr>
+<tr><td><code>cit.assignments.search</code></td><td><code>cit.assignments.search(query: string): Promise&lt;Task[]&gt;</code></td></tr>
+<tr><td><code>cit.assignments.byCourse</code></td><td><code>cit.assignments.byCourse(course: string): Promise&lt;Task[]&gt;</code></td></tr>
+<tr><td><code>cit.assignments.between</code></td><td><code>cit.assignments.between(start: Date, end: Date): Promise&lt;Task[]&gt;</code></td></tr>
+<tr><td><code>cit.todo.list</code></td><td><code>cit.todo.list(): Promise&lt;PersonalTodo[]&gt;</code></td></tr>
+<tr><td><code>cit.todo.get</code></td><td><code>cit.todo.get(id: string): Promise&lt;PersonalTodo | null&gt;</code></td></tr>
+<tr><td><code>cit.todo.create</code></td><td><code>cit.todo.create(fields: TodoFields): Promise&lt;PersonalTodo&gt;</code></td></tr>
+<tr><td><code>cit.todo.update</code></td><td><code>cit.todo.update(expected: PersonalTodo, fields: TodoFields): Promise&lt;PersonalTodo&gt;</code></td></tr>
+<tr><td><code>cit.todo.complete</code></td><td><code>cit.todo.complete(id: string): Promise&lt;PersonalTodo | null&gt;</code></td></tr>
+<tr><td><code>cit.todo.uncomplete</code></td><td><code>cit.todo.uncomplete(id: string): Promise&lt;PersonalTodo | null&gt;</code></td></tr>
+<tr><td><code>cit.todo.delete</code></td><td><code>cit.todo.delete(expected: PersonalTodo): Promise&lt;null&gt;</code></td></tr>
+<tr><td><code>cit.todo.search</code></td><td><code>cit.todo.search(query: string): Promise&lt;PersonalTodo[]&gt;</code></td></tr>
+<tr><td><code>cit.todo.watch</code></td><td><code>cit.todo.watch(callback: (rows: PersonalTodo[]) =&gt; void, onError?: ((error: unknown) =&gt; void) | undefined): () =&gt; void</code></td></tr>
+<tr><td><code>cit.courseNotes.list</code></td><td><code>cit.courseNotes.list(): Promise&lt;{ id: string; courseKey: string; content: string; }[]&gt;</code></td></tr>
+<tr><td><code>cit.courseNotes.get</code></td><td><code>cit.courseNotes.get(id: string): Promise&lt;{ id: string; courseKey: string; content: string; } | null&gt;</code></td></tr>
+<tr><td><code>cit.courseNotes.create</code></td><td><code>cit.courseNotes.create(title: string, content: string): Promise&lt;{ id: string; courseKey: string; content: string; } | null&gt;</code></td></tr>
+<tr><td><code>cit.courseNotes.update</code></td><td><code>cit.courseNotes.update(id: string, content: string, expectedContent: string): Promise&lt;{ id: string; courseKey: string; content: string; } | null&gt;</code></td></tr>
+<tr><td><code>cit.courseNotes.delete</code></td><td><code>cit.courseNotes.delete(id: string, expectedContent: string): Promise&lt;null&gt;</code></td></tr>
+<tr><td><code>cit.semester.current</code></td><td><code>cit.semester.current(): Promise&lt;string | null&gt;</code></td></tr>
+<tr><td><code>cit.semester.list</code></td><td><code>cit.semester.list(): Promise&lt;string[]&gt;</code></td></tr>
+<tr><td><code>cit.calendar.events</code></td><td><code>cit.calendar.events(): Promise&lt;AcademicCalendarEvent[]&gt;</code></td></tr>
+<tr><td><code>cit.calendar.holidays</code></td><td><code>cit.calendar.holidays(start?: Date | undefined, end?: Date | undefined): Promise&lt;AcademicCalendarEvent[]&gt;</code></td></tr>
+<tr><td><code>cit.calendar.classDays</code></td><td><code>cit.calendar.classDays(start: Date, end: Date): Promise&lt;string[]&gt;</code></td></tr>
+<tr><td><code>cit.bus.routes</code></td><td><code>cit.bus.routes(): Promise&lt;BusRoute[]&gt;</code></td></tr>
+<tr><td><code>cit.bus.stops</code></td><td><code>cit.bus.stops(): Promise&lt;string[]&gt;</code></td></tr>
+<tr><td><code>cit.bus.timetable</code></td><td><code>cit.bus.timetable(at?: Date, routeFilter?: { from?: string | undefined; to?: string | undefined; } | undefined): Promise&lt;BusDeparture[]&gt;</code></td></tr>
+<tr><td><code>cit.bus.next</code></td><td><code>cit.bus.next(from?: string | undefined, to?: string | undefined, at?: Date): Promise&lt;BusDeparture | null&gt;</code></td></tr>
+<tr><td><code>cit.bus.between</code></td><td><code>cit.bus.between(start: Date, end: Date, routeFilter?: { from?: string | undefined; to?: string | undefined; } | undefined): Promise&lt;BusDeparture[]&gt;</code></td></tr>
+<tr><td><code>cit.bus.serviceStatus</code></td><td><code>cit.bus.serviceStatus(at?: Date): Promise&lt;BusServiceStatus&gt;</code></td></tr>
+<tr><td><code>cit.cafeteria.locations</code></td><td><code>cit.cafeteria.locations(): Promise&lt;CafeteriaLocation[]&gt;</code></td></tr>
+<tr><td><code>cit.cafeteria.menu</code></td><td><code>cit.cafeteria.menu(): Promise&lt;CafeteriaLocation[]&gt;</code></td></tr>
+<tr><td><code>cit.cafeteria.hours</code></td><td><code>cit.cafeteria.hours(): Promise&lt;CafeteriaHours[]&gt;</code></td></tr>
+<tr><td><code>cit.cafeteria.cameraStatus</code></td><td><code>cit.cafeteria.cameraStatus(): Promise&lt;CafeteriaCameraStatus[]&gt;</code></td></tr>
+<tr><td><code>cit.cafeteria.openCamera</code></td><td><code>cit.cafeteria.openCamera(): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>cit.campus.facilities</code></td><td><code>cit.campus.facilities(): Promise&lt;CampusRoom[]&gt;</code></td></tr>
+<tr><td><code>cit.campus.buildings</code></td><td><code>cit.campus.buildings(): Promise&lt;{ campus: "新習志野" | "津田沼" | "不明"; building: string; rooms: CampusRoom[]; }[]&gt;</code></td></tr>
+<tr><td><code>cit.campus.rooms</code></td><td><code>cit.campus.rooms(): Promise&lt;CampusRoom[]&gt;</code></td></tr>
+<tr><td><code>cit.campus.room</code></td><td><code>cit.campus.room(id: string): Promise&lt;CampusRoom | null&gt;</code></td></tr>
+<tr><td><code>cit.campus.search</code></td><td><code>cit.campus.search(query: string): Promise&lt;CampusRoom[]&gt;</code></td></tr>
+<tr><td><code>cit.campus.roomAvailability</code></td><td><code>cit.campus.roomAvailability(roomID: string, at?: Date): Promise&lt;RoomScheduleStatus&gt;</code></td></tr>
+<tr><td><code>cit.services.list</code></td><td><code>cit.services.list(): Promise&lt;CampusService[]&gt;</code></td></tr>
+<tr><td><code>cit.services.open</code></td><td><code>cit.services.open(service: HostService): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>cit.user.displayName</code></td><td><code>cit.user.displayName(): Promise&lt;string | null&gt;</code></td></tr>
+<tr><td><code>cit.user.preferences</code></td><td><code>cit.user.preferences(): Promise&lt;UserPreferences&gt;</code></td></tr>
+<tr><td><code>cit.settings.appearance</code></td><td><code>cit.settings.appearance(): Promise&lt;Pick&lt;UserPreferences, "accentColor"&gt;&gt;</code></td></tr>
+<tr><td><code>cit.settings.notifications</code></td><td><code>cit.settings.notifications(): Promise&lt;{ classStart: boolean; assignments: boolean; }&gt;</code></td></tr>
+<tr><td><code>cit.settings.language</code></td><td><code>cit.settings.language(): Promise&lt;string&gt;</code></td></tr>
+<tr><td><code>cit.settings.enabledServices</code></td><td><code>cit.settings.enabledServices(): Promise&lt;string[]&gt;</code></td></tr>
+<tr><td><code>storage.get</code></td><td><code>storage.get&lt;T = unknown&gt;(name: string): Promise&lt;T | null&gt;</code></td></tr>
+<tr><td><code>storage.set</code></td><td><code>storage.set(name: string, value: unknown): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>storage.has</code></td><td><code>storage.has(name: string): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>storage.remove</code></td><td><code>storage.remove(name: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>storage.clear</code></td><td><code>storage.clear(): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>storage.keys</code></td><td><code>storage.keys(): Promise&lt;string[]&gt;</code></td></tr>
+<tr><td><code>database.createTable</code></td><td><code>database.createTable(name: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>database.insert</code></td><td><code>database.insert(name: string, row: RecordValue): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>database.update</code></td><td><code>database.update(name: string, id: string, changes: Record&lt;string, unknown&gt;): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>database.delete</code></td><td><code>database.delete(name: string, id: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>database.get</code></td><td><code>database.get(name: string, id: string): Promise&lt;RecordValue | null&gt;</code></td></tr>
+<tr><td><code>database.query</code></td><td><code>database.query(name: string): Promise&lt;RecordValue[]&gt;</code></td></tr>
+<tr><td><code>database.transaction</code></td><td><code>database.transaction&lt;T&gt;(work: (transaction: Transaction) =&gt; T): Promise&lt;T&gt;</code></td></tr>
+<tr><td><code>database.watch</code></td><td><code>database.watch(name: string, callback: (rows: RecordValue[]) =&gt; void, onError?: ((error: unknown) =&gt; void) | undefined): () =&gt; void</code></td></tr>
+<tr><td><code>files.read</code></td><td><code>files.read(name: string): Promise&lt;Uint8Array&lt;ArrayBufferLike&gt; | null&gt;</code></td></tr>
+<tr><td><code>files.write</code></td><td><code>files.write(name: string, bytes: Uint8Array&lt;ArrayBufferLike&gt;): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>files.delete</code></td><td><code>files.delete(name: string): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>files.move</code></td><td><code>files.move(source: string, destination: string): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>files.copy</code></td><td><code>files.copy(source: string, destination: string): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>files.exists</code></td><td><code>files.exists(name: string): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>files.list</code></td><td><code>files.list(): Promise&lt;string[]&gt;</code></td></tr>
+<tr><td><code>files.info</code></td><td><code>files.info(name: string): Promise&lt;ExtensionFileInfo | null&gt;</code></td></tr>
+<tr><td><code>files.pick</code></td><td><code>files.pick(kind?: FilePickerKind): Promise&lt;PickedFileInfo | null&gt;</code></td></tr>
+<tr><td><code>files.pickMultiple</code></td><td><code>files.pickMultiple(kind?: FilePickerKind): Promise&lt;PickedFileInfo[] | null&gt;</code></td></tr>
+<tr><td><code>files.pickImage</code></td><td><code>files.pickImage(): Promise&lt;PickedFileInfo | null&gt;</code></td></tr>
+<tr><td><code>files.pickVideo</code></td><td><code>files.pickVideo(): Promise&lt;PickedFileInfo | null&gt;</code></td></tr>
+<tr><td><code>files.pickAudio</code></td><td><code>files.pickAudio(): Promise&lt;PickedFileInfo | null&gt;</code></td></tr>
+<tr><td><code>files.pickDocument</code></td><td><code>files.pickDocument(): Promise&lt;PickedFileInfo | null&gt;</code></td></tr>
+<tr><td><code>files.export</code></td><td><code>files.export(name: string, suggestedName?: string): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>files.saveAs</code></td><td><code>files.saveAs(name: string, suggestedName?: string): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>camera.capturePhoto</code></td><td><code>camera.capturePhoto(): Promise&lt;PickedFileInfo | null&gt;</code></td></tr>
+<tr><td><code>camera.captureVideo</code></td><td><code>camera.captureVideo(maxSeconds?: number): Promise&lt;PickedFileInfo | null&gt;</code></td></tr>
+<tr><td><code>camera.available</code></td><td><code>camera.available(): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>camera.permissions</code></td><td><code>camera.permissions(): Promise&lt;PermissionStatus&gt;</code></td></tr>
+<tr><td><code>camera.scanQRCode</code></td><td><code>camera.scanQRCode(): Promise&lt;ScannedCode | null&gt;</code></td></tr>
+<tr><td><code>camera.scanBarcode</code></td><td><code>camera.scanBarcode(): Promise&lt;ScannedCode | null&gt;</code></td></tr>
+<tr><td><code>photos.pick</code></td><td><code>photos.pick(): Promise&lt;PickedFileInfo | null&gt;</code></td></tr>
+<tr><td><code>photos.pickMultiple</code></td><td><code>photos.pickMultiple(): Promise&lt;PickedFileInfo[] | null&gt;</code></td></tr>
+<tr><td><code>photos.save</code></td><td><code>photos.save(source: string): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>photos.info</code></td><td><code>photos.info(source: string): Promise&lt;ImageInfo&gt;</code></td></tr>
+<tr><td><code>image.resize</code></td><td><code>image.resize(input: ImageSource, name: string, width: number, height: number, options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code></td></tr>
+<tr><td><code>image.crop</code></td><td><code>image.crop(input: ImageSource, name: string, rectangle: { x: number; y: number; width: number; height: number; }, options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code></td></tr>
+<tr><td><code>image.rotate</code></td><td><code>image.rotate(input: ImageSource, name: string, degrees: 0 | 90 | 180 | 270, options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code></td></tr>
+<tr><td><code>image.flip</code></td><td><code>image.flip(input: ImageSource, name: string, axis: "horizontal" | "vertical", options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code></td></tr>
+<tr><td><code>image.compress</code></td><td><code>image.compress(input: ImageSource, name: string, quality?: number): Promise&lt;ImageResult&gt;</code></td></tr>
+<tr><td><code>image.convert</code></td><td><code>image.convert(input: ImageSource, name: string, format: "jpeg" | "png", quality?: number): Promise&lt;ImageResult&gt;</code></td></tr>
+<tr><td><code>image.thumbnail</code></td><td><code>image.thumbnail(input: ImageSource, name: string, maxDimension?: number): Promise&lt;ImageResult&gt;</code></td></tr>
+<tr><td><code>image.removeMetadata</code></td><td><code>image.removeMetadata(input: ImageSource, name: string, options?: ImageOptions | undefined): Promise&lt;ImageResult&gt;</code></td></tr>
+<tr><td><code>image.scanDocument</code></td><td><code>image.scanDocument(options?: { name?: string | undefined; maxPages?: number | undefined; }): Promise&lt;ScannedDocumentInfo | null&gt;</code></td></tr>
+<tr><td><code>audio.record</code></td><td><code>audio.record(maxSeconds?: number): Promise&lt;PickedFileInfo | null&gt;</code></td></tr>
+<tr><td><code>audio.stopRecording</code></td><td><code>audio.stopRecording(): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>audio.play</code></td><td><code>audio.play(source?: string | undefined): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>audio.pause</code></td><td><code>audio.pause(): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>audio.stop</code></td><td><code>audio.stop(): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>audio.duration</code></td><td><code>audio.duration(): Promise&lt;number | null&gt;</code></td></tr>
+<tr><td><code>audio.position</code></td><td><code>audio.position(): Promise&lt;number | null&gt;</code></td></tr>
+<tr><td><code>video.play</code></td><td><code>video.play(source?: string | undefined): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>video.pause</code></td><td><code>video.pause(): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>video.thumbnail</code></td><td><code>video.thumbnail(source: string, name: string, seconds?: number, maxDimension?: number): Promise&lt;GeneratedThumbnail&gt;</code></td></tr>
+<tr><td><code>video.info</code></td><td><code>video.info(source: string): Promise&lt;VideoInfo&gt;</code></td></tr>
+<tr><td><code>code.generateQR</code></td><td><code>code.generateQR(text: string, name: string, size?: number): Promise&lt;{ name: string; size: number; mimeType: "image/png"; width: number; height: number; }&gt;</code></td></tr>
+<tr><td><code>code.scanQR</code></td><td><code>code.scanQR(): Promise&lt;ScannedCode | null&gt;</code></td></tr>
+<tr><td><code>code.scanBarcode</code></td><td><code>code.scanBarcode(): Promise&lt;ScannedCode | null&gt;</code></td></tr>
+<tr><td><code>location.current</code></td><td><code>location.current(): Promise&lt;LocationFix&gt;</code></td></tr>
+<tr><td><code>location.permission</code></td><td><code>location.permission(): Promise&lt;PermissionStatus&gt;</code></td></tr>
+<tr><td><code>location.openSettings</code></td><td><code>location.openSettings(): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>map.view</code></td><td><code>map.view(options?: MapViewOptions, overlays?: Node[]): Node</code></td></tr>
+<tr><td><code>map.marker</code></td><td><code>map.marker(location: MapCoordinate, options: MapMarkerOptions): Node</code></td></tr>
+<tr><td><code>map.polyline</code></td><td><code>map.polyline(path: MapCoordinate[], options?: MapShapeOptions): Node</code></td></tr>
+<tr><td><code>map.circle</code></td><td><code>map.circle(center: MapCoordinate, radiusMeters: number, options?: MapShapeOptions): Node</code></td></tr>
+<tr><td><code>map.fitBounds</code></td><td><code>map.fitBounds(bounds: MapCoordinate[], padding?: number): Node</code></td></tr>
+<tr><td><code>map.openDirections</code></td><td><code>map.openDirections(destination: MapCoordinate, options?: DirectionsOptions): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>geo.distance</code></td><td><code>geo.distance(from: Coordinate, to: Coordinate): number</code></td></tr>
+<tr><td><code>geo.bearing</code></td><td><code>geo.bearing(from: Coordinate, to: Coordinate): number</code></td></tr>
+<tr><td><code>geo.contains</code></td><td><code>geo.contains(point: Coordinate, circle: { center: Coordinate; radius: number; }): boolean</code></td></tr>
+<tr><td><code>notification.permission</code></td><td><code>notification.permission(): Promise&lt;PermissionStatus&gt;</code></td></tr>
+<tr><td><code>notification.schedule</code></td><td><code>notification.schedule(value: LocalNotificationInput): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>notification.cancel</code></td><td><code>notification.cancel(id: string): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>notification.cancelAll</code></td><td><code>notification.cancelAll(): Promise&lt;number&gt;</code></td></tr>
+<tr><td><code>notification.listScheduled</code></td><td><code>notification.listScheduled(): Promise&lt;ScheduledLocalNotification[]&gt;</code></td></tr>
+<tr><td><code>notification.onOpen</code></td><td><code>notification.onOpen(callback: (notification: { id: string; data: Record&lt;string, string&gt;; action: string; }) =&gt; unknown): () =&gt; void</code></td></tr>
+<tr><td><code>background.register</code></td><td><code>background.register(task: { id: string; intervalMinutes: number; networkRequired?: boolean | undefined; chargingRequired?: boolean | undefined; }): Promise&lt;{ id: string; accepted: boolean; }&gt;</code></td></tr>
+<tr><td><code>background.unregister</code></td><td><code>background.unregister(id: string): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>background.status</code></td><td><code>background.status(): Promise&lt;BackgroundStatus&gt;</code></td></tr>
+<tr><td><code>network.fetch</code></td><td><code>network.fetch(url: string, options?: NetworkOptions): Promise&lt;NetworkResponse&gt;</code></td></tr>
+<tr><td><code>network.get</code></td><td><code>network.get(url: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code></td></tr>
+<tr><td><code>network.post</code></td><td><code>network.post(url: string, body: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code></td></tr>
+<tr><td><code>network.put</code></td><td><code>network.put(url: string, body: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code></td></tr>
+<tr><td><code>network.patch</code></td><td><code>network.patch(url: string, body: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code></td></tr>
+<tr><td><code>network.delete</code></td><td><code>network.delete(url: string, headers?: Record&lt;string, string&gt; | undefined): Promise&lt;NetworkResponse&gt;</code></td></tr>
+<tr><td><code>network.upload</code></td><td><code>network.upload(url: string, name: string, options?: { method?: "POST" | "PUT" | undefined; headers?: Record&lt;string, string&gt; | undefined; onProgress?: NetworkProgressHandler | undefined; }): Promise&lt;NetworkResponse&gt;</code></td></tr>
+<tr><td><code>network.download</code></td><td><code>network.download(url: string, name: string, options?: Record&lt;string, string&gt; | { headers?: Record&lt;string, string&gt; | undefined; onProgress?: NetworkProgressHandler | undefined; }): Promise&lt;NetworkFileResponse&gt;</code></td></tr>
+<tr><td><code>network.websocket.connect</code></td><td><code>network.websocket.connect(url: string): Promise&lt;ExtensionWebSocket&gt;</code></td></tr>
+<tr><td><code>socket.send</code></td><td><code>socket.send(data: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>socket.onMessage</code></td><td><code>socket.onMessage(callback: (data: string) =&gt; unknown): () =&gt; void</code></td></tr>
+<tr><td><code>socket.close</code></td><td><code>socket.close(code?: number | undefined, reason?: string | undefined): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>browser.open</code></td><td><code>browser.open(url: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>browser.openExternal</code></td><td><code>browser.openExternal(url: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>webView.open</code></td><td><code>webView.open(url: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>clipboard.write</code></td><td><code>clipboard.write(value: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>clipboard.read</code></td><td><code>clipboard.read(): Promise&lt;string | null&gt;</code></td></tr>
+<tr><td><code>share.text</code></td><td><code>share.text(value: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>share.url</code></td><td><code>share.url(value: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>share.image</code></td><td><code>share.image(key: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>share.file</code></td><td><code>share.file(key: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>share.items</code></td><td><code>share.items(items: ShareItem[]): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>drag.source</code></td><td><code>drag.source(label: string, value: string): Node</code></td></tr>
+<tr><td><code>drop.target</code></td><td><code>drop.target(key: string, label: string): Node</code></td></tr>
+<tr><td><code>haptics.light</code></td><td><code>haptics.light(): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>haptics.medium</code></td><td><code>haptics.medium(): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>haptics.heavy</code></td><td><code>haptics.heavy(): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>haptics.success</code></td><td><code>haptics.success(): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>haptics.warning</code></td><td><code>haptics.warning(): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>haptics.error</code></td><td><code>haptics.error(): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>device.platform</code></td><td><code>device.platform(): Promise&lt;"ios" | "macos" | "android"&gt;</code></td></tr>
+<tr><td><code>device.osVersion</code></td><td><code>device.osVersion(): Promise&lt;string&gt;</code></td></tr>
+<tr><td><code>device.deviceClass</code></td><td><code>device.deviceClass(): Promise&lt;"phone" | "tablet" | "desktop"&gt;</code></td></tr>
+<tr><td><code>device.screen</code></td><td><code>device.screen(): Promise&lt;DeviceScreen&gt;</code></td></tr>
+<tr><td><code>device.locale</code></td><td><code>device.locale(): Promise&lt;string&gt;</code></td></tr>
+<tr><td><code>device.timezone</code></td><td><code>device.timezone(): Promise&lt;string&gt;</code></td></tr>
+<tr><td><code>device.appearance</code></td><td><code>device.appearance(): Promise&lt;"light" | "dark"&gt;</code></td></tr>
+<tr><td><code>device.capabilities</code></td><td><code>device.capabilities(): Promise&lt;string[]&gt;</code></td></tr>
+<tr><td><code>keyboard.dismiss</code></td><td><code>keyboard.dismiss(): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>keyboard.focus</code></td><td><code>keyboard.focus(key: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>accessibility.label</code></td><td><code>accessibility.label(node: Node, value: string): Node</code></td></tr>
+<tr><td><code>accessibility.hint</code></td><td><code>accessibility.hint(node: Node, value: string): Node</code></td></tr>
+<tr><td><code>accessibility.role</code></td><td><code>accessibility.role(node: Node, value: AccessibilityRole): Node</code></td></tr>
+<tr><td><code>accessibility.isReduceMotionEnabled</code></td><td><code>accessibility.isReduceMotionEnabled(): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>accessibility.isHighContrastEnabled</code></td><td><code>accessibility.isHighContrastEnabled(): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>animation.animate</code></td><td><code>animation.animate&lt;T&gt;(options: AnimationOptions, update: () =&gt; T | Promise&lt;T&gt;): Promise&lt;T&gt;</code></td></tr>
+<tr><td><code>animation.spring</code></td><td><code>animation.spring&lt;T&gt;(update: () =&gt; T | Promise&lt;T&gt;, options?: Omit&lt;AnimationOptions, "curve"&gt;): Promise&lt;T&gt;</code></td></tr>
+<tr><td><code>animation.transition</code></td><td><code>animation.transition&lt;T&gt;(update: () =&gt; T | Promise&lt;T&gt;, options?: AnimationOptions): Promise&lt;T&gt;</code></td></tr>
+<tr><td><code>chart.line</code></td><td><code>chart.line(label: string, categories: string[], series: ChartSeries[]): Node</code></td></tr>
+<tr><td><code>chart.bar</code></td><td><code>chart.bar(label: string, categories: string[], series: ChartSeries[]): Node</code></td></tr>
+<tr><td><code>chart.area</code></td><td><code>chart.area(label: string, categories: string[], series: ChartSeries[]): Node</code></td></tr>
+<tr><td><code>chart.pie</code></td><td><code>chart.pie(label: string, categories: string[], values: number[]): Node</code></td></tr>
+<tr><td><code>chart.donut</code></td><td><code>chart.donut(label: string, categories: string[], values: number[]): Node</code></td></tr>
+<tr><td><code>chart.scatter</code></td><td><code>chart.scatter(label: string, series: ScatterSeries[]): Node</code></td></tr>
+<tr><td><code>canvas.create</code></td><td><code>canvas.create(width?: number, height?: number, label?: string): ExtensionCanvas</code></td></tr>
+<tr><td><code>canvas.line</code></td><td><code>canvas.create().line(x1: number, y1: number, x2: number, y2: number, appearance?: DrawingStyle): ExtensionCanvas</code></td></tr>
+<tr><td><code>canvas.rect</code></td><td><code>canvas.create().rect(x: number, y: number, width: number, height: number, appearance?: DrawingStyle): ExtensionCanvas</code></td></tr>
+<tr><td><code>canvas.circle</code></td><td><code>canvas.create().circle(x: number, y: number, radius: number, appearance?: DrawingStyle): ExtensionCanvas</code></td></tr>
+<tr><td><code>canvas.text</code></td><td><code>canvas.create().text(text: string, x: number, y: number, options?: { color?: DrawingColor | undefined; size?: number | undefined; align?: "leading" | "center" | "trailing" | undefined; }): ExtensionCanvas</code></td></tr>
+<tr><td><code>canvas.image</code></td><td><code>canvas.create().image(url: string, x: number, y: number, width: number, height: number): ExtensionCanvas</code></td></tr>
+<tr><td><code>canvas.path</code></td><td><code>canvas.create().path(segments: PathSegment[], appearance?: DrawingStyle): ExtensionCanvas</code></td></tr>
+<tr><td><code>pdf.open</code></td><td><code>pdf.open(source: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>pdf.pageCount</code></td><td><code>pdf.pageCount(source: string): Promise&lt;number&gt;</code></td></tr>
+<tr><td><code>pdf.thumbnail</code></td><td><code>pdf.thumbnail(source: string, name: string, page?: number, maxDimension?: number): Promise&lt;GeneratedThumbnail&gt;</code></td></tr>
+<tr><td><code>pdf.export</code></td><td><code>pdf.export(name: string, suggestedName?: string): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>pdf.share</code></td><td><code>pdf.share(source: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>pdf.create</code></td><td><code>pdf.create(name: string, pages: PDFPageInput[]): Promise&lt;PDFInfo&gt;</code></td></tr>
+<tr><td><code>scanner.document</code></td><td><code>scanner.document(options?: { name?: string | undefined; maxPages?: number | undefined; }): Promise&lt;ScannedDocumentInfo | null&gt;</code></td></tr>
+<tr><td><code>sensors.accelerometer</code></td><td><code>sensors.accelerometer(): Promise&lt;MotionVector&gt;</code></td></tr>
+<tr><td><code>sensors.gyroscope</code></td><td><code>sensors.gyroscope(): Promise&lt;MotionVector&gt;</code></td></tr>
+<tr><td><code>sensors.magnetometer</code></td><td><code>sensors.magnetometer(): Promise&lt;MotionVector&gt;</code></td></tr>
+<tr><td><code>sensors.orientation</code></td><td><code>sensors.orientation(): Promise&lt;MotionOrientation&gt;</code></td></tr>
+<tr><td><code>connectivity.status</code></td><td><code>connectivity.status(): Promise&lt;NetworkStatus&gt;</code></td></tr>
+<tr><td><code>connectivity.onChange</code></td><td><code>connectivity.onChange(callback: (status: NetworkStatus) =&gt; unknown): Promise&lt;() =&gt; void&gt;</code></td></tr>
+<tr><td><code>crypto.randomBytes</code></td><td><code>crypto.randomBytes(length: number): Uint8Array&lt;ArrayBufferLike&gt;</code></td></tr>
+<tr><td><code>crypto.hash</code></td><td><code>crypto.hash(text: string, algorithm?: "SHA-256" | "SHA-512"): Promise&lt;string&gt;</code></td></tr>
+<tr><td><code>crypto.hmac</code></td><td><code>crypto.hmac(text: string, key: string, algorithm?: "SHA-256" | "SHA-512"): Promise&lt;string&gt;</code></td></tr>
+<tr><td><code>crypto.encrypt</code></td><td><code>crypto.encrypt(text: string, key: string, aad?: string): Promise&lt;EncryptedText&gt;</code></td></tr>
+<tr><td><code>crypto.decrypt</code></td><td><code>crypto.decrypt(envelope: EncryptedText, key: string, aad?: string): Promise&lt;string&gt;</code></td></tr>
+<tr><td><code>secureStorage.set</code></td><td><code>secureStorage.set(name: string, value: unknown): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>secureStorage.get</code></td><td><code>secureStorage.get&lt;T = unknown&gt;(name: string): Promise&lt;T | null&gt;</code></td></tr>
+<tr><td><code>secureStorage.delete</code></td><td><code>secureStorage.delete(name: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>auth.oauth2</code></td><td><code>auth.oauth2(providerInput: OAuthProvider): Promise&lt;OAuthSession&gt;</code></td></tr>
+<tr><td><code>auth.openIDConnect</code></td><td><code>auth.openIDConnect(config: { issuer: string; clientId: string; scopes: string[]; }): Promise&lt;OIDCSession&gt;</code></td></tr>
+<tr><td><code>auth.logout</code></td><td><code>auth.logout(): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>auth.tokenStatus</code></td><td><code>auth.tokenStatus(): Promise&lt;{ connected: boolean; expiresAt: number | null; scopes: string[]; }&gt;</code></td></tr>
+<tr><td><code>link.create</code></td><td><code>link.create(id: string): Promise&lt;string&gt;</code></td></tr>
+<tr><td><code>link.open</code></td><td><code>link.open(url: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>app.onDeepLink</code></td><td><code>app.onDeepLink(callback: (payload: AppOpenURLPayload) =&gt; unknown): () =&gt; void</code></td></tr>
+<tr><td><code>extensions.isInstalled</code></td><td><code>extensions.isInstalled(id: string): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>extensions.open</code></td><td><code>extensions.open(id: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>extensions.request</code></td><td><code>extensions.request(id: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>intent.register</code></td><td><code>intent.register&lt;T = unknown, R = unknown&gt;(name: string, handler: IntentHandler&lt;T, R&gt;): () =&gt; void</code></td></tr>
+<tr><td><code>intent.perform</code></td><td><code>intent.perform&lt;T = unknown, R = unknown&gt;(name: string, input?: T | undefined): Promise&lt;R[]&gt;</code></td></tr>
+<tr><td><code>search.registerItems</code></td><td><code>search.registerItems(items: SearchItem[]): Promise&lt;{ indexed: number; }&gt;</code></td></tr>
+<tr><td><code>search.removeItems</code></td><td><code>search.removeItems(ids: string[]): Promise&lt;{ removed: number; }&gt;</code></td></tr>
+<tr><td><code>host.registerShortcut</code></td><td><code>host.registerShortcut(value: HostAction): Promise&lt;{ registered: boolean; }&gt;</code></td></tr>
+<tr><td><code>host.registerAction</code></td><td><code>host.registerAction(value: HostAction): Promise&lt;{ registered: boolean; }&gt;</code></td></tr>
+<tr><td><code>widget.define</code></td><td><code>widget.define(value: WidgetDefinition): Promise&lt;{ registered: boolean; }&gt;</code></td></tr>
+<tr><td><code>widget.reload</code></td><td><code>widget.reload(id: string): Promise&lt;{ queued: boolean; }&gt;</code></td></tr>
+<tr><td><code>shortcuts.register</code></td><td><code>shortcuts.register(value: HostAction): Promise&lt;{ registered: boolean; }&gt;</code></td></tr>
+<tr><td><code>server.function</code></td><td><code>server.function&lt;T = unknown&gt;(name: string, input?: unknown): Promise&lt;T&gt;</code></td></tr>
+<tr><td><code>server.kv.get</code></td><td><code>server.kv.get&lt;T = unknown&gt;(key: string): Promise&lt;{ value: T | null; revision: number; }&gt;</code></td></tr>
+<tr><td><code>server.kv.set</code></td><td><code>server.kv.set(key: string, value: unknown, expectedRevision: number): Promise&lt;number&gt;</code></td></tr>
+<tr><td><code>server.kv.delete</code></td><td><code>server.kv.delete(key: string, expectedRevision: number): Promise&lt;boolean&gt;</code></td></tr>
+<tr><td><code>server.db.insert</code></td><td><code>server.db.insert&lt;T extends Record&lt;string, unknown&gt;&gt;(table: string, id: string, value: T): Promise&lt;ServerRecord&lt;T&gt;&gt;</code></td></tr>
+<tr><td><code>server.db.query</code></td><td><code>server.db.query&lt;T extends Record&lt;string, unknown&gt; = Record&lt;string, unknown&gt;&gt;(table: string, options?: ServerQuery): Promise&lt;{ rows: ServerRecord&lt;T&gt;[]; nextCursor: string | null; }&gt;</code></td></tr>
+<tr><td><code>server.db.update</code></td><td><code>server.db.update&lt;T extends Record&lt;string, unknown&gt;&gt;(table: string, id: string, value: T, expectedRevision: number): Promise&lt;ServerRecord&lt;T&gt;&gt;</code></td></tr>
+<tr><td><code>server.db.delete</code></td><td><code>server.db.delete(table: string, id: string, expectedRevision: number): Promise&lt;{ deleted: boolean; }&gt;</code></td></tr>
+<tr><td><code>server.db.transaction</code></td><td><code>server.db.transaction(operations: ServerOperation[]): Promise&lt;ServerResult[]&gt;</code></td></tr>
+<tr><td><code>cloud.user.get</code></td><td><code>cloud.user.get&lt;T = unknown&gt;(name: string): Promise&lt;{ value: T | null; revision: number; }&gt;</code></td></tr>
+<tr><td><code>cloud.user.set</code></td><td><code>cloud.user.set(name: string, expectedRevision: number, value: unknown): Promise&lt;number&gt;</code></td></tr>
+<tr><td><code>cloud.shared.create</code></td><td><code>cloud.shared.create&lt;T&gt;(group: string, name: string, value: T): Promise&lt;SharedValue&lt;T&gt;&gt;</code></td></tr>
+<tr><td><code>cloud.shared.read</code></td><td><code>cloud.shared.read&lt;T = unknown&gt;(group: string, name: string): Promise&lt;SharedValue&lt;T&gt; | null&gt;</code></td></tr>
+<tr><td><code>cloud.shared.update</code></td><td><code>cloud.shared.update&lt;T&gt;(group: string, name: string, value: T, expectedRevision: number): Promise&lt;SharedValue&lt;T&gt;&gt;</code></td></tr>
+<tr><td><code>cloud.shared.delete</code></td><td><code>cloud.shared.delete(group: string, name: string, expectedRevision: number): Promise&lt;{ deleted: true; }&gt;</code></td></tr>
+<tr><td><code>groups.create</code></td><td><code>groups.create(name: string): Promise&lt;ExtensionGroup&gt;</code></td></tr>
+<tr><td><code>groups.join</code></td><td><code>groups.join(invitation: string): Promise&lt;ExtensionGroup | null&gt;</code></td></tr>
+<tr><td><code>groups.leave</code></td><td><code>groups.leave(id: string): Promise&lt;{ left: true; } | null&gt;</code></td></tr>
+<tr><td><code>groups.members</code></td><td><code>groups.members(id: string): Promise&lt;GroupMember[]&gt;</code></td></tr>
+<tr><td><code>groups.invite</code></td><td><code>groups.invite(id: string, options?: { expiresInHours?: number | undefined; maxUses?: number | undefined; }): Promise&lt;GroupInvitation&gt;</code></td></tr>
+<tr><td><code>realtime.subscribe</code></td><td><code>realtime.subscribe&lt;T&gt;(group: string, topic: string, onMessage: (message: RealtimeMessage&lt;T&gt;) =&gt; unknown, options?: RealtimeSubscribeOptions): () =&gt; void</code></td></tr>
+<tr><td><code>realtime.publish</code></td><td><code>realtime.publish&lt;T&gt;(group: string, topic: string, value: T): Promise&lt;RealtimeMessage&lt;T&gt;&gt;</code></td></tr>
+<tr><td><code>server.cron.register</code></td><td><code>server.cron.register(name: string, input?: unknown, intervalSeconds?: number): Promise&lt;CronRegistration&gt;</code></td></tr>
+<tr><td><code>server.cron.status</code></td><td><code>server.cron.status(name: string): Promise&lt;CronStatus&gt;</code></td></tr>
+<tr><td><code>push.sendToCurrentUser</code></td><td><code>push.sendToCurrentUser(value: { title: string; body: string; data?: Record&lt;string, string&gt; | undefined; }): Promise&lt;{ accepted: boolean; }&gt;</code></td></tr>
+<tr><td><code>console.log</code></td><td><code>console.log(...values: unknown[]): void</code></td></tr>
+<tr><td><code>console.warn</code></td><td><code>console.warn(...values: unknown[]): void</code></td></tr>
+<tr><td><code>console.error</code></td><td><code>console.error(...values: unknown[]): void</code></td></tr>
+<tr><td><code>debug.inspect</code></td><td><code>debug.inspect(value: unknown): string</code></td></tr>
+<tr><td><code>analytics.event</code></td><td><code>analytics.event(name: string): Promise&lt;void&gt;</code></td></tr>
+<tr><td><code>capabilities.has</code></td><td><code>capabilities.has(name: string): boolean</code></td></tr>
+<tr><td><code>permissions.status</code></td><td><code>permissions.status(permission: Permission): Promise&lt;PermissionStatus&gt;</code></td></tr>
+<tr><td><code>permissions.request</code></td><td><code>permissions.request(permission: Permission): Promise&lt;PermissionStatus&gt;</code></td></tr>
+<tr><td><code>permissions.openSettings</code></td><td><code>permissions.openSettings(): Promise&lt;void&gt;</code></td></tr></tbody></table></div></details></section>
 <!-- GENERATED PUBLIC API INDEX END -->
 </main>
     <aside class="toc-right"><strong>このページ</strong><div id="right-toc"></div></aside>
