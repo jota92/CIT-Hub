@@ -16,45 +16,3446 @@
   "commonErrors": {
     "permission_required": "The permission is missing from manifest.permissions.",
     "permission_denied": "The OS permission or user consent was denied.",
-    "user_gesture_required": "Call from a click, pointer, touch, keyboard or explicit user action.",
+    "user_gesture_required": "Call directly from a user click, pointer, touch, keyboard or explicit user action.",
     "unsupported": "The host or device does not provide this capability.",
     "invalid_arguments": "The args object does not match the operation schema.",
     "not_found": "The requested item or local file does not exist.",
-    "network_error": "The approved network operation failed.",
+    "network_error": "The approved network operation failed or timed out.",
     "storage_error": "The extension storage operation failed.",
     "rate_limited": "Retry later; the operation quota was reached."
   },
   "operations": [
-    {"name":"permissions.status","permission":null,"args":{"permission":"string"},"returns":{"status":"granted|denied|prompt|undeclared|unsupported"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"permissions.request","permission":"the requested permission","args":{"permission":"string"},"returns":{"status":"granted|denied|prompt|unsupported"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"device.info","permission":null,"args":{},"returns":{"platform":"ios|ipados|macos|android","osVersion":"string","deviceClass":"string","screen":{"width":"number","height":"number","scale":"number","orientation":"portrait|landscape"},"locale":"string","timezone":"string","appearance":"light|dark","capabilities":"string[]"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"camera.available","permission":"camera.use","args":{},"returns":{"available":"boolean"},"gesture":false,"platforms":["iOS","iPadOS","Android"]},
-    {"name":"camera.capture","permission":"camera.use + files.selection.read","args":{"key":"string, 1-40 characters","kind":"photo|video","maxSeconds":"0 for photo, 1-60 for video"},"returns":{"key":"string","name":"string","size":"number","mimeType":"image/jpeg|video/quicktime|video/mp4"},"gesture":true,"platforms":["iOS","iPadOS","Android"]},
-    {"name":"camera.scan","permission":"camera.use","args":{"format":"qr|barcode"},"returns":{"value":"string","format":"qr|barcode"},"gesture":true,"platforms":["iOS","iPadOS","Android"]},
-    {"name":"scanner.document","permission":"camera.use + files.storage","args":{"name":"PDF filename","maxPages":"1-50"},"returns":{"name":"string","pageCount":"number","size":"number","mimeType":"application/pdf"},"gesture":true,"platforms":["iOS","iPadOS","Android"]},
-    {"name":"files.selection.pick","permission":"files.user + files.selection.read","args":{"key":"string","kind":"any|image|video|audio|document"},"returns":{"key":"string","name":"string","size":"number","mimeType":"string"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"files.selection.pickMultiple","permission":"files.user + files.selection.read","args":{"kind":"any|image|video|audio|document","maxCount":"1-10"},"returns":{"files":"SelectedFileInfo[]"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"files.selection.info","permission":"files.selection.read","args":{"key":"string"},"returns":{"key":"string","name":"string","size":"number","mimeType":"string"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"files.selection.read","permission":"files.selection.read","args":{"key":"string","offset":"number","maxBytes":"number, up to 49152"},"returns":{"data":"base64 string","offset":"number","totalSize":"number","done":"boolean"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"photos.save","permission":"photos.user + files.selection.read","args":{"key":"string"},"returns":{"saved":"boolean"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"audio.record","permission":"microphone.use + files.selection.read","args":{"key":"string","maxSeconds":"1-300"},"returns":{"key":"string","name":"string","size":"number","mimeType":"audio/mp4"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"audio.stopRecording","permission":"microphone.use + files.selection.read","args":{},"returns":{"stopped":"boolean"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"sensors.read","permission":"sensors.motion","args":{"kind":"accelerometer|gyroscope|magnetometer|orientation"},"returns":{"kind":"string","x":"number?","y":"number?","z":"number?","roll":"number?","pitch":"number?","yaw":"number?","timestamp":"number"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"location.current","permission":"location.use","args":{"accuracy":"coarse|fine"},"returns":{"latitude":"number","longitude":"number","accuracy":"number","altitude":"number?","timestamp":"number"},"gesture":true,"platforms":["iOS","iPadOS","Android"]},
-    {"name":"profile.displayName","permission":"profile.read","args":{},"returns":{"displayName":"string|null"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"settings.display","permission":"settings.read","args":{},"returns":{"appearance":"light|dark","locale":"string","timezone":"string"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"cit.timetable.today|tomorrow|week|current|next","permission":"timetable.read","args":{"date":"ISO date for date-based calls"},"returns":{"items":"CourseOccurrence[]"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"cit.courses.list|search|get","permission":"timetable.read","args":{"query":"string?","courseId":"string?"},"returns":{"items":"Course[]"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"cit.assignments.list|pending|overdue|dueSoon","permission":"assignments.read","args":{"courseId":"string?","limit":"number?"},"returns":{"items":"Assignment[]"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"cit.todo.list","permission":"todos.read","args":{"includeCompleted":"boolean?"},"returns":{"items":"Todo[]"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"cit.courseNotes.list|get","permission":"courseNotes.read","args":{"courseId":"string?"},"returns":{"items":"CourseNote[]"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"storage.get|set|has|remove|keys","permission":null,"args":{"key":"string","value":"JSON value for set"},"returns":{"value":"JSON value|null","keys":"string[]?"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"secureStorage.get|set|delete","permission":null,"args":{"key":"string","value":"string for set"},"returns":{"value":"string|null","deleted":"boolean?"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"clipboard.read|write","permission":"clipboard.read or clipboard.write","args":{"text":"string for write"},"returns":{"text":"string|null","written":"boolean?"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"notification.schedule|cancel|cancelAll|listScheduled","permission":"notifications.schedule","args":{"identifier":"string","title":"string","body":"string","date":"ISO datetime","repeat":"none|daily|weekly"},"returns":{"identifier":"string?","scheduled":"boolean?","items":"ScheduledNotification[]?"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"network.status","permission":"network.status","args":{},"returns":{"connected":"boolean","transport":"wifi|cellular|ethernet|other|none","metered":"boolean|null","internetValidated":"boolean|null"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"browser.open|browser.openExternal","permission":"browser.open","args":{"url":"HTTPS URL"},"returns":{"opened":"boolean"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"media.info|media.playback","permission":"files.selection.read","args":{"key":"string","kind":"image|video|audio","action":"play|pause|stop|duration|position"},"returns":{"name":"string","mimeType":"string","width":"number?","height":"number?","duration":"number?","position":"number?"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
-    {"name":"server.function|server.files|server.db|server.kv","permission":"server.functions or cloud.storage","args":"operation-specific JSON; see review-approved function schema","returns":"operation-specific JSON, always user-scoped","gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]}
-  ]
+    {
+      "name": "accessibility.highContrast",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "accessibility.reduceMotion",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "accessibility.status",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "analytics.event",
+      "permission": "analytics.collect",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "app.capabilities",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "audio.duration",
+      "permission": "files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "audio.pause",
+      "permission": "files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "audio.play",
+      "permission": "files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "audio.position",
+      "permission": "files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "audio.record",
+      "permission": "microphone.use + files.selection.read",
+      "args": {
+        "key": "string",
+        "maxSeconds": "1-300"
+      },
+      "returns": {
+        "key": "string",
+        "name": "string",
+        "size": "number",
+        "mimeType": "audio/mp4"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "audio.stop",
+      "permission": "files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "audio.stopRecording",
+      "permission": "microphone.use + files.selection.read",
+      "args": {},
+      "returns": {
+        "stopped": "boolean"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "auth.logout",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "auth.oauth2",
+      "permission": "browser.open + network.fetch",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "auth.openIDConnect",
+      "permission": "browser.open + network.fetch",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "auth.refresh",
+      "permission": "network.fetch",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "auth.tokenStatus",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "browser.open",
+      "permission": "browser.open",
+      "args": {
+        "url": "HTTPS URL"
+      },
+      "returns": {
+        "opened": "boolean"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "browser.openExternal",
+      "permission": "browser.open",
+      "args": {
+        "url": "HTTPS URL"
+      },
+      "returns": {
+        "opened": "boolean"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "camera.available",
+      "permission": "camera.use",
+      "args": {},
+      "returns": {
+        "available": "boolean"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "camera.capture",
+      "permission": "camera.use + files.selection.read",
+      "args": {
+        "key": "string, 1-40 characters",
+        "kind": "photo|video",
+        "maxSeconds": "0 for photo, 1-60 for video"
+      },
+      "returns": {
+        "key": "string",
+        "name": "string",
+        "size": "number",
+        "mimeType": "image/jpeg|video/quicktime|video/mp4"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "camera.capturePhoto",
+      "permission": "camera.use + files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "camera.captureVideo",
+      "permission": "camera.use + microphone.use + files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "camera.scan",
+      "permission": "camera.use",
+      "args": {
+        "format": "qr|barcode"
+      },
+      "returns": {
+        "value": "string",
+        "format": "qr|barcode"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "camera.scanBarcode",
+      "permission": "camera.use",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "camera.scanQRCode",
+      "permission": "camera.use",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cancel",
+      "permission": "notifications.schedule",
+      "args": {
+        "identifier": "string",
+        "title": "string",
+        "body": "string",
+        "date": "ISO datetime",
+        "repeat": "none|daily|weekly"
+      },
+      "returns": {
+        "identifier": "string?",
+        "scheduled": "boolean?",
+        "items": "ScheduledNotification[]?"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cancelAll",
+      "permission": "notifications.schedule",
+      "args": {
+        "identifier": "string",
+        "title": "string",
+        "body": "string",
+        "date": "ISO datetime",
+        "repeat": "none|daily|weekly"
+      },
+      "returns": {
+        "identifier": "string?",
+        "scheduled": "boolean?",
+        "items": "ScheduledNotification[]?"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "capabilities.has",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.academicCalendar.between",
+      "permission": "calendar.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.academicCalendar.isClassDay",
+      "permission": "calendar.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.academicCalendar.list",
+      "permission": "calendar.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.academicCalendar.on",
+      "permission": "calendar.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.assignments.between",
+      "permission": "assignments.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.assignments.byCourse",
+      "permission": "assignments.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.assignments.get",
+      "permission": "assignments.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.assignments.list",
+      "permission": "assignments.read",
+      "args": {
+        "courseId": "string?",
+        "limit": "number?"
+      },
+      "returns": {
+        "items": "Assignment[]"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.assignments.search",
+      "permission": "assignments.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.bus.between",
+      "permission": "bus.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.bus.next",
+      "permission": "bus.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.bus.routes",
+      "permission": "bus.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.bus.serviceStatus",
+      "permission": "bus.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.bus.stops",
+      "permission": "bus.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.bus.timetable",
+      "permission": "bus.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.cafeteria.cameraStatus",
+      "permission": "cafeteria.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.cafeteria.hours",
+      "permission": "cafeteria.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.cafeteria.locations",
+      "permission": "cafeteria.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.cafeteria.menu",
+      "permission": "cafeteria.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.cafeteria.openCamera",
+      "permission": "cafeteria.read + host.navigate",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.calendar.classDays",
+      "permission": "calendar.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.calendar.isClassDay",
+      "permission": "calendar.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.calendar.weekNumber",
+      "permission": "calendar.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.campus.buildings",
+      "permission": "timetable.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.campus.facilities",
+      "permission": "timetable.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.campus.room",
+      "permission": "timetable.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.campus.roomAvailability",
+      "permission": "timetable.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.campus.rooms",
+      "permission": "timetable.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.campus.search",
+      "permission": "timetable.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.courseNotes.create",
+      "permission": "courseNotes.write",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.courseNotes.delete",
+      "permission": "courseNotes.write",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.courseNotes.list",
+      "permission": "courseNotes.read",
+      "args": {
+        "courseId": "string?"
+      },
+      "returns": {
+        "items": "CourseNote[]"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.courseNotes.update",
+      "permission": "courseNotes.write",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.courses.byWeekday",
+      "permission": "timetable.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.courses.forPeriod",
+      "permission": "timetable.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.courses.list",
+      "permission": "timetable.read",
+      "args": {
+        "query": "string?",
+        "courseId": "string?"
+      },
+      "returns": {
+        "items": "Course[]"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.semester.current",
+      "permission": "timetable.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.semester.list",
+      "permission": "timetable.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.services.list",
+      "permission": "settings.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.services.open",
+      "permission": "host.navigate",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.settings.appearance",
+      "permission": "settings.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.settings.enabledServices",
+      "permission": "settings.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.settings.language",
+      "permission": "settings.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.settings.notifications",
+      "permission": "settings.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.timetable.at",
+      "permission": "timetable.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.timetable.freePeriods",
+      "permission": "timetable.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.timetable.today",
+      "permission": "timetable.read",
+      "args": {
+        "date": "ISO date for date-based calls"
+      },
+      "returns": {
+        "items": "CourseOccurrence[]"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.todo.complete",
+      "permission": "todos.write",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.todo.create",
+      "permission": "todos.write",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.todo.delete",
+      "permission": "todos.write",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.todo.list",
+      "permission": "todos.read",
+      "args": {
+        "includeCompleted": "boolean?"
+      },
+      "returns": {
+        "items": "Todo[]"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.todo.uncomplete",
+      "permission": "todos.write",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.todo.update",
+      "permission": "todos.write",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.user.displayName",
+      "permission": "profile.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cit.user.preferences",
+      "permission": "settings.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "clipboard.read",
+      "permission": "clipboard.read or clipboard.write",
+      "args": {
+        "text": "string for write"
+      },
+      "returns": {
+        "text": "string|null",
+        "written": "boolean?"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cloud.user.delete",
+      "permission": "cloud.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cloud.user.get",
+      "permission": "cloud.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "cloud.user.set",
+      "permission": "cloud.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "code.generateQR",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "code.scanBarcode",
+      "permission": "camera.use",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "code.scanQR",
+      "permission": "camera.use",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "current",
+      "permission": "timetable.read",
+      "args": {
+        "date": "ISO date for date-based calls"
+      },
+      "returns": {
+        "items": "CourseOccurrence[]"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "delete",
+      "permission": null,
+      "args": {
+        "key": "string",
+        "value": "string for set"
+      },
+      "returns": {
+        "value": "string|null",
+        "deleted": "boolean?"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "device.info",
+      "permission": null,
+      "args": {},
+      "returns": {
+        "platform": "ios|ipados|macos|android",
+        "osVersion": "string",
+        "deviceClass": "string",
+        "screen": {
+          "width": "number",
+          "height": "number",
+          "scale": "number",
+          "orientation": "portrait|landscape"
+        },
+        "locale": "string",
+        "timezone": "string",
+        "appearance": "light|dark",
+        "capabilities": "string[]"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "dueSoon",
+      "permission": "assignments.read",
+      "args": {
+        "courseId": "string?",
+        "limit": "number?"
+      },
+      "returns": {
+        "items": "Assignment[]"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "extensions.isInstalled",
+      "permission": "extensions.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "extensions.open",
+      "permission": "extensions.read + host.navigate",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "extensions.request",
+      "permission": "extensions.read + host.navigate",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "field.blur",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "field.focus",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "files.copy",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "files.delete",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "files.exists",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "files.export",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "files.info",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "files.list",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "files.move",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "files.read",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "files.saveAs",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "files.selection.info",
+      "permission": "files.selection.read",
+      "args": {
+        "key": "string"
+      },
+      "returns": {
+        "key": "string",
+        "name": "string",
+        "size": "number",
+        "mimeType": "string"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "files.selection.pick",
+      "permission": "files.user + files.selection.read",
+      "args": {
+        "key": "string",
+        "kind": "any|image|video|audio|document"
+      },
+      "returns": {
+        "key": "string",
+        "name": "string",
+        "size": "number",
+        "mimeType": "string"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "files.selection.pickMultiple",
+      "permission": "files.user + files.selection.read",
+      "args": {
+        "kind": "any|image|video|audio|document",
+        "maxCount": "1-10"
+      },
+      "returns": {
+        "files": "SelectedFileInfo[]"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "files.selection.preview",
+      "permission": "files.user",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "files.selection.read",
+      "permission": "files.selection.read",
+      "args": {
+        "key": "string",
+        "offset": "number",
+        "maxBytes": "number, up to 49152"
+      },
+      "returns": {
+        "data": "base64 string",
+        "offset": "number",
+        "totalSize": "number",
+        "done": "boolean"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "files.transformImage",
+      "permission": "files.storage + files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "files.write",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "get",
+      "permission": "courseNotes.read",
+      "args": {
+        "courseId": "string?"
+      },
+      "returns": {
+        "items": "CourseNote[]"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "groups.create",
+      "permission": "cloud.shared",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "groups.invite",
+      "permission": "cloud.shared",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "groups.join",
+      "permission": "cloud.shared",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "groups.leave",
+      "permission": "cloud.shared",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "groups.list",
+      "permission": "cloud.shared",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "groups.members",
+      "permission": "cloud.shared",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "haptics",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "has",
+      "permission": null,
+      "args": {
+        "key": "string",
+        "value": "JSON value for set"
+      },
+      "returns": {
+        "value": "JSON value|null",
+        "keys": "string[]?"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "host.registerAction",
+      "permission": "host.navigate",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "host.registerShortcut",
+      "permission": "host.navigate",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "image.compress",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "image.convert",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "image.crop",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "image.flip",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "image.process",
+      "permission": "files.storage + files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "image.removeMetadata",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "image.resize",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "image.rotate",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "image.thumbnail",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "keyboard.dismiss",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "keyboard.focus",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "keys",
+      "permission": null,
+      "args": {
+        "key": "string",
+        "value": "JSON value for set"
+      },
+      "returns": {
+        "value": "JSON value|null",
+        "keys": "string[]?"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "link.create",
+      "permission": "extensions.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "link.open",
+      "permission": "extensions.read + host.navigate",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "listScheduled",
+      "permission": "notifications.schedule",
+      "args": {
+        "identifier": "string",
+        "title": "string",
+        "body": "string",
+        "date": "ISO datetime",
+        "repeat": "none|daily|weekly"
+      },
+      "returns": {
+        "identifier": "string?",
+        "scheduled": "boolean?",
+        "items": "ScheduledNotification[]?"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "location.current",
+      "permission": "location.use",
+      "args": {
+        "accuracy": "coarse|fine"
+      },
+      "returns": {
+        "latitude": "number",
+        "longitude": "number",
+        "accuracy": "number",
+        "altitude": "number?",
+        "timestamp": "number"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "map.openDirections",
+      "permission": "browser.open",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "media.exportPDF",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "media.generate",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "media.info",
+      "permission": "files.selection.read",
+      "args": {
+        "key": "string",
+        "kind": "image|video|audio",
+        "action": "play|pause|stop|duration|position"
+      },
+      "returns": {
+        "name": "string",
+        "mimeType": "string",
+        "width": "number?",
+        "height": "number?",
+        "duration": "number?",
+        "position": "number?"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "media.playback",
+      "permission": "files.selection.read",
+      "args": {
+        "key": "string",
+        "kind": "image|video|audio",
+        "action": "play|pause|stop|duration|position"
+      },
+      "returns": {
+        "name": "string",
+        "mimeType": "string",
+        "width": "number?",
+        "height": "number?",
+        "duration": "number?",
+        "position": "number?"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "navigation.dismiss",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "navigation.fullScreen",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "navigation.openExtension",
+      "permission": "extensions.read + host.navigate",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "navigation.openHostPage",
+      "permission": "host.navigate",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "navigation.pop",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "navigation.popToRoot",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "navigation.present",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "navigation.push",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "navigation.sheet",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "navigation.tabs",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "network.downloadFile",
+      "permission": "network.fetch + files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "network.fetch",
+      "permission": "network.fetch",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "network.onChange",
+      "permission": "network.status",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "network.status",
+      "permission": "network.status",
+      "args": {},
+      "returns": {
+        "connected": "boolean",
+        "transport": "wifi|cellular|ethernet|other|none",
+        "metered": "boolean|null",
+        "internetValidated": "boolean|null"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "network.transferProgress",
+      "permission": "network.fetch + files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "network.unwatch",
+      "permission": "network.status",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "network.uploadFile",
+      "permission": "network.fetch + files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "network.watch",
+      "permission": "network.status",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "network.websocket.close",
+      "permission": "network.fetch",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "network.websocket.connect",
+      "permission": "network.fetch",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "network.websocket.send",
+      "permission": "network.fetch",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "next",
+      "permission": "timetable.read",
+      "args": {
+        "date": "ISO date for date-based calls"
+      },
+      "returns": {
+        "items": "CourseOccurrence[]"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "notification.cancel",
+      "permission": "notifications.schedule",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "notification.cancelAll",
+      "permission": "notifications.schedule",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "notification.listScheduled",
+      "permission": "notifications.schedule",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "notification.permission",
+      "permission": "notifications.schedule",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "notification.schedule",
+      "permission": "notifications.schedule",
+      "args": {
+        "identifier": "string",
+        "title": "string",
+        "body": "string",
+        "date": "ISO datetime",
+        "repeat": "none|daily|weekly"
+      },
+      "returns": {
+        "identifier": "string?",
+        "scheduled": "boolean?",
+        "items": "ScheduledNotification[]?"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "overdue",
+      "permission": "assignments.read",
+      "args": {
+        "courseId": "string?",
+        "limit": "number?"
+      },
+      "returns": {
+        "items": "Assignment[]"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "pdf.create",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "pdf.export",
+      "permission": "files.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "pdf.open",
+      "permission": "files.user + files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "pdf.pageCount",
+      "permission": "files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "pdf.share",
+      "permission": "files.user + files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "pdf.thumbnail",
+      "permission": "files.storage + files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "pending",
+      "permission": "assignments.read",
+      "args": {
+        "courseId": "string?",
+        "limit": "number?"
+      },
+      "returns": {
+        "items": "Assignment[]"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "permissions.request",
+      "permission": "the requested permission",
+      "args": {
+        "permission": "string"
+      },
+      "returns": {
+        "status": "granted|denied|prompt|unsupported"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "permissions.status",
+      "permission": null,
+      "args": {
+        "permission": "string"
+      },
+      "returns": {
+        "status": "granted|denied|prompt|undeclared|unsupported"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "photos.info",
+      "permission": "files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "photos.pick",
+      "permission": "files.user + files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "photos.pickMultiple",
+      "permission": "files.user + files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "photos.save",
+      "permission": "photos.user + files.selection.read",
+      "args": {
+        "key": "string"
+      },
+      "returns": {
+        "saved": "boolean"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "profile.displayName",
+      "permission": "profile.read",
+      "args": {},
+      "returns": {
+        "displayName": "string|null"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "realtime.publish",
+      "permission": "cloud.shared",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "realtime.subscribe",
+      "permission": "cloud.shared",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "remove",
+      "permission": null,
+      "args": {
+        "key": "string",
+        "value": "JSON value for set"
+      },
+      "returns": {
+        "value": "JSON value|null",
+        "keys": "string[]?"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "scanner.document",
+      "permission": "camera.use + files.storage",
+      "args": {
+        "name": "PDF filename",
+        "maxPages": "1-50"
+      },
+      "returns": {
+        "name": "string",
+        "pageCount": "number",
+        "size": "number",
+        "mimeType": "application/pdf"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "search",
+      "permission": "timetable.read",
+      "args": {
+        "query": "string?",
+        "courseId": "string?"
+      },
+      "returns": {
+        "items": "Course[]"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "search.registerItems",
+      "permission": "extensions.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "search.removeItems",
+      "permission": "extensions.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "secureStorage.get",
+      "permission": null,
+      "args": {
+        "key": "string",
+        "value": "string for set"
+      },
+      "returns": {
+        "value": "string|null",
+        "deleted": "boolean?"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "sensors.read",
+      "permission": "sensors.motion",
+      "args": {
+        "kind": "accelerometer|gyroscope|magnetometer|orientation"
+      },
+      "returns": {
+        "kind": "string",
+        "x": "number?",
+        "y": "number?",
+        "z": "number?",
+        "roll": "number?",
+        "pitch": "number?",
+        "yaw": "number?",
+        "timestamp": "number"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "server.cron.register",
+      "permission": "server.functions",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "server.cron.status",
+      "permission": "server.functions",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "server.cron.unregister",
+      "permission": "server.functions",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "server.db",
+      "permission": "server.functions or cloud.storage",
+      "args": "operation-specific JSON; see review-approved function schema",
+      "returns": "operation-specific JSON, always user-scoped",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "server.db.delete",
+      "permission": "cloud.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "server.db.insert",
+      "permission": "cloud.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "server.db.query",
+      "permission": "cloud.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "server.db.transaction",
+      "permission": "cloud.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "server.db.update",
+      "permission": "cloud.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "server.files",
+      "permission": "server.functions or cloud.storage",
+      "args": "operation-specific JSON; see review-approved function schema",
+      "returns": "operation-specific JSON, always user-scoped",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "server.function",
+      "permission": "server.functions or cloud.storage",
+      "args": "operation-specific JSON; see review-approved function schema",
+      "returns": "operation-specific JSON, always user-scoped",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "server.kv",
+      "permission": "server.functions or cloud.storage",
+      "args": "operation-specific JSON; see review-approved function schema",
+      "returns": "operation-specific JSON, always user-scoped",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "server.kv.delete",
+      "permission": "cloud.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "server.kv.get",
+      "permission": "cloud.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "server.kv.set",
+      "permission": "cloud.storage",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "set",
+      "permission": null,
+      "args": {
+        "key": "string",
+        "value": "string for set"
+      },
+      "returns": {
+        "value": "string|null",
+        "deleted": "boolean?"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "settings.display",
+      "permission": "settings.read",
+      "args": {},
+      "returns": {
+        "appearance": "light|dark",
+        "locale": "string",
+        "timezone": "string"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "share.file",
+      "permission": "files.user + files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "share.image",
+      "permission": "files.user + files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "share.sheet",
+      "permission": "files.user",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "shortcuts.register",
+      "permission": "host.navigate",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "storage.clear",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "storage.compareAndSet",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "storage.get",
+      "permission": null,
+      "args": {
+        "key": "string",
+        "value": "JSON value for set"
+      },
+      "returns": {
+        "value": "JSON value|null",
+        "keys": "string[]?"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "tomorrow",
+      "permission": "timetable.read",
+      "args": {
+        "date": "ISO date for date-based calls"
+      },
+      "returns": {
+        "items": "CourseOccurrence[]"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "ui.actionSheet",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "ui.alert",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "ui.banner",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "ui.confirm",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "ui.dialog",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "ui.lazyGrid",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "ui.lazyList",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "ui.prompt",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "ui.toast",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "video.info",
+      "permission": "files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "video.pause",
+      "permission": "files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "video.play",
+      "permission": "files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "video.thumbnail",
+      "permission": "files.storage + files.selection.read",
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "week",
+      "permission": "timetable.read",
+      "args": {
+        "date": "ISO date for date-based calls"
+      },
+      "returns": {
+        "items": "CourseOccurrence[]"
+      },
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "widget.define",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "widget.reload",
+      "permission": null,
+      "args": {},
+      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "gesture": false,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    },
+    {
+      "name": "write",
+      "permission": "clipboard.read or clipboard.write",
+      "args": {
+        "text": "string for write"
+      },
+      "returns": {
+        "text": "string|null",
+        "written": "boolean?"
+      },
+      "gesture": true,
+      "platforms": [
+        "iOS",
+        "iPadOS",
+        "macOS",
+        "Android"
+      ]
+    }
+  ],
+  "operationCount": 241
 }

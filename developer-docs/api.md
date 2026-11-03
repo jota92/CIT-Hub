@@ -54,7 +54,27 @@ npm run build:web -- examples/web-app-study-timer.html \
 
 ## 4. CIT Hubブリッジ
 
-全APIの引数、戻り値、権限、ユーザー操作、対応OSは [`api-reference.json`](api-reference.json) に機械可読形式で掲載しています。成功時は値を返し、失敗時は `{code, message}` を持つエラーとして拒否されます。
+全APIの引数、戻り値、権限、ユーザー操作、対応OSは [`api-reference.json`](api-reference.json) に機械可読形式で掲載しています。現行リファレンスには、従来のCIT Hub拡張機能で利用されていた端末機能・本人データ・保存・共有・通知・ネットワーク・サーバー機能を含む241操作を個別のoperationとして収録しています。成功時は値を返し、失敗時は `{code, message}` を持つエラーとして拒否されます。
+
+### 全機能カタログ
+
+`api-reference.json`は概要だけの一覧ではありません。`operations`の各要素に、HTMLから渡すoperation名、宣言する権限、ユーザー操作の要否、対応OS、引数と戻り値の契約を収録しています。複数の操作を同じ権限で使う場合も、`name`は個別のoperation名です。`server.*`、`files.*`、`network.*`、`cit.*`のような操作も同じ`window.CITHub.call()`から呼び出します。
+
+```js
+const result = await window.CITHub.call('cit.bus.next', {
+  from: '津田沼', to: '新習志野', at: new Date().toISOString()
+});
+
+const file = await window.CITHub.call('files.selection.pick', {
+  kind: 'image'
+});
+
+const saved = await window.CITHub.call('server.kv.set', {
+  key: 'last-view', value: { at: Date.now() }
+});
+```
+
+返却値の共通エラーは`commonErrors`に収録しています。端末依存・OS許可・ユーザー操作が必要な操作は、`permissions.status`、`permissions.request`、`capabilities.has`で実行前に確認してください。未対応端末で機能を隠すのではなく、`unsupported`を画面に表示して代替操作を案内します。
 
 HTMLからCIT Hubの機能を使う唯一の入口は`window.CITHub`です。
 
