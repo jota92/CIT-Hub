@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "title": "CIT Hub Web App API reference",
+  "hostApi": 80,
+  "transport": "window.CITHub.call(operation, args)",
+  "envelope": {
+    "success": "Promise<T>",
+    "failure": "Promise rejection with { code: string, message: string }"
+  },
+  "rules": {
+    "declarePermissions": true,
+    "userGestureOperations": "camera, scanner, photo save, audio, browser, dialogs, notifications, file export, sharing and writes must be called directly from a user event",
+    "dataScope": "Only the signed-in user's own CIT Hub data and the extension's own local/cloud namespace are available",
+    "network": "Web App code cannot use fetch or external resources; use the approved bridge operation"
+  },
+  "commonErrors": {
+    "permission_required": "The permission is missing from manifest.permissions.",
+    "permission_denied": "The OS permission or user consent was denied.",
+    "user_gesture_required": "Call from a click, pointer, touch, keyboard or explicit user action.",
+    "unsupported": "The host or device does not provide this capability.",
+    "invalid_arguments": "The args object does not match the operation schema.",
+    "not_found": "The requested item or local file does not exist.",
+    "network_error": "The approved network operation failed.",
+    "storage_error": "The extension storage operation failed.",
+    "rate_limited": "Retry later; the operation quota was reached."
+  },
+  "operations": [
+    {"name":"permissions.status","permission":null,"args":{"permission":"string"},"returns":{"status":"granted|denied|prompt|undeclared|unsupported"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"permissions.request","permission":"the requested permission","args":{"permission":"string"},"returns":{"status":"granted|denied|prompt|unsupported"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"device.info","permission":null,"args":{},"returns":{"platform":"ios|ipados|macos|android","osVersion":"string","deviceClass":"string","screen":{"width":"number","height":"number","scale":"number","orientation":"portrait|landscape"},"locale":"string","timezone":"string","appearance":"light|dark","capabilities":"string[]"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"camera.available","permission":"camera.use","args":{},"returns":{"available":"boolean"},"gesture":false,"platforms":["iOS","iPadOS","Android"]},
+    {"name":"camera.capture","permission":"camera.use + files.selection.read","args":{"key":"string, 1-40 characters","kind":"photo|video","maxSeconds":"0 for photo, 1-60 for video"},"returns":{"key":"string","name":"string","size":"number","mimeType":"image/jpeg|video/quicktime|video/mp4"},"gesture":true,"platforms":["iOS","iPadOS","Android"]},
+    {"name":"camera.scan","permission":"camera.use","args":{"format":"qr|barcode"},"returns":{"value":"string","format":"qr|barcode"},"gesture":true,"platforms":["iOS","iPadOS","Android"]},
+    {"name":"scanner.document","permission":"camera.use + files.storage","args":{"name":"PDF filename","maxPages":"1-50"},"returns":{"name":"string","pageCount":"number","size":"number","mimeType":"application/pdf"},"gesture":true,"platforms":["iOS","iPadOS","Android"]},
+    {"name":"files.selection.pick","permission":"files.user + files.selection.read","args":{"key":"string","kind":"any|image|video|audio|document"},"returns":{"key":"string","name":"string","size":"number","mimeType":"string"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"files.selection.pickMultiple","permission":"files.user + files.selection.read","args":{"kind":"any|image|video|audio|document","maxCount":"1-10"},"returns":{"files":"SelectedFileInfo[]"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"files.selection.info","permission":"files.selection.read","args":{"key":"string"},"returns":{"key":"string","name":"string","size":"number","mimeType":"string"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"files.selection.read","permission":"files.selection.read","args":{"key":"string","offset":"number","maxBytes":"number, up to 49152"},"returns":{"data":"base64 string","offset":"number","totalSize":"number","done":"boolean"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"photos.save","permission":"photos.user + files.selection.read","args":{"key":"string"},"returns":{"saved":"boolean"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"audio.record","permission":"microphone.use + files.selection.read","args":{"key":"string","maxSeconds":"1-300"},"returns":{"key":"string","name":"string","size":"number","mimeType":"audio/mp4"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"audio.stopRecording","permission":"microphone.use + files.selection.read","args":{},"returns":{"stopped":"boolean"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"sensors.read","permission":"sensors.motion","args":{"kind":"accelerometer|gyroscope|magnetometer|orientation"},"returns":{"kind":"string","x":"number?","y":"number?","z":"number?","roll":"number?","pitch":"number?","yaw":"number?","timestamp":"number"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"location.current","permission":"location.use","args":{"accuracy":"coarse|fine"},"returns":{"latitude":"number","longitude":"number","accuracy":"number","altitude":"number?","timestamp":"number"},"gesture":true,"platforms":["iOS","iPadOS","Android"]},
+    {"name":"profile.displayName","permission":"profile.read","args":{},"returns":{"displayName":"string|null"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"settings.display","permission":"settings.read","args":{},"returns":{"appearance":"light|dark","locale":"string","timezone":"string"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"cit.timetable.today|tomorrow|week|current|next","permission":"timetable.read","args":{"date":"ISO date for date-based calls"},"returns":{"items":"CourseOccurrence[]"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"cit.courses.list|search|get","permission":"timetable.read","args":{"query":"string?","courseId":"string?"},"returns":{"items":"Course[]"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"cit.assignments.list|pending|overdue|dueSoon","permission":"assignments.read","args":{"courseId":"string?","limit":"number?"},"returns":{"items":"Assignment[]"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"cit.todo.list","permission":"todos.read","args":{"includeCompleted":"boolean?"},"returns":{"items":"Todo[]"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"cit.courseNotes.list|get","permission":"courseNotes.read","args":{"courseId":"string?"},"returns":{"items":"CourseNote[]"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"storage.get|set|has|remove|keys","permission":null,"args":{"key":"string","value":"JSON value for set"},"returns":{"value":"JSON value|null","keys":"string[]?"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"secureStorage.get|set|delete","permission":null,"args":{"key":"string","value":"string for set"},"returns":{"value":"string|null","deleted":"boolean?"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"clipboard.read|write","permission":"clipboard.read or clipboard.write","args":{"text":"string for write"},"returns":{"text":"string|null","written":"boolean?"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"notification.schedule|cancel|cancelAll|listScheduled","permission":"notifications.schedule","args":{"identifier":"string","title":"string","body":"string","date":"ISO datetime","repeat":"none|daily|weekly"},"returns":{"identifier":"string?","scheduled":"boolean?","items":"ScheduledNotification[]?"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"network.status","permission":"network.status","args":{},"returns":{"connected":"boolean","transport":"wifi|cellular|ethernet|other|none","metered":"boolean|null","internetValidated":"boolean|null"},"gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"browser.open|browser.openExternal","permission":"browser.open","args":{"url":"HTTPS URL"},"returns":{"opened":"boolean"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"media.info|media.playback","permission":"files.selection.read","args":{"key":"string","kind":"image|video|audio","action":"play|pause|stop|duration|position"},"returns":{"name":"string","mimeType":"string","width":"number?","height":"number?","duration":"number?","position":"number?"},"gesture":true,"platforms":["iOS","iPadOS","macOS","Android"]},
+    {"name":"server.function|server.files|server.db|server.kv","permission":"server.functions or cloud.storage","args":"operation-specific JSON; see review-approved function schema","returns":"operation-specific JSON, always user-scoped","gesture":false,"platforms":["iOS","iPadOS","macOS","Android"]}
+  ]
+}

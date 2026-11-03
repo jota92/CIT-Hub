@@ -1,6 +1,7 @@
 # CIT Hub Web App API
 
 > CIT Hub拡張機能の画面はローカルHTML Web Appで作成します。
+> 全APIのJSON形式は [`api-reference.json`](api-reference.json) を参照してください。
 
 ## 1. manifest
 
@@ -52,6 +53,8 @@ npm run build:web -- examples/web-app-study-timer.html \
 画面は標準DOM、CSS、SVG、Canvas、Web Animationsで作成できます。Claude生成では、セマンティックHTML、ライト/ダーク対応、レスポンシブ配置、アクセシビリティ、`prefers-reduced-motion`を必須とします。
 
 ## 4. CIT Hubブリッジ
+
+全APIの引数、戻り値、権限、ユーザー操作、対応OSは [`api-reference.json`](api-reference.json) に機械可読形式で掲載しています。成功時は値を返し、失敗時は `{code, message}` を持つエラーとして拒否されます。
 
 HTMLからCIT Hubの機能を使う唯一の入口は`window.CITHub`です。
 

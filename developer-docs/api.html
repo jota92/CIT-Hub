@@ -19,7 +19,7 @@
       <p class="eyebrow">CIT HUB EXTENSIONS</p><p class="doc-kicker">開発者ドキュメント <span> / </span> APIリファレンス</p>
       <h1>HTMLで、<br class="desktop-break">CIT Hubを拡張する。</h1>
       <p class="lead">HTML・CSS・JavaScriptでローカルWeb Appを作り、CIT Hubの審査済みブリッジから本人データと端末機能を利用します。</p>
-      <div class="doc-actions"><a class="doc-button primary" href="guide.html">開発を始める</a><a class="doc-button" href="assets/cithub-extension-kit.zip?v=80.0" download>Web App SDKをダウンロード</a><a class="doc-button quiet" href="api.md" download>Markdown仕様書</a></div>
+      <div class="doc-actions"><a class="doc-button primary" href="guide.html">開発を始める</a><a class="doc-button" href="assets/cithub-extension-kit.zip?v=80.0" download>Web App SDKをダウンロード</a><a class="doc-button quiet" href="api.md" download>Markdown仕様書</a><a class="doc-button quiet" href="api-reference.json" download>機械可読リファレンス</a></div>
       <div class="meta"><span><strong>Host API</strong> v80</span><span><strong>UI</strong> Local HTML WebView</span><span><strong>対象</strong> iOS・iPadOS・macOS・Android</span></div>
       <div class="callout"><strong>画面を作る</strong><br>拡張機能の画面はHTML・CSS・JavaScriptで作成します。データ取得やCIT Hub機能の呼び出しには<code>window.CITHub.call(operation, args)</code>を使います。</div>
       <div class="doc-intro-grid"><a class="doc-intro-card" href="#quickstart"><span class="card-index">01</span><strong>まず動かす</strong><span>HTMLをJSONへビルドして試す。</span><span class="card-arrow" aria-hidden="true">→</span></a><a class="doc-intro-card" href="#bridge"><span class="card-index">02</span><strong>ブリッジを使う</strong><span>本人データと端末機能を安全に呼び出す。</span><span class="card-arrow" aria-hidden="true">→</span></a><a class="doc-intro-card" href="#permissions"><span class="card-index">03</span><strong>審査に出す</strong><span>権限と安全境界を確認する。</span><span class="card-arrow" aria-hidden="true">→</span></a></div>
@@ -39,7 +39,13 @@ npm run build:web -- examples/web-app-study-timer.html \
   }
 }</code></pre><p>HTMLファイルをエントリーポイントとして指定します。</p></section>
       <a id="ui"></a><section id="web-app" data-title="Web App" data-group="基礎"><h2>Web App</h2><p>Web AppはCIT Hub内の隔離されたローカルWebViewで実行されます。外部スクリプト、外部CSS、外部画像、iframe、<code>fetch</code>、XHR、WebSocket、Service Worker、<code>eval</code>、<code>Function</code>、動的import、任意のネイティブコードは使用できません。</p><p>画面は標準DOM、CSS、SVG、Canvas、Web Animationsで作成できます。</p></section>
-      <section id="bridge" data-title="CITHub bridge" data-group="CIT Hubデータ"><h2>CIT Hubブリッジ</h2><p>HTMLからCIT Hubの機能を使う唯一の入口は<code>window.CITHub</code>です。</p><pre><code>const host = await window.CITHub.ready();
+      <section id="reference" data-title="戻り値と型" data-group="CIT Hubデータ"><h2>戻り値と型</h2><p>全APIの引数、戻り値、権限、ユーザー操作、対応OSは<a href="api-reference.json">機械可読リファレンス</a>にJSON形式で掲載しています。API呼び出しは成功時に値を返し、失敗時は<code>{code, message}</code>形式のエラーで拒否されます。</p><pre><code>try {
+  const data = await window.CITHub.call('camera.capture', {
+    key: 'photo', kind: 'photo', maxSeconds: 0
+  });
+} catch (error) {
+  console.error(error.code, error.message);
+}</code></pre></section><section id="bridge" data-title="CITHub bridge" data-group="CIT Hubデータ"><h2>CIT Hubブリッジ</h2><p>HTMLからCIT Hubの機能を使う唯一の入口は<code>window.CITHub</code>です。</p><pre><code>const host = await window.CITHub.ready();
 const today = await window.CITHub.call('cit.timetable.today', {});
 const stop = window.CITHub.on('resume', () =&gt; refresh());</code></pre><p><code>ready()</code>はホスト情報、<code>on()</code>は解除関数、<code>call()</code>は権限と端末Capabilityを検査した結果を返します。非同期処理は必ず<code>try/catch</code>で扱います。</p></section>
       <section id="data" data-title="本人データ" data-group="CIT Hubデータ"><h2>本人データ</h2><div class="tablewrap"><table><thead><tr><th>operation</th><th>権限</th><th>用途</th></tr></thead><tbody><tr><td><code>cit.timetable.today</code><br><code>tomorrow</code> / <code>week</code></td><td>timetable.read</td><td>時間割</td></tr><tr><td><code>cit.courses.list</code> / <code>search</code></td><td>timetable.read</td><td>履修授業</td></tr><tr><td><code>cit.assignments.list</code> / <code>pending</code> / <code>overdue</code></td><td>assignments.read</td><td>課題</td></tr><tr><td><code>cit.todo.list</code></td><td>todos.read</td><td>ToDo</td></tr><tr><td><code>cit.courseNotes.list</code> / <code>get</code></td><td>courseNotes.read</td><td>授業メモ</td></tr><tr><td><code>cit.calendar.events</code> / <code>holidays</code></td><td>calendar.read</td><td>学年暦</td></tr><tr><td><code>cit.bus.next</code> / <code>timetable</code></td><td>bus.read</td><td>バス</td></tr><tr><td><code>cit.cafeteria.menu</code> / <code>hours</code></td><td>cafeteria.read</td><td>食堂</td></tr></tbody></table></div></section>
