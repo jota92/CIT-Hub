@@ -54,7 +54,7 @@ npm run build:web -- examples/web-app-study-timer.html \
 
 ## 4. CIT Hubブリッジ
 
-全APIの引数、戻り値、権限、ユーザー操作、対応OSは [`api-reference.json`](api-reference.json) に機械可読形式で掲載しています。現行リファレンスには、従来のCIT Hub拡張機能で利用されていた端末機能・本人データ・保存・共有・通知・ネットワーク・サーバー機能を含む241操作を個別のoperationとして収録しています。成功時は値を返し、失敗時は `{code, message}` を持つエラーとして拒否されます。
+全APIの引数、戻り値、権限、ユーザー操作、対応OSは [`api-reference.json`](api-reference.json) に機械可読形式で掲載しています。現行リファレンスには、端末機能・本人データ・保存・共有・通知・ネットワーク・サーバー機能を含む241操作を個別のoperationとして収録しています。成功時は値を返し、失敗時は `{code, message}` を持つエラーとして拒否されます。
 
 ### 全機能カタログ
 
