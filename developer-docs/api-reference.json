@@ -3654,7 +3654,14 @@
       "name": "server.db",
       "permission": "server.functions or cloud.storage",
       "args": "operation-specific JSON; see review-approved function schema",
-      "returns": "operation-specific JSON, always user-scoped",
+      "returns": {
+        "id": "string?",
+        "value": "JSON value?",
+        "revision": "number?",
+        "rows": "ServerRecord[]?",
+        "nextCursor": "string|null",
+        "deleted": "boolean?"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -3767,7 +3774,14 @@
       "name": "server.files",
       "permission": "server.functions or cloud.storage",
       "args": "operation-specific JSON; see review-approved function schema",
-      "returns": "operation-specific JSON, always user-scoped",
+      "returns": {
+        "key": "string",
+        "name": "string",
+        "size": "number?",
+        "mimeType": "string?",
+        "data": "base64 string?",
+        "deleted": "boolean?"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -3780,7 +3794,10 @@
       "name": "server.function",
       "permission": "server.functions or cloud.storage",
       "args": "operation-specific JSON; see review-approved function schema",
-      "returns": "operation-specific JSON, always user-scoped",
+      "returns": {
+        "value": "JSON value",
+        "executionMs": "number"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -3793,7 +3810,11 @@
       "name": "server.kv",
       "permission": "server.functions or cloud.storage",
       "args": "operation-specific JSON; see review-approved function schema",
-      "returns": "operation-specific JSON, always user-scoped",
+      "returns": {
+        "value": "JSON value|null",
+        "revision": "number?",
+        "deleted": "boolean?"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
