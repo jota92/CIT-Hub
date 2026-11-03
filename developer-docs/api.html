@@ -38,7 +38,7 @@ npm run build:web -- examples/web-app-study-timer.html \
     "contentHash": "sha256-..."
   }
 }</code></pre><p><code>runtime</code>、native <code>content</code>、旧<code>webApp.html</code>単体形式は使用できません。</p></section>
-      <section id="runtime" data-title="Runtime" data-group="基礎"><h2>Runtime</h2><p>Web AppはCIT Hub内の隔離されたローカルWebViewで実行されます。外部スクリプト、外部CSS、外部画像、iframe、<code>fetch</code>、XHR、WebSocket、Service Worker、<code>eval</code>、<code>Function</code>、動的import、任意のネイティブコードは使用できません。</p><p>画面は標準DOM、CSS、SVG、Canvas、Web Animationsで作成できます。</p></section>
+      <a id="ui"></a><section id="runtime" data-title="Runtime" data-group="基礎"><h2>Runtime</h2><p>Web AppはCIT Hub内の隔離されたローカルWebViewで実行されます。外部スクリプト、外部CSS、外部画像、iframe、<code>fetch</code>、XHR、WebSocket、Service Worker、<code>eval</code>、<code>Function</code>、動的import、任意のネイティブコードは使用できません。</p><p>画面は標準DOM、CSS、SVG、Canvas、Web Animationsで作成できます。</p></section>
       <section id="bridge" data-title="CITHub bridge" data-group="CIT Hubデータ"><h2>CIT Hubブリッジ</h2><p>HTMLからCIT Hubの機能を使う唯一の入口は<code>window.CITHub</code>です。</p><pre><code>const host = await window.CITHub.ready();
 const today = await window.CITHub.call('cit.timetable.today', {});
 const stop = window.CITHub.on('resume', () =&gt; refresh());</code></pre><p><code>ready()</code>はホスト情報、<code>on()</code>は解除関数、<code>call()</code>は権限と端末Capabilityを検査した結果を返します。非同期処理は必ず<code>try/catch</code>で扱います。</p></section>
