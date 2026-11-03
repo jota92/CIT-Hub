@@ -82,13 +82,37 @@ const stop = window.CITHub.on('resume', () => refresh());
 | operation | 必要な権限 | 条件 |
 |---|---|---|
 | `permissions.status` / `permissions.request` | 対象権限 | OS権限の確認・要求。ユーザー操作が必要 |
-| `camera.capturePhoto` | `camera.use`, `files.selection.read` | カメラ起動はユーザー操作から実行 |
-| `photos.save` | `photos.user`, `files.selection.read` | 確認後に写真へ保存 |
+| `camera.available` / `camera.capture` | `camera.use`, `files.selection.read` | 撮影はユーザー操作から実行。動画は`microphone.use`も必要 |
+| `camera.scan` / `scanner.document` | `camera.use`、文書スキャンは`files.storage` | QR・バーコード・PDFスキャン。ユーザー操作が必要 |
+| `photos.save` | `photos.user`, `files.user`, `files.selection.read` | 写真の選択・保存。保存前にOS確認を表示 |
 | `audio.record` / `audio.stopRecording` | `microphone.use`, `files.selection.read` | 録音はユーザー操作から実行 |
-| `sensors.motion` | `sensors.motion` | 端末が対応するセンサーだけ |
-| `device.info` | なし | OS・端末Capabilityの限定情報 |
+| `sensors.read` | `sensors.motion` | 加速度・ジャイロ・磁気・姿勢。読み取りはユーザー操作から実行 |
+| `device.info` / `permissions.status` / `permissions.request` | 対象権限 | OS・端末Capabilityの限定情報と権限状態 |
 | `browser.openExternal` | `browser.open` | HTTPS URLのみ。ユーザー操作が必要 |
 | `notification.schedule` | `notifications.schedule` | 通知権限とユーザー操作が必要 |
+
+カメラ撮影、写真保存、センサー読み取りなどは、HTMLのボタン操作から呼び出してください。ブリッジが操作元を検証するため、タイマーや起動処理からの呼び出しは拒否されます。
+
+```html
+<button id="photo">写真を撮る</button>
+<button id="motion">センサーを読む</button>
+<script>
+  photo.onclick = async () => {
+    const result = await window.CITHub.call('camera.capture', {
+      key: 'capturedPhoto', kind: 'photo', maxSeconds: 0
+    });
+    console.log(result.key);
+  };
+  motion.onclick = async () => {
+    const result = await window.CITHub.call('sensors.read', {
+      kind: 'accelerometer'
+    });
+    console.log(result);
+  };
+</script>
+```
+
+撮影・選択したファイルは`files.selection.read`で読み取り、`photos.save`で写真フォルダへ保存できます。端末内のユーザー情報は`profile.read`、`settings.read`、`extensions.read`、`timetable.read`、`assignments.read`など、必要な権限をmanifestに宣言した場合だけ取得できます。パスワード、OTP秘密鍵、Cookie、セッショントークン、他ユーザー情報は取得できません。
 
 ### ローカル保存
 
@@ -97,7 +121,7 @@ const stop = window.CITHub.on('resume', () => refresh());
 | `storage.get` / `set` / `has` / `remove` / `keys` | なし | 拡張機能・ユーザーごとの端末内保存 |
 | `secureStorage.get` / `set` / `delete` | なし | 端末の保護領域への保存 |
 | `files.read` / `write` / `delete` / `list` | `files.storage` | 拡張機能専用領域 |
-| `files.selection.pick` / `read` | `files.user`, `files.selection.read` | ユーザーが選択したファイル |
+| `files.selection.pick` / `files.selection.pickMultiple` / `files.selection.read` | `files.user`, `files.selection.read` | ユーザーが選択したファイル |
 | `files.export` / `saveAs` | `files.storage` | ユーザー操作による書き出し |
 
 ### 拡張機能サーバー
