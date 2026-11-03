@@ -1,7 +1,6 @@
 # CIT Hub Web App API
 
-> **現行仕様（Host API v80）**
-> 拡張機能の作成・審査・公開・インストールで利用できる画面方式は、ローカルHTML Web Appだけです。旧TypeScript/QuickJS/native UI SDK、`defineProgram`、`runtime`、native `content`、旧`webApp.html`単体形式は廃止され、受け付けません。
+> CIT Hub拡張機能の画面はローカルHTML Web Appで作成します。
 
 ## 1. manifest
 
@@ -25,7 +24,7 @@
 }
 ```
 
-`content`は必ず空配列、`runtime`は指定不可です。旧形式は `native_ui_removed`、`web_app_required`、`manifest_content_invalid` などで拒否されます。
+`content`は空配列にし、`ui.mode`を`web`にします。`webApp.files.index.html`がエントリーポイントです。
 
 ## 2. 作成とビルド
 
@@ -118,10 +117,10 @@ const stop = window.CITHub.on('resume', () => refresh());
 
 ## 6. 審査と更新
 
-審査ではmanifest、HTML、権限、外部通信、データ範囲、エラー処理を検査します。審査前の下書きは作成者の端末だけで動作確認できます。公開版は承認後に配布されます。更新版も必ずWeb App形式で提出し、旧native形式への更新はできません。
+審査ではmanifest、HTML、権限、外部通信、データ範囲、エラー処理を検査します。審査前の下書きは作成者の端末だけで動作確認できます。公開版は承認後に配布されます。更新版もWeb App形式で提出します。
 
 ## 7. エラー
 
 代表的なエラーコードは`permission_denied`、`user_action_required`、`unsupported`、`network_error`、`not_found`、`rate_limited`、`storage_error`、`validation_error`、`host_update_required`です。エラーコードを画面へ表示し、再試行・権限設定・ユーザー操作など次の手順を案内してください。
 
-詳細な最新のoperation、引数、戻り値、対応OSは、配布されるSDKの`API.md`とアプリのHost API実装を正とします。旧SDKの記述やサンプルは公開仕様ではありません。
+詳細なoperation、引数、戻り値、対応OSは、このAPIリファレンスと配布されるSDKの`API.md`を参照してください。

@@ -10,7 +10,7 @@
   <script src="assets/api.js?v=20261103-web-only" defer></script>
 </head>
 <body>
-  <div class="web-app-only-notice" role="note"><strong>現行仕様: HTML Web Appのみ</strong><br>旧TypeScript/QuickJS/native UI SDK、<code>defineProgram</code>、<code>runtime</code>、native <code>content</code>、旧<code>webApp.html</code>単体形式は廃止され、公開・審査・インストールできません。</div>
+  
   <header class="topbar"><a class="wordmark" href="documentation.html">CIT Hub</a><span class="product">Developer Documentation</span><nav class="toplinks" aria-label="グローバルナビゲーション"><a href="documentation.html">ドキュメント</a><a href="guide.html">開発ガイド</a><a href="api.html" aria-current="page">APIリファレンス</a><a href="https://developer.cithub.app/">コンソール</a></nav></header>
   <details class="mobile-nav"><summary>このページの目次</summary><input class="search" id="api-search-mobile" type="search" placeholder="APIを検索" aria-label="APIを検索"><div id="mobile-toc"></div></details>
   <div class="layout">
@@ -21,7 +21,7 @@
       <p class="lead">HTML・CSS・JavaScriptでローカルWeb Appを作り、CIT Hubの審査済みブリッジから本人データと端末機能を利用します。</p>
       <div class="doc-actions"><a class="doc-button primary" href="guide.html">開発を始める</a><a class="doc-button" href="assets/cithub-extension-kit.zip?v=80.0" download>Web App SDKをダウンロード</a><a class="doc-button quiet" href="api.md" download>Markdown仕様書</a></div>
       <div class="meta"><span><strong>Host API</strong> v80</span><span><strong>UI</strong> Local HTML WebView</span><span><strong>対象</strong> iOS・iPadOS・macOS・Android</span></div>
-      <div class="callout"><strong>方式は1つだけです</strong><br>拡張機能の画面はHTML Web Appで作成します。旧native UI SDKはサーバーとアプリが拒否します。</div>
+      <div class="callout"><strong>画面を作る</strong><br>拡張機能の画面はHTML・CSS・JavaScriptで作成します。データ取得やCIT Hub機能の呼び出しには<code>window.CITHub.call(operation, args)</code>を使います。</div>
       <div class="doc-intro-grid"><a class="doc-intro-card" href="#quickstart"><span class="card-index">01</span><strong>まず動かす</strong><span>HTMLをJSONへビルドして試す。</span><span class="card-arrow" aria-hidden="true">→</span></a><a class="doc-intro-card" href="#bridge"><span class="card-index">02</span><strong>ブリッジを使う</strong><span>本人データと端末機能を安全に呼び出す。</span><span class="card-arrow" aria-hidden="true">→</span></a><a class="doc-intro-card" href="#permissions"><span class="card-index">03</span><strong>審査に出す</strong><span>権限と安全境界を確認する。</span><span class="card-arrow" aria-hidden="true">→</span></a></div>
       <section id="quickstart" data-title="はじめに" data-group="開始する"><h2>はじめに</h2><p>SDK ZIPを展開し、HTMLファイルとmetadata JSONを作成します。</p><div class="codebox"><button class="copy" type="button">コピー</button><pre><code>npm install
 npm run build:web -- examples/web-app-study-timer.html \
@@ -37,8 +37,8 @@ npm run build:web -- examples/web-app-study-timer.html \
     "files": { "index.html": "&lt;!doctype html&gt;..." },
     "contentHash": "sha256-..."
   }
-}</code></pre><p><code>runtime</code>、native <code>content</code>、旧<code>webApp.html</code>単体形式は使用できません。</p></section>
-      <a id="ui"></a><section id="runtime" data-title="Runtime" data-group="基礎"><h2>Runtime</h2><p>Web AppはCIT Hub内の隔離されたローカルWebViewで実行されます。外部スクリプト、外部CSS、外部画像、iframe、<code>fetch</code>、XHR、WebSocket、Service Worker、<code>eval</code>、<code>Function</code>、動的import、任意のネイティブコードは使用できません。</p><p>画面は標準DOM、CSS、SVG、Canvas、Web Animationsで作成できます。</p></section>
+}</code></pre><p>HTMLファイルをエントリーポイントとして指定します。</p></section>
+      <a id="ui"></a><section id="web-app" data-title="Web App" data-group="基礎"><h2>Web App</h2><p>Web AppはCIT Hub内の隔離されたローカルWebViewで実行されます。外部スクリプト、外部CSS、外部画像、iframe、<code>fetch</code>、XHR、WebSocket、Service Worker、<code>eval</code>、<code>Function</code>、動的import、任意のネイティブコードは使用できません。</p><p>画面は標準DOM、CSS、SVG、Canvas、Web Animationsで作成できます。</p></section>
       <section id="bridge" data-title="CITHub bridge" data-group="CIT Hubデータ"><h2>CIT Hubブリッジ</h2><p>HTMLからCIT Hubの機能を使う唯一の入口は<code>window.CITHub</code>です。</p><pre><code>const host = await window.CITHub.ready();
 const today = await window.CITHub.call('cit.timetable.today', {});
 const stop = window.CITHub.on('resume', () =&gt; refresh());</code></pre><p><code>ready()</code>はホスト情報、<code>on()</code>は解除関数、<code>call()</code>は権限と端末Capabilityを検査した結果を返します。非同期処理は必ず<code>try/catch</code>で扱います。</p></section>
@@ -47,7 +47,7 @@ const stop = window.CITHub.on('resume', () =&gt; refresh());</code></pre><p><cod
       <section id="storage" data-title="保存" data-group="データと端末"><h2>保存</h2><p><code>storage.get/set/has/remove/keys</code>は拡張機能・ユーザーごとの端末内保存です。<code>secureStorage</code>は保護領域、<code>files.*</code>は拡張機能専用領域です。他ユーザーのデータは取得できません。</p></section>
       <section id="server" data-title="拡張機能サーバー" data-group="サーバー"><h2>拡張機能サーバー</h2><p><code>server.function</code>、<code>server.cron.*</code>、<code>server.files.*</code>、<code>server.db.*</code>、<code>server.kv.*</code>は宣言権限と審査を必要とします。パスワード、OTP、Cookie、セッショントークン、管理者データ、他ユーザーのデータは渡されません。</p></section>
       <section id="permissions" data-title="権限と互換性" data-group="公開と互換性"><h2>権限と安全性</h2><p>利用する本人データ・端末機能だけを<code>permissions</code>へ宣言します。権限、OS許可、ユーザー操作、Host APIバージョンをホストが検査します。外部通信が必要な場合もHTMLから直接通信せず、許可されたブリッジを使用します。</p></section>
-      <section id="not-available" data-title="未提供API" data-group="公開と互換性"><h2>廃止・未提供</h2><p>旧TypeScript/QuickJS/native UI SDK、<code>defineProgram</code>、<code>runtime</code>、native <code>content</code>、旧<code>webApp.html</code>単体形式は廃止済みです。サーバーとアプリはこれらを受け付けません。未提供の機能を推測して実行することもありません。</p></section>
+      
       <section id="errors" data-title="エラー" data-group="公開と互換性"><h2>エラー</h2><p><code>permission_denied</code>、<code>user_action_required</code>、<code>unsupported</code>、<code>network_error</code>、<code>not_found</code>、<code>rate_limited</code>、<code>storage_error</code>、<code>validation_error</code>、<code>host_update_required</code>を画面へ表示し、再試行や設定変更を案内してください。</p></section>
     </main>
     <aside class="toc-right"><strong>次に読む</strong><a href="guide.html">開発ガイド</a><a href="#permissions">権限と安全性</a><a href="https://developer.cithub.app/">開発者コンソール</a></aside>

@@ -8,7 +8,7 @@
   <meta name="description" content="CIT Hub拡張機能をHTML Web Appで作成し、自分のアプリで確認して公開審査へ提出するまでの開発者ガイド。">
   <link rel="stylesheet" href="assets/api.css?v=20261010-v51">
 </head>
-<body><div class="web-app-only-notice" role="note"><strong>現行仕様: HTML Web Appのみ</strong><br>旧TypeScript/QuickJS/native UI SDK（defineProgram / runtime / content）は廃止され、公開・審査・インストールできません。<code>window.CITHub.call(operation, args)</code>を使うHTML Web Appを<code>kit/build-web-app.mjs</code>でビルドしてください。</div>
+<body>
   <header class="topbar"><a class="wordmark" href="documentation.html">CIT Hub</a><span class="product">Developer Documentation</span><nav class="toplinks" aria-label="グローバルナビゲーション"><a href="documentation.html">ドキュメント</a><a href="guide.html" aria-current="page">開発ガイド</a><a href="api.html">APIリファレンス</a><a href="https://developer.cithub.app/">コンソール</a></nav></header>
   <details class="mobile-nav"><summary>このページの目次</summary><nav class="navgroup" aria-label="開発の流れ"><a href="#start">始める</a><a href="#build">ビルド</a><a href="#test">アプリで試す</a><a href="#publish">公開申請</a><a href="#security">権限と安全性</a></nav></details>
   <div class="layout">
@@ -34,9 +34,9 @@ npm run build:web -- examples/web-app-study-timer.html \
 
       <section id="publish"><h2>4. 公開を申請</h2><p>開発者コンソールから機能説明を添えて審査へ提出します。更新時は変更内容を記載します。承認されるまでは一般の利用者へ配布されません。拡張機能名は原則として作成後に変更できません。</p><p>審査では、必要な権限、扱うデータ、外部通信先、利用者が行う操作、エラー時の挙動を確認します。個人情報や秘密情報を収集する機能は追加できません。</p></section>
 
-      <section id="security"><h2>権限と安全性</h2><ul><li>利用するCIT Hubデータ・端末機能だけをmanifestへ宣言します。</li><li>権限宣言とOS権限は別です。カメラ・位置情報・通知などは必要時に利用者の操作を経て要求します。</li><li>Web AppはローカルWebViewで隔離され、外部スクリプト、任意の外部通信、動的コード実行、任意のネイティブコードは利用できません。</li><li>Portal/Manabaのパスワード、OTP秘密鍵、Cookie、CIT Hubセッショントークン、他ユーザー情報はAPIで公開しません。</li><li>旧TypeScript/QuickJS/native UI SDKは廃止され、サーバーとアプリで拒否されます。</li></ul><p>実装済みAPI、権限、容量・実行制限は<a href="api.html">APIリファレンス</a>と<a href="api.md">詳細仕様書</a>を参照してください。</p></section>
+      <section id="security"><h2>権限と安全性</h2><ul><li>利用するCIT Hubデータ・端末機能だけをmanifestへ宣言します。</li><li>権限宣言とOS権限は別です。カメラ・位置情報・通知などは必要時に利用者の操作を経て要求します。</li><li>Web AppはローカルWebViewで隔離され、外部スクリプト、任意の外部通信、動的コード実行、任意のネイティブコードは利用できません。</li><li>Portal/Manabaのパスワード、OTP秘密鍵、Cookie、CIT Hubセッショントークン、他ユーザー情報はAPIで公開しません。</li></ul><p>実装済みAPI、権限、容量・実行制限は<a href="api.html">APIリファレンス</a>と<a href="api.md">詳細仕様書</a>を参照してください。</p></section>
     </main>
-    <aside class="toc-right"><strong>次に読む</strong><a href="api.html">APIリファレンス</a><a href="api.html#not-available">未対応APIと制限</a><a href="https://developer.cithub.app/">開発者コンソール</a></aside>
+    <aside class="toc-right"><strong>次に読む</strong><a href="api.html">APIリファレンス</a><a href="api.html#permissions">権限と安全性</a><a href="https://developer.cithub.app/">開発者コンソール</a></aside>
   </div>
   <footer class="footer">CIT Hub Developer Documentation · Host API v51 · <a href="documentation.html">ドキュメント</a> · <a href="api.html">APIリファレンス</a> · <a href="https://developer.cithub.app/">コンソール</a></footer>
 </body>

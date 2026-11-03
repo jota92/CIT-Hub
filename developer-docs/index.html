@@ -8,7 +8,7 @@
   <meta name="description" content="CIT Hub拡張機能のHTML Web App、データAPI、権限、テストと公開手順を確認できます。">
   <link rel="stylesheet" href="assets/api.css?v=20261010-v48">
 </head>
-<body><div class="web-app-only-notice" role="note"><strong>現行仕様: HTML Web Appのみ</strong><br>旧TypeScript/QuickJS/native UI SDK（defineProgram / runtime / content）は廃止され、公開・審査・インストールできません。<code>window.CITHub.call(operation, args)</code>を使うHTML Web Appを<code>kit/build-web-app.mjs</code>でビルドしてください。</div>
+<body>
   <header class="topbar">
     <a class="wordmark" href="documentation.html">CIT Hub</a>
     <span class="product">Developer Documentation</span>
@@ -58,14 +58,14 @@
         <h2>目的からAPIを探す</h2>
         <p>APIの存在だけでなく、権限、最低Host API、OSごとの挙動、データの取得条件もリファレンスで確認できます。</p>
         <div class="api-index">
-          <a href="api.html#runtime"><strong>画面・入力・レイアウト</strong><span>HTML Web App</span></a>
+          <a href="api.html#web-app"><strong>画面・入力・レイアウト</strong><span>HTML Web App</span></a>
           <a href="api.html#campus-data"><strong>時間割・課題・ToDo</strong><span>本人データ</span></a>
           <a href="api.html#storage"><strong>端末保存・Cloud KV</strong><span>データ管理</span></a>
           <a href="api.html#files"><strong>ファイル・メディア</strong><span>ユーザー選択</span></a>
           <a href="api.html#network"><strong>HTTPS通信</strong><span>接続先の宣言</span></a>
           <a href="api.html#notifications"><strong>通知・ライフサイクル</strong><span>イベント</span></a>
           <a href="api.html#permission-index"><strong>権限一覧</strong><span>許可とスコープ</span></a>
-          <a href="api.html#not-available"><strong>未提供API・制限</strong><span>互換性</span></a>
+          <a href="api.html#permissions"><strong>権限と安全性</strong><span>安全設計</span></a>
         </div>
       </section>
 
