@@ -29,7 +29,10 @@
       "name": "accessibility.highContrast",
       "permission": null,
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "supported": "boolean",
+        "enabled": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -42,7 +45,10 @@
       "name": "accessibility.reduceMotion",
       "permission": null,
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "supported": "boolean",
+        "enabled": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -55,7 +61,10 @@
       "name": "accessibility.status",
       "permission": null,
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "supported": "boolean",
+        "enabled": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -68,7 +77,9 @@
       "name": "analytics.event",
       "permission": "analytics.collect",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "recorded": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -81,7 +92,9 @@
       "name": "app.capabilities",
       "permission": null,
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "capabilities": "string[]"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -394,7 +407,12 @@
       "name": "camera.capturePhoto",
       "permission": "camera.use + files.selection.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "key": "string",
+        "name": "string",
+        "size": "number",
+        "mimeType": "string"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -407,7 +425,12 @@
       "name": "camera.captureVideo",
       "permission": "camera.use + microphone.use + files.selection.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "key": "string",
+        "name": "string",
+        "size": "number",
+        "mimeType": "string"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -437,7 +460,10 @@
       "name": "camera.scanBarcode",
       "permission": "camera.use",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "value": "string",
+        "format": "qr|barcode"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -450,7 +476,10 @@
       "name": "camera.scanQRCode",
       "permission": "camera.use",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "value": "string",
+        "format": "qr|barcode"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -509,7 +538,9 @@
       "name": "capabilities.has",
       "permission": null,
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "available": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -893,7 +924,11 @@
       "name": "cit.campus.buildings",
       "permission": "timetable.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "item": "CampusItem|null",
+        "items": "CampusItem[]",
+        "available": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -906,7 +941,11 @@
       "name": "cit.campus.facilities",
       "permission": "timetable.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "item": "CampusItem|null",
+        "items": "CampusItem[]",
+        "available": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -919,7 +958,11 @@
       "name": "cit.campus.room",
       "permission": "timetable.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "item": "CampusItem|null",
+        "items": "CampusItem[]",
+        "available": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -932,7 +975,11 @@
       "name": "cit.campus.roomAvailability",
       "permission": "timetable.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "item": "CampusItem|null",
+        "items": "CampusItem[]",
+        "available": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -945,7 +992,11 @@
       "name": "cit.campus.rooms",
       "permission": "timetable.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "item": "CampusItem|null",
+        "items": "CampusItem[]",
+        "available": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -958,7 +1009,11 @@
       "name": "cit.campus.search",
       "permission": "timetable.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "item": "CampusItem|null",
+        "items": "CampusItem[]",
+        "available": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -1117,7 +1172,9 @@
       "name": "cit.services.list",
       "permission": "settings.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "items": "CampusService[]"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -1130,7 +1187,9 @@
       "name": "cit.services.open",
       "permission": "host.navigate",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "opened": "boolean"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -1143,7 +1202,10 @@
       "name": "cit.settings.appearance",
       "permission": "settings.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "value": "JSON value|null",
+        "settings": "JSON object"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -1156,7 +1218,10 @@
       "name": "cit.settings.enabledServices",
       "permission": "settings.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "value": "JSON value|null",
+        "settings": "JSON object"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -1169,7 +1234,10 @@
       "name": "cit.settings.language",
       "permission": "settings.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "value": "JSON value|null",
+        "settings": "JSON object"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -1182,7 +1250,10 @@
       "name": "cit.settings.notifications",
       "permission": "settings.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "value": "JSON value|null",
+        "settings": "JSON object"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -1344,7 +1415,9 @@
       "name": "cit.user.displayName",
       "permission": "profile.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "displayName": "string|null"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -1357,7 +1430,9 @@
       "name": "cit.user.preferences",
       "permission": "settings.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "preferences": "JSON object"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -1439,7 +1514,13 @@
       "name": "code.generateQR",
       "permission": "files.storage",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "name": "string",
+        "size": "number",
+        "mimeType": "image/png",
+        "width": "number",
+        "height": "number"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -1452,7 +1533,10 @@
       "name": "code.scanBarcode",
       "permission": "camera.use",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "value": "string",
+        "format": "qr|barcode"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -1465,7 +1549,10 @@
       "name": "code.scanQR",
       "permission": "camera.use",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "value": "string",
+        "format": "qr|barcode"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -1559,7 +1646,9 @@
       "name": "extensions.isInstalled",
       "permission": "extensions.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "installed": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -1572,7 +1661,9 @@
       "name": "extensions.open",
       "permission": "extensions.read + host.navigate",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "opened": "boolean"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -1585,7 +1676,9 @@
       "name": "extensions.request",
       "permission": "extensions.read + host.navigate",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "opened": "boolean"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -1598,7 +1691,9 @@
       "name": "field.blur",
       "permission": null,
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "accepted": "boolean"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -1611,7 +1706,9 @@
       "name": "field.focus",
       "permission": null,
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "accepted": "boolean"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -1984,7 +2081,12 @@
       "name": "groups.create",
       "permission": "cloud.shared",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "group": "Group|null",
+        "groups": "Group[]",
+        "members": "GroupMember[]",
+        "changed": "boolean"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -1997,7 +2099,12 @@
       "name": "groups.invite",
       "permission": "cloud.shared",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "group": "Group|null",
+        "groups": "Group[]",
+        "members": "GroupMember[]",
+        "changed": "boolean"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -2010,7 +2117,12 @@
       "name": "groups.join",
       "permission": "cloud.shared",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "group": "Group|null",
+        "groups": "Group[]",
+        "members": "GroupMember[]",
+        "changed": "boolean"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -2023,7 +2135,12 @@
       "name": "groups.leave",
       "permission": "cloud.shared",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "group": "Group|null",
+        "groups": "Group[]",
+        "members": "GroupMember[]",
+        "changed": "boolean"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -2036,7 +2153,12 @@
       "name": "groups.list",
       "permission": "cloud.shared",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "group": "Group|null",
+        "groups": "Group[]",
+        "members": "GroupMember[]",
+        "changed": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -2049,7 +2171,12 @@
       "name": "groups.members",
       "permission": "cloud.shared",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "group": "Group|null",
+        "groups": "Group[]",
+        "members": "GroupMember[]",
+        "changed": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -2062,7 +2189,9 @@
       "name": "haptics",
       "permission": null,
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "performed": "boolean"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -2094,7 +2223,9 @@
       "name": "host.registerAction",
       "permission": "host.navigate",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "registered": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -2107,7 +2238,9 @@
       "name": "host.registerShortcut",
       "permission": "host.navigate",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "registered": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -2318,7 +2451,9 @@
       "name": "keyboard.dismiss",
       "permission": null,
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "accepted": "boolean"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -2331,7 +2466,9 @@
       "name": "keyboard.focus",
       "permission": null,
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "accepted": "boolean"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -2363,7 +2500,9 @@
       "name": "link.create",
       "permission": "extensions.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "url": "string"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -2376,7 +2515,9 @@
       "name": "link.open",
       "permission": "extensions.read + host.navigate",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "opened": "boolean"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -2432,7 +2573,9 @@
       "name": "map.openDirections",
       "permission": "browser.open",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "opened": "boolean"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -2445,7 +2588,11 @@
       "name": "media.exportPDF",
       "permission": "files.storage",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "name": "string",
+        "size": "number",
+        "mimeType": "string"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -2458,7 +2605,11 @@
       "name": "media.generate",
       "permission": "files.storage",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "name": "string",
+        "size": "number",
+        "mimeType": "string"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -3207,7 +3358,12 @@
       "name": "photos.info",
       "permission": "files.selection.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "key": "string",
+        "width": "number",
+        "height": "number",
+        "mimeType": "string"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -3220,7 +3376,9 @@
       "name": "photos.pick",
       "permission": "files.user + files.selection.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "files": "SelectedFileInfo[]"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -3233,7 +3391,9 @@
       "name": "photos.pickMultiple",
       "permission": "files.user + files.selection.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "files": "SelectedFileInfo[]"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -3278,7 +3438,10 @@
       "name": "realtime.publish",
       "permission": "cloud.shared",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "subscriptionId": "string?",
+        "published": "boolean?"
+      },
       "gesture": true,
       "platforms": [
         "iOS",
@@ -3291,7 +3454,10 @@
       "name": "realtime.subscribe",
       "permission": "cloud.shared",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "subscriptionId": "string?",
+        "published": "boolean?"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -3361,7 +3527,9 @@
       "name": "search.registerItems",
       "permission": "extensions.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "indexed": "number"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -3374,7 +3542,9 @@
       "name": "search.removeItems",
       "permission": "extensions.read",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "removed": "number"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -3771,7 +3941,9 @@
       "name": "shortcuts.register",
       "permission": "host.navigate",
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "registered": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -3784,7 +3956,11 @@
       "name": "storage.clear",
       "permission": null,
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "value": "JSON value|null",
+        "keys": "string[]?",
+        "changed": "boolean?"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -3797,7 +3973,11 @@
       "name": "storage.compareAndSet",
       "permission": null,
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "value": "JSON value|null",
+        "keys": "string[]?",
+        "changed": "boolean?"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -4095,7 +4275,9 @@
       "name": "widget.define",
       "permission": null,
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "registered": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
@@ -4108,7 +4290,9 @@
       "name": "widget.reload",
       "permission": null,
       "args": {},
-      "returns": "Operation-specific JSON; see the operation section and the typed example in api.md.",
+      "returns": {
+        "reloaded": "boolean"
+      },
       "gesture": false,
       "platforms": [
         "iOS",
