@@ -10,7 +10,7 @@
   <script src="assets/api.js?v=20261103-web-only" defer></script>
 </head>
 <body>
-  
+
   <header class="topbar"><a class="wordmark" href="documentation.html">CIT Hub</a><span class="product">Developer Documentation</span><nav class="toplinks" aria-label="グローバルナビゲーション"><a href="documentation.html">ドキュメント</a><a href="guide.html">開発ガイド</a><a href="api.html" aria-current="page">APIリファレンス</a><a href="https://developer.cithub.app/">コンソール</a></nav></header>
   <details class="mobile-nav"><summary>このページの目次</summary><input class="search" id="api-search-mobile" type="search" placeholder="APIを検索" aria-label="APIを検索"><div id="mobile-toc"></div></details>
   <div class="layout">
@@ -47,7 +47,7 @@ const stop = window.CITHub.on('resume', () =&gt; refresh());</code></pre><p><cod
       <section id="storage" data-title="保存" data-group="データと端末"><h2>保存</h2><p><code>storage.get/set/has/remove/keys</code>は拡張機能・ユーザーごとの端末内保存です。<code>secureStorage</code>は保護領域、<code>files.*</code>は拡張機能専用領域です。他ユーザーのデータは取得できません。</p></section>
       <section id="server" data-title="拡張機能サーバー" data-group="サーバー"><h2>拡張機能サーバー</h2><p><code>server.function</code>、<code>server.cron.*</code>、<code>server.files.*</code>、<code>server.db.*</code>、<code>server.kv.*</code>は宣言権限と審査を必要とします。パスワード、OTP、Cookie、セッショントークン、管理者データ、他ユーザーのデータは渡されません。</p></section>
       <section id="permissions" data-title="権限と互換性" data-group="公開と互換性"><h2>権限と安全性</h2><p>利用する本人データ・端末機能だけを<code>permissions</code>へ宣言します。権限、OS許可、ユーザー操作、Host APIバージョンをホストが検査します。外部通信が必要な場合もHTMLから直接通信せず、許可されたブリッジを使用します。</p></section>
-      
+
       <section id="errors" data-title="エラー" data-group="公開と互換性"><h2>エラー</h2><p><code>permission_denied</code>、<code>user_action_required</code>、<code>unsupported</code>、<code>network_error</code>、<code>not_found</code>、<code>rate_limited</code>、<code>storage_error</code>、<code>validation_error</code>、<code>host_update_required</code>を画面へ表示し、再試行や設定変更を案内してください。</p></section>
     </main>
     <aside class="toc-right"><strong>次に読む</strong><a href="guide.html">開発ガイド</a><a href="#permissions">権限と安全性</a><a href="https://developer.cithub.app/">開発者コンソール</a></aside>
