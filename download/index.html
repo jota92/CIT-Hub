@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>CIT Hubをダウンロード</title>
+  <meta name="description" content="CIT HubをiPhone、iPad、Mac、Androidにインストールします。" />
+  <meta name="theme-color" content="#f5f5f7" />
+  <link rel="icon" href="../assets/app-icon.png" />
+  <link rel="stylesheet" href="../assets/site.css" />
+  <style>
+    .download-page { min-height: 100vh; display: grid; place-items: center; padding: 48px 20px; }
+    .download-card { width: min(560px, 100%); padding: 42px; border: 1px solid rgba(17, 24, 39, .12); border-radius: 28px; background: rgba(255, 255, 255, .86); box-shadow: 0 24px 70px rgba(17, 24, 39, .12); text-align: center; }
+    .download-card img { width: 84px; height: 84px; border-radius: 21px; box-shadow: 0 12px 30px rgba(17, 24, 39, .18); }
+    .download-card h1 { margin: 22px 0 10px; }
+    .download-card p { color: #5f6673; line-height: 1.75; }
+    .download-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 28px; }
+    .download-status { min-height: 1.5em; margin-top: 22px; color: #5f6673; }
+    .download-status[data-state="error"] { color: #b42318; }
+    @media (prefers-color-scheme: dark) {
+      .download-card { border-color: rgba(255, 255, 255, .15); background: rgba(31, 32, 36, .9); }
+      .download-card p, .download-status { color: #b8bcc6; }
+    }
+  </style>
+</head>
+<body>
+  <main class="download-page">
+    <section class="download-card" aria-labelledby="download-title">
+      <img src="../assets/app-icon.png" alt="CIT Hub" />
+      <h1 id="download-title">CIT Hubをダウンロード</h1>
+      <p id="download-message">お使いの端末に合わせて、最適な配布先へ移動します。</p>
+      <div class="download-actions">
+        <a id="ios-link" class="btn btn-primary" href="https://apps.apple.com/jp/app/cit-hub/id6760315556">App Storeを開く</a>
+        <a id="android-link" class="btn btn-primary" href="#" hidden>Android版APKをダウンロード</a>
+        <a class="btn btn-secondary" href="../">公式サイトへ戻る</a>
+      </div>
+      <p id="download-status" class="download-status" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const appStoreUrl = 'https://apps.apple.com/jp/app/cit-hub/id6760315556';
+      const ua = navigator.userAgent || '';
+      const isAndroid = /Android/i.test(ua);
+      const isIOS = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
+      const iosLink = document.querySelector('#ios-link');
+      const androidLink = document.querySelector('#android-link');
+      const message = document.querySelector('#download-message');
+      const status = document.querySelector('#download-status');
+
+      const showError = (text) => {
+        status.dataset.state = 'error';
+        status.textContent = text;
+        iosLink.hidden = false;
+        androidLink.hidden = false;
+      };
+
+      const loadLatestAndroid = () => fetch('../assets/version.json', { cache: 'no-store' })
+        .then((response) => { if (!response.ok) throw new Error('version'); return response.json(); })
+        .then((data) => {
+          const versions = Array.isArray(data.versions) ? data.versions : [];
+          const latest = versions
+            .filter((item) => item && item.downloadUrl)
+            .sort((a, b) => Number(b.versionCode || 0) - Number(a.versionCode || 0))[0];
+          if (!latest) throw new Error('apk');
+          return latest;
+        });
+
+      if (isAndroid) {
+        iosLink.hidden = true;
+        message.textContent = '最新版のAndroid版APKを準備しています。';
+        loadLatestAndroid()
+          .then((latest) => {
+            androidLink.href = latest.downloadUrl;
+            androidLink.hidden = false;
+            status.textContent = `Android版 ${latest.version || ''} をダウンロードします。`;
+            window.location.replace(latest.downloadUrl);
+          })
+          .catch(() => showError('最新版APKの配布情報を取得できませんでした。下のボタンから再試行してください。'));
+        return;
+      }
+
+      if (isIOS || /Macintosh|Mac OS X/i.test(ua)) {
+        androidLink.hidden = true;
+        window.location.replace(appStoreUrl);
+        return;
+      }
+
+      message.textContent = '端末を自動判定できませんでした。配布先を選択してください。';
+      loadLatestAndroid().then((latest) => {
+        androidLink.href = latest.downloadUrl;
+        androidLink.hidden = false;
+        status.textContent = `Android版 ${latest.version || ''} のダウンロード`;
+      }).catch(() => {
+        androidLink.hidden = false;
+        androidLink.addEventListener('click', (event) => {
+          event.preventDefault();
+          showError('Android版の配布情報を取得できませんでした。時間を置いて再試行してください。');
+        }, { once: true });
+      });
+    })();
+  </script>
+</body>
+</html>
